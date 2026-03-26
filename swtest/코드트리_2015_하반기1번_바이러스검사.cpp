@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define MAX (1000000+5000)
+#define MAX (1000000+50000)
 
 typedef long long ll;
 
