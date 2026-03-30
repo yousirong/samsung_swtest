@@ -15,94 +15,94 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BOJ_17276_배열돌리기.cpp">
+    <ClCompile Include="12_BOJ_17276_배열돌리기.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_16926_16927_배열돌리기1_2.cpp">
+    <ClCompile Include="13_BOJ_16926_16927_배열돌리기1_2.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_16935_배열돌리기3.cpp">
+    <ClCompile Include="14_BOJ_16935_배열돌리기3.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_20327_배열돌리기6.cpp">
+    <ClCompile Include="15_BOJ_20327_배열돌리기6.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_1913_달팽이.cpp">
+    <ClCompile Include="16_BOJ_1913_달팽이.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_10828_스택.cpp">
+    <ClCompile Include="17_BOJ_10828_스택.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_9012_괄호.cpp">
+    <ClCompile Include="18_BOJ_9012_괄호.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_10845_18258_큐_큐2.cpp">
+    <ClCompile Include="19_BOJ_10845_18258_큐_큐2.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_2161_카드1.cpp">
+    <ClCompile Include="20_BOJ_2161_카드1.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_10866_덱.cpp">
+    <ClCompile Include="21_BOJ_10866_덱.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_1021_회전하는큐.cpp">
+    <ClCompile Include="22_BOJ_1021_회전하는큐.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_2606_바이러스DFS.cpp">
+    <ClCompile Include="24_BOJ_2606_바이러스DFS.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_2606_바이러스BFS.cpp">
+    <ClCompile Include="25_BOJ_2606_바이러스BFS.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_1260_DFS와BFS.cpp">
+    <ClCompile Include="26_BOJ_1260_DFS와BFS.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="경우의수_순열_조합_중복순열_중복조합.cpp">
+    <ClCompile Include="27_경우의수_순열_조합_중복순열_중복조합.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_15651_15656_중복순열.cpp">
+    <ClCompile Include="28_BOJ_15651_15656_중복순열.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_15652_15657_중복조합.cpp">
+    <ClCompile Include="29_BOJ_15652_15657_중복조합.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_15649_15654_15663_순열.cpp">
+    <ClCompile Include="30_BOJ_15649_15654_15663_순열.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_15650_15655_15664_조합.cpp">
+    <ClCompile Include="31_BOJ_15650_15655_15664_조합.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_15665_15666_N과M11_12.cpp">
+    <ClCompile Include="32_BOJ_15665_15666_N과M11_12.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_6603_10819_로또차이를최대로.cpp">
+    <ClCompile Include="33_BOJ_6603_10819_로또차이를최대로.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_2667_단지번호붙이기.cpp">
+    <ClCompile Include="34_BOJ_2667_단지번호붙이기.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_4963_섬의개수.cpp">
+    <ClCompile Include="35_BOJ_4963_섬의개수.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_2178_미로탐색.cpp">
+    <ClCompile Include="36_BOJ_2178_미로탐색.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_2206_14442_벽부수고이동하기.cpp">
+    <ClCompile Include="37_BOJ_2206_14442_벽부수고이동하기.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_7576_토마토.cpp">
+    <ClCompile Include="38_BOJ_7576_토마토.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_7569_토마토3차원.cpp">
+    <ClCompile Include="38_BOJ_7569_토마토3차원.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_7562_나이트의이동.cpp">
+    <ClCompile Include="39_BOJ_7562_나이트의이동.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_2234_성곽.cpp">
+    <ClCompile Include="40_BOJ_2234_성곽.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="BOJ_2194_유닛이동시키기.cpp">
+    <ClCompile Include="41_BOJ_2194_유닛이동시키기.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="코드트리_2015_하반기1번_바이러스검사.cpp">
@@ -130,6 +130,21 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="코드트리_2017_하반기오전1번_조삼모사.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2017_하반기오전2번_보도블럭.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2017_하반기오후1번_돌아가는팔각의자.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2017_하반기오후2번_연산자배치하기.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2018_상반기오전1번_이상한체스.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2018_상반기오전2번_디버깅.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
