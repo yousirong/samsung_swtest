@@ -1,6 +1,6 @@
 // 백준 2667 단지번호붙이기
 // BFS(너비 우선 탐색)으로 각 아파트 단지의 크기를 구하는 코드
-
+// https://www.acmicpc.net/problem/2667
 #include <stdio.h>
 #include <stdbool.h>
 

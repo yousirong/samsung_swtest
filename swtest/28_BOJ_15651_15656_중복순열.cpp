@@ -1,5 +1,6 @@
 // BOJ 15651 - N과 M (3)
-//
+// https://www.acmicpc.net/problem/15651
+// 
 // 문제 요약
 // 1부터 N까지의 숫자 중에서
 // 길이 M의 수열을 만든다.
@@ -71,7 +72,7 @@ int main()
 }
 
 // BOJ 15656 - N과 M (7)
-//
+// https://www.acmicpc.net/problem/15656
 // 문제 요약
 // 입력으로 주어진 N개의 숫자 중에서
 // 길이 M의 수열을 만든다.

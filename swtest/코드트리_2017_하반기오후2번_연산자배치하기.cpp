@@ -1,5 +1,5 @@
 // 코드트리 2017 하반기 오후 2번 - 연산자 배치하기
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/arrange-operator
 // 문제 요약
 // 숫자 N개가 순서대로 주어지고,
 // 사용할 수 있는 연산자 개수(+, -, *)가 주어진다.

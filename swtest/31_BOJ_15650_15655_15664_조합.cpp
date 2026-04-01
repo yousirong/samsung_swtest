@@ -1,5 +1,5 @@
 // BOJ 15650 - N과 M (2)
-//
+// https://www.acmicpc.net/problem/15650
 // 문제 요약
 // 1부터 N까지 숫자 중에서
 // 중복 없이 M개를 골라
@@ -69,7 +69,7 @@ int main()
 }
 
 // BOJ 15655 - N과 M (6)
-//
+// https://www.acmicpc.net/problem/15655
 // 문제 요약
 // 입력으로 주어진 N개의 숫자 중에서
 // 중복 없이 M개를 골라
@@ -146,7 +146,7 @@ int main()
 }
 
 // BOJ 15656 - N과 M (7)
-//
+// https://www.acmicpc.net/problem/15664
 // 문제 요약
 // 입력으로 주어진 N개의 숫자 중에서
 // 길이 M의 수열을 만든다.

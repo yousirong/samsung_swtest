@@ -1,5 +1,5 @@
 // 코드트리 2018 상반기 오후 2번 - 병원 거리 최소화하기
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/min-of-hospital-distance
 // 문제 요약
 // N x N 격자에
 // - 사람(1)

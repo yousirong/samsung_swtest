@@ -1,5 +1,5 @@
 // 코드트리 2017 하반기 오후 1번 - 돌아가는 팔각의자
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/rounding-eight-angle
 // 문제 요약
 // 4개의 팔각의자가 일렬로 놓여 있고,
 // 각 의자는 8개의 톱니 상태(0 또는 1)를 가진다.

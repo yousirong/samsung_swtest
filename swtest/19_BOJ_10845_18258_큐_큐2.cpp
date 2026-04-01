@@ -1,5 +1,6 @@
 // BOJ 10845 / 18258 - 큐 / 큐 2
-//
+// https://www.acmicpc.net/problem/10845
+// https://www.acmicpc.net/problem/18258
 // 문제 요약
 // 큐(queue)를 직접 구현하고,
 // push / pop / size / empty / front / back 명령을 처리하는 문제

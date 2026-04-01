@@ -1,5 +1,5 @@
 // 코드트리 2015 하반기 1번 - 바이러스 검사
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/virus-detector
 // 문제 요약
 // 각 식당마다 검사해야 할 인원 수가 주어진다.
 // 각 식당에는

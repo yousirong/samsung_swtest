@@ -1,5 +1,5 @@
 // BOJ 15652 - N과 M (4)
-//
+// https://www.acmicpc.net/problem/15652
 // 문제 요약
 // 1부터 N까지 숫자 중에서
 // 중복을 허용하여 M개를 고르되,
@@ -72,7 +72,7 @@ int main()
 }
 
 // BOJ 15657 - N과 M (8)
-//
+// https://www.acmicpc.net/problem/15657
 // 문제 요약
 // 입력으로 주어진 N개의 숫자 중에서
 // 중복을 허용하여 M개를 고르되,

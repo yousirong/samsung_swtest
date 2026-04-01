@@ -1,5 +1,5 @@
 // BOJ 10828 - 스택
-//
+// https://www.acmicpc.net/problem/10828
 // 문제 요약
 // 스택(stack)을 직접 구현하고,
 // 주어진 명령(push, pop, size, empty, top)을 처리하는 문제

@@ -1,5 +1,5 @@
 // 코드트리 2016 하반기 1번 - 정육면체 굴리기
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/cube-rounding
 // 문제 요약
 // 지도 위에 정육면체(주사위)를 놓고,
 // 동/서/북/남 명령에 따라 굴린다.

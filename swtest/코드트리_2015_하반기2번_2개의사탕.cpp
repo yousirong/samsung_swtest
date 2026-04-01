@@ -1,5 +1,5 @@
 // 코드트리 2015 하반기 2번 - 2개의 사탕
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/two-candies
 // 문제 요약
 // 빨간 사탕(R)과 파란 사탕(B)이 있는 보드에서
 // 상/하/좌/우로 기울이는 동작을 최대 10번까지 수행할 수 있다.

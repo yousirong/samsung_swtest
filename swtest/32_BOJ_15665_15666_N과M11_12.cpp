@@ -1,5 +1,5 @@
 // BOJ 15665 - N과 M (11)
-//
+// https://www.acmicpc.net/problem/15665
 // 문제 요약
 // 입력으로 주어진 숫자들 중에서 길이 M의 수열을 만든다.
 //
@@ -108,7 +108,7 @@ int main()
 }
 
 // BOJ 15666 - N과 M (12)
-//
+// https://www.acmicpc.net/problem/15666
 // 문제 요약
 // 입력으로 주어진 숫자들 중에서 길이 M의 수열을 만든다.
 //

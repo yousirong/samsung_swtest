@@ -1,6 +1,6 @@
 // BOJ 2206 - 벽 부수고 이동하기
 // BFS + 상태 확장
-//
+// https://www.acmicpc.net/problem/2206
 // 핵심 아이디어:
 // 같은 좌표라도 "벽을 부순 적이 있는지"에 따라 다른 상태로 봐야 한다.
 // 그래서 visit[r][c] 가 아니라
@@ -183,6 +183,7 @@ int main()
 
 
 // BOJ 14442 - 벽 부수고 이동하기 2
+// https://www.acmicpc.net/problem/14442
 // BFS + 상태 확장
 //
 // 핵심 아이디어:

@@ -1,5 +1,7 @@
 // 코드트리 2018 상반기 오전 2번 - 디버깅
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/debugging
+// BOJ 15684 - 사다리 조작 (더 강한 test case)
+// https://www.acmicpc.net/problem/15684
 // 문제 요약
 // 세로선 C개, 가로 위치 R개가 있는 사다리 게임이 주어진다.
 // 현재 놓여 있는 가로선 M개에 대해,

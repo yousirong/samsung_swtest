@@ -284,7 +284,9 @@
     <ClCompile Include="코드트리_2018_하반기오후1번_바이러스실험.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="코드트리_2018_하반기오후2번_전투로봇.cpp" />
+    <ClCompile Include="코드트리_2018_하반기오후2번_전투로봇.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />

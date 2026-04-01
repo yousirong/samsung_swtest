@@ -1,5 +1,5 @@
 // 코드트리 2017 상반기 오후 2번 - 방화벽 설치
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/firewall-installation
 // 문제 요약
 // 연구소 맵에서
 // 0 : 빈 칸

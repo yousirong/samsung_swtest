@@ -1,5 +1,5 @@
 // 코드트리 2017 하반기 오전 1번 - 조삼모사
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/three-at-dawn-and-four-at-dusk
 // 문제 요약
 // N명의 사람을 두 팀으로 나누되,
 // 각 팀의 인원 수는 정확히 N/2명이어야 한다.

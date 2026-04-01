@@ -1,5 +1,5 @@
 // 코드트리 2018 상반기 오후 1번 - 드래곤 커브
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/dragon-curve
 // 문제 요약
 // 드래곤 커브를 N개 그린 뒤,
 // 꼭짓점 4개가 모두 드래곤 커브 위에 있는

@@ -1,5 +1,5 @@
 // 코드트리 2017 상반기 오전 2번 - 외주 수익 최대화하기
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/max-of-outsourcing-profit
 // 문제 요약
 // 1일부터 N일까지 매일 "그 날 시작할 수 있는 외주"가 하나씩 주어진다.
 // 각 외주는

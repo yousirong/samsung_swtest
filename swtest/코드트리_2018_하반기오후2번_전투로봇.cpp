@@ -1,5 +1,5 @@
 // 코드트리 2018 하반기 오후 2번 - 전투로봇
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/fighting-robot
 // 문제 요약
 // N x N 격자 안에 전투로봇과 몬스터들이 있다.
 // 로봇은 자신의 레벨보다 작은 몬스터만 제거할 수 있고,

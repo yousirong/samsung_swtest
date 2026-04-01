@@ -1,3 +1,6 @@
+// BOJ 2606 - 바이러스 (BFS)
+// https://www.acmicpc.net/problem/2606
+
 // BFS (너비 우선 탐색)
 // 시작 노드에서 가까운 노드부터 차례대로 탐색하는 알고리즘
 

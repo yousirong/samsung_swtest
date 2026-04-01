@@ -1,5 +1,5 @@
 // 코드트리 2016 하반기 2번 - 2048 게임
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/2048-game
 // 문제 요약
 // N x N 보드에서 2048 게임을 최대 5번 이동시킬 수 있을 때,
 // 만들 수 있는 가장 큰 블록 값을 구하는 문제이다.

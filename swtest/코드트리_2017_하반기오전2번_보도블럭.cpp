@@ -1,5 +1,7 @@
 // 코드트리 2017 하반기 오전 2번 - 보도블럭
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/crosswalk
+// BOJ 14890 - 경사로
+// https://www.acmicpc.net/problem/14890
 // 문제 요약
 // N x N 높이 지도가 주어지고,
 // 길이 L의 경사로를 이용해 "지나갈 수 있는 길"의 개수를 구하는 문제이다.

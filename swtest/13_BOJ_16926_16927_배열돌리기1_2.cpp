@@ -1,4 +1,6 @@
 // 백준 16926, 16927 배열 돌리기 1 / 배열 돌리기 2
+// https://www.acmicpc.net/problem/16926
+// https://www.acmicpc.net/problem/16927
 // 배열의 각 테두리(layer, ring)를 반시계 방향으로 회전시키는 문제
 //
 // 핵심 아이디어

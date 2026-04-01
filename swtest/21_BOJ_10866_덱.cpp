@@ -1,5 +1,5 @@
 // BOJ 10866 - 덱
-//
+// https://www.acmicpc.net/problem/10866
 // 문제 요약
 // 덱(deque, double-ended queue)은
 // 앞(front)과 뒤(back) 양쪽에서

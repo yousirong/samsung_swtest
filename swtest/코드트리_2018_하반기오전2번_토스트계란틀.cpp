@@ -1,5 +1,5 @@
 // 코드트리 2018 하반기 오전 2번 - 토스트 계란틀
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/toast-eggmold
 // 문제 요약
 // N x N 격자에 각 칸의 인구(혹은 계란 수)가 주어진다.
 // 인접한 두 칸의 차이가 [L, R] 범위 안에 있으면

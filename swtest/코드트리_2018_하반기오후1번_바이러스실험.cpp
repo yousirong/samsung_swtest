@@ -1,5 +1,5 @@
 // 코드트리 2018 하반기 오후 1번 - 바이러스 실험
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/virus-experiment
 // 문제 요약
 // N x N 격자에서 K년 동안 바이러스 실험을 진행한다.
 //

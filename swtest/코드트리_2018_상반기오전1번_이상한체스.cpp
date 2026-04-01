@@ -1,5 +1,5 @@
 // 코드트리 2018 상반기 오전 1번 - 이상한 체스
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/odd-chess
 // 문제 요약
 // 격자판에 여러 종류의 말(1~5번)이 놓여 있다.
 // 각 말은 방향을 하나 정하면 정해진 규칙대로 감시 영역을 만든다.

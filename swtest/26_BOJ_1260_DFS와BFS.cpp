@@ -1,5 +1,5 @@
 // BOJ 1260 - DFS와 BFS
-//
+// https://www.acmicpc.net/problem/1260
 // 문제 요약
 // 하나의 그래프에 대해
 // 1. DFS 방문 순서
