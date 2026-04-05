@@ -1,5 +1,5 @@
 // 코드트리 2019 상반기 오전 1번 - 시공의 돌풍
-//
+// https://www.codetree.ai/training-field/frequent-problems/problems/heros-of-storm
 // 문제 요약
 // N x M 격자에 먼지가 있고, 공기청정기(돌풍 기계)가 2칸 차지하고 있다.
 // 매 초마다 다음 두 단계가 순서대로 일어난다.
