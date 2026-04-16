@@ -180,6 +180,12 @@
     <ClCompile Include="코드트리_2019_하반기오전2번_이상한윷놀이.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="코드트리_2019_하반기오후1번_이상한다트게임.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2019_하반기오후2번문제_윷놀이사기단.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">

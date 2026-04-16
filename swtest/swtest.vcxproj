@@ -302,7 +302,13 @@
     <ClCompile Include="코드트리_2019_하반기오전1번_종전.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="코드트리_2019_하반기오전2번_이상한윷놀이.cpp" />
+    <ClCompile Include="코드트리_2019_하반기오전2번_이상한윷놀이.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="코드트리_2019_하반기오후1번_이상한다트게임.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="코드트리_2019_하반기오후2번문제_윷놀이사기단.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
