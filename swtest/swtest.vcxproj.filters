@@ -186,6 +186,27 @@
     <ClCompile Include="코드트리_2019_하반기오후2번문제_윷놀이사기단.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="코드트리_2020_상반기오전1번_2차원테트리스.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2020_상반기오전2번_술래잡기체스.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2020_상반기오후1번_승자독식모노폴리.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2020_상반기오후2번_자율주행자동차.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2020_하반기오전1번_불안한무빙워크.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2020_하반기오전2번_원자충돌.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2020_하반기오후1번_청소는즐거워.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
