@@ -329,7 +329,19 @@
     <ClCompile Include="코드트리_2020_하반기오전2번_원자충돌.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="코드트리_2020_하반기오후1번_청소는즐거워.cpp" />
+    <ClCompile Include="코드트리_2020_하반기오후1번_청소는즐거워.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="코드트리_2020_하반기오후2번_회전하는빙하.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="코드트리_2021_상반기오전1번_놀이기구탑승.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="코드트리_2021_상반기오전2번_색깔폭탄.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="코드트리_2021_상반기오후1번_나무타이쿤.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />

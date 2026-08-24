@@ -18,7 +18,7 @@ struct RCD
 RCD track[MAX * MAX];
 int tcnt;
 
-// ¡ç, ¡é, ¡æ, ¡è
+// â†, â†“, â†’, â†‘
 int dr[] = { 0, 1, 0, -1 };
 int dc[] = { -1, 0, 1, 0 };
 
@@ -42,7 +42,7 @@ void printMap(int map[MAX][MAX]) // for debug
 	putchar('\n');
 }
 
-// ¡ç, ¡é, ¡æ, ¡è
+// â†, â†“, â†’, â†‘
 int ratio[4][5][5] =
 {
 	{
@@ -124,10 +124,10 @@ void makeSnail()
 		nr = track[i + 1].r;
 		nc = track[i + 1].c;
 
-		if (nc - c == -1) track[i].dir = 0; // ¿ŞÂÊ
-		else if (nc - c == 1) track[i].dir = 2; // ¿À¸¥ÂÊ
-		else if (nr - r == -1) track[i].dir = 3; // À§ÂÊ
-		else if (nr - r == 1) track[i].dir = 1; // ¾Æ·¡ÂÊ
+		if (nc - c == -1) track[i].dir = 0; // ì™¼ìª½
+		else if (nc - c == 1) track[i].dir = 2; // ì˜¤ë¥¸ìª½
+		else if (nr - r == -1) track[i].dir = 3; // ìœ„ìª½
+		else if (nr - r == 1) track[i].dir = 1; // ì•„ë˜ìª½
 	}
 
 	track[tcnt - 1].dir = 0;

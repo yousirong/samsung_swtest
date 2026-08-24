@@ -207,6 +207,18 @@
     <ClCompile Include="코드트리_2020_하반기오후1번_청소는즐거워.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="코드트리_2020_하반기오후2번_회전하는빙하.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2021_상반기오전1번_놀이기구탑승.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2021_상반기오전2번_색깔폭탄.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2021_상반기오후1번_나무타이쿤.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
