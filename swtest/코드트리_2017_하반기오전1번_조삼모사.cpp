@@ -1,26 +1,38 @@
-// 코드트리 2017 하반기 오전 1번 - 조삼모사
-// https://www.codetree.ai/training-field/frequent-problems/problems/three-at-dawn-and-four-at-dusk
-// 문제 요약
-// N명의 사람을 두 팀으로 나누되,
-// 각 팀의 인원 수는 정확히 N/2명이어야 한다.
-//
-// 사람 i와 j가 같은 팀에 있을 때의 시너지 값이 MAP[i][j] 로 주어진다.
-// 한 팀의 팀 능력치는
-// 같은 팀에 속한 모든 두 사람 쌍 (i, j)에 대해
-// MAP[i][j] + MAP[j][i] 를 모두 더한 값이다.
-//
-// 목표
-// 두 팀의 능력치 차이의 절댓값을 최소로 만드는 팀 분할을 구하는 문제이다.
-//
-// 핵심 아이디어
-// 1. N명 중 절반(N/2명)을 한 팀(예: morning 팀)으로 고르는 모든 조합을 DFS로 만든다.
-// 2. 나머지 사람들은 자동으로 다른 팀(dinner 팀)이 된다.
-// 3. 두 팀의 능력치를 계산하고,
-//    그 차이의 절댓값의 최솟값을 갱신한다.
-//
-// 즉,
-// "사람 절반 뽑는 조합 DFS" + "각 팀 시너지 계산"
-// 구조의 완전탐색 문제이다.
+/*
+	[코드트리] 2017 하반기 오전 1번 - 조삼모사
+	https://www.codetree.ai/training-field/frequent-problems/problems/three-at-dawn-and-four-at-dusk
+
+	■ 문제 요약
+	  N명(N은 짝수)을 정확히 N/2명씩 두 팀으로 나눈다.
+	  같은 팀에 i번과 j번이 함께 있으면 그 팀의 능력치에 MAP[i][j] + MAP[j][i]가 더해진다.
+	  두 팀 능력치 차이의 절댓값을 최소로 만들었을 때 그 값을 출력한다.
+
+	  (백준 14889 "스타트와 링크"와 같은 문제다)
+
+	■ 풀이 방침 : 절반을 고르는 조합 완전탐색
+	  한 팀을 정하면 나머지는 자동으로 다른 팀이므로, 실제로 정할 것은 하나뿐이다.
+
+	    1) DFS로 1 ~ N 중 N/2명을 고르는 조합을 만든다
+	    2) 고른 사람은 morning 팀, 나머지는 dinner 팀
+	    3) 두 팀의 능력치를 각각 구해 차이의 절댓값으로 최솟값을 갱신한다
+
+	  N이 20 이하라 조합 수는 최대 20C10 = 184,756가지이고,
+	  능력치 계산도 (N/2)^2 수준이라 완전탐색으로 충분하다.
+
+	  ※ 조합이므로 순서가 다른 같은 팀은 만들어지지 않는다.
+	    다만 "A팀을 고른 경우"와 "B팀을 고른 경우"는 결과가 같은데도 둘 다 생성된다.
+	    1번 사람을 항상 morning에 고정하면(DFS(1, 2)로 시작) 절반으로 줄일 수 있다.
+
+	■ 능력치 계산
+	  한 팀 안의 모든 두 사람 쌍을 봐야 하므로, 팀 목록에서 i < k인 쌍만 훑는다.
+	  MAP은 대칭이 아니라서 두 방향을 모두 더해야 한다.
+
+	    팀이 {2, 3, 4} 라면 (2,3) (2,4) (3,4) 세 쌍에 대해
+	    MAP[2][3]+MAP[3][2], MAP[2][4]+MAP[4][2], MAP[3][4]+MAP[4][3] 을 더한다.
+
+	  두 팀의 인원이 똑같이 halfN명이므로, 같은 이중 for문 안에서
+	  morning과 dinner의 합을 한 번에 구할 수 있다.
+*/
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -30,16 +42,16 @@
 
 int T;
 
-int N;               // 전체 사람 수
+int N;               // 전체 사람 수 (짝수)
 int halfN;           // 한 팀의 인원 수 = N / 2
-int MAP[MAX][MAX];   // 시너지 배열
+int MAP[MAX][MAX];   // MAP[i][j] : i와 j가 같은 팀일 때 더해지는 값
 
 int num_of_cases[MAX]; // DFS로 고른 morning 팀 사람 번호들
 
-int minAnswer;       // 능력치 차이의 최소값
+int minAnswer;       // 두 팀 능력치 차이의 최솟값
 
 // ---------------------------
-// 입력 함수
+// 입력
 // ---------------------------
 void input()
 {
@@ -53,7 +65,7 @@ void input()
 }
 
 // ---------------------------
-// 디버그용: 현재 고른 morning 팀 출력
+// 디버그용: 현재 고른 팀 출력
 // ---------------------------
 void printCases()
 {
@@ -63,7 +75,7 @@ void printCases()
 }
 
 // ---------------------------
-// 절댓값 함수
+// 절댓값 (stdlib.h 없이 직접 구현)
 // ---------------------------
 int abs(int x)
 {
@@ -71,28 +83,26 @@ int abs(int x)
 }
 
 // ---------------------------
-// 현재 num_of_cases[]에 저장된 morning 팀 기준으로
-// 두 팀의 능력치 차이를 계산
+// 현재 조합에 대한 두 팀 능력치 차이
 //
-// 과정
-// 1. morning 팀에 속한 사람 표시
-// 2. 나머지를 dinner 팀으로 분리
-// 3. 각 팀의 시너지 합 계산
-// 4. |sum1 - sum2| 반환
+//   1) 고른 사람을 morning으로 표시
+//   2) 표시되지 않은 사람을 dinner로 모은다
+//   3) 각 팀 안의 모든 쌍을 더한다
+//   4) 차이의 절댓값을 돌려준다
 // ---------------------------
 int calculate()
 {
-	bool isMorning[MAX] = { 0 }; // i번 사람이 morning 팀인지 표시
-	int morning[MAX] = { 0 };    // morning 팀 사람 목록
-	int dinner[MAX] = { 0 };     // dinner 팀 사람 목록
-	int mcnt, dcnt;              // 각 팀 인원 수
-	int sum1, sum2;              // 두 팀의 시너지 합
+	bool isMorning[MAX] = { 0 }; // i번 사람이 morning 팀인지
+	int morning[MAX] = { 0 };    // morning 팀 사람 번호 목록
+	int dinner[MAX] = { 0 };     // dinner 팀 사람 번호 목록
+	int mcnt, dcnt;              // 각 팀 인원 수 (둘 다 halfN이 된다)
+	int sum1, sum2;              // 두 팀의 능력치
 
-	// 현재 DFS에서 고른 사람들을 morning 팀으로 표시
+	// 이번 조합에서 고른 사람들에 표시
 	for (int i = 0; i < halfN; i++)
 		isMorning[num_of_cases[i]] = true;
 
-	// 전체 사람을 보며 morning / dinner로 나누기
+	// 표시 여부로 두 팀을 실제 목록으로 분리
 	mcnt = dcnt = 0;
 	for (int i = 1; i <= N; i++)
 	{
@@ -112,11 +122,8 @@ int calculate()
 
 	sum1 = sum2 = 0;
 
-	// 각 팀 내부의 모든 두 사람 쌍(i, k)에 대해
-	// MAP[a][b] + MAP[b][a] 를 더한다.
-	//
-	// 예: 팀이 2,3,4 이면
-	// (2,3), (2,4), (3,4) 의 조합을 모두 본다.
+	// 팀 안의 서로 다른 두 사람 쌍을 모두 훑는다 (i < k).
+	// 두 팀의 인원이 같으므로 같은 루프에서 둘 다 계산할 수 있다.
 	for (int i = 0; i < halfN; i++)
 	{
 		for (int k = i + 1; k < halfN; k++)
@@ -130,29 +137,24 @@ int calculate()
 			dr = dinner[i];
 			dc = dinner[k];
 
-			// morning 팀 시너지 누적
+			// MAP이 대칭이 아니므로 양방향을 모두 더한다
 			sum1 += (MAP[mr][mc] + MAP[mc][mr]);
-
-			// dinner 팀 시너지 누적
 			sum2 += (MAP[dr][dc] + MAP[dc][dr]);
 		}
 	}
 
-	// 두 팀 시너지 차이의 절댓값 반환
 	return abs(sum1 - sum2);
 }
 
 // ---------------------------
-// DFS로 N명 중 halfN명을 고르는 조합 생성
+// DFS : 1 ~ N 중 halfN명을 고르는 조합 생성
 //
-// depth : 현재 몇 명 골랐는지
-// start : 다음에 선택할 수 있는 시작 번호
-//
-// 조합이므로 DFS(depth+1, i+1) 형태 사용
+//   depth : 지금까지 고른 인원 수
+//   start : 이번에 고를 수 있는 최소 번호
 // ---------------------------
 void DFS(int depth, int start)
 {
-	// halfN명을 모두 고르면 한 팀 완성
+	// 절반을 다 골랐으면 팀 분할이 하나 완성된 것
 	if (depth == halfN)
 	{
 		// printCases();
@@ -164,20 +166,18 @@ void DFS(int depth, int start)
 		return;
 	}
 
-	// start부터 N까지 사람 번호 하나씩 선택
 	for (int i = start; i <= N; i++)
 	{
 		num_of_cases[depth] = i;
 
-		// 다음 사람은 현재보다 뒤에서만 고름
+		// 조합이므로 다음은 i보다 뒤에서만 고른다
 		DFS(depth + 1, i + 1);
 	}
 }
 
 int main()
 {
-	// 원래 테스트케이스 형식이 있을 수도 있지만
-	// 현재 코드는 1회만 수행
+	// 이 문제는 테스트 케이스가 하나다
 	// scanf("%d", &T);
 	T = 1;
 
@@ -187,7 +187,6 @@ int main()
 
 		minAnswer = INF;
 
-		// N명 중 halfN명을 고르는 모든 조합 탐색
 		DFS(0, 1);
 
 		printf("%d\n", minAnswer);

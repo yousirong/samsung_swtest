@@ -1,28 +1,36 @@
-// 코드트리 2018 상반기 오후 2번 - 병원 거리 최소화하기
-// https://www.codetree.ai/training-field/frequent-problems/problems/min-of-hospital-distance
-// 문제 요약
-// N x N 격자에
-// - 사람(1)
-// - 병원(2)
-// 이 주어진다.
-//
-// 병원들 중 정확히 M개를 선택했을 때,
-// 모든 사람에 대해 "가장 가까운 선택된 병원까지의 거리"를 구하고,
-// 그 거리들의 합을 최소로 만드는 문제이다.
-//
-// 거리 정의
-// - 맨해튼 거리(Manhattan Distance)
-// - |r1 - r2| + |c1 - c2|
-//
-// 핵심 아이디어
-// 1. 병원 후보들 중 M개를 고르는 모든 조합을 DFS로 만든다.
-// 2. 각 조합마다 모든 사람에 대해
-//    선택된 병원들 중 가장 가까운 병원까지의 거리를 계산한다.
-// 3. 그 거리 합의 최솟값을 갱신한다.
-//
-// 즉,
-// "병원 M개 고르는 조합 DFS" + "거리 합 계산"
-// 구조의 완전탐색 문제이다.
+/*
+	[코드트리] 2018 상반기 오후 2번 - 병원 거리 최소화하기
+	https://www.codetree.ai/training-field/frequent-problems/problems/min-of-hospital-distance
+
+	■ 문제 요약
+	  N x N 격자에 사람(1)과 병원(2)이 놓여 있다.
+	  병원 중 정확히 M개만 남기고 나머지는 폐업시킨다.
+
+	  "도시의 병원 거리"는 각 사람마다 가장 가까운 살아남은 병원까지의 거리를 구해 모두 더한 값이고,
+	  거리는 맨해튼 거리 |r1-r2| + |c1-c2| 다.
+	  도시의 병원 거리를 최소로 만들었을 때 그 값을 출력한다.
+
+	  (백준 15686 "치킨 배달"과 같은 문제다)
+
+	■ 풀이 방침 : 병원 조합 완전탐색
+	  병원은 최대 13개뿐이라 M개를 고르는 조합이 많아야 13C6 = 1,716가지다.
+	  전부 시도해도 전혀 부담이 없다.
+
+	    1) 입력을 받으며 사람과 병원의 좌표를 각각 목록으로 모아 둔다
+	    2) DFS로 병원 목록에서 M개를 고르는 조합을 만든다
+	    3) 각 조합마다 모든 사람에 대해 "선택된 병원 중 최소 거리"를 구해 더한다
+	    4) 그 합의 최솟값을 갱신한다
+
+	■ 구현 포인트
+	  1) 격자를 매번 훑을 필요가 없다. 필요한 것은 좌표뿐이므로
+	     입력 단계에서 person[], hospital[] 목록으로 펴 두면
+	     이후 계산이 "좌표 목록 두 개의 거리 계산"으로 단순해진다.
+	  2) 이동 경로가 아니라 맨해튼 거리를 쓰므로 BFS가 필요 없다.
+	     벽이나 장애물 개념이 없어서 두 점 사이 거리가 공식 하나로 나온다.
+	  3) 조합이므로 DFS의 다음 시작값을 i + 1로 넘긴다.
+	  4) 사람마다 최솟값을 구해야 하므로 minDistance는 INF에서 시작한다.
+	     (문제 조건상 병원이 최소 M개는 있으므로 갱신되지 않는 경우는 없다)
+*/
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -37,12 +45,12 @@
 
 int T;
 
-int N, M;                  // N: 격자 크기, M: 선택할 병원 수
-int MAP[MAX][MAX];         // 격자 정보
+int N, M;                  // N: 격자 크기, M: 남길 병원 수
+int MAP[MAX][MAX];         // 격자 (좌표 수집이 끝나면 사실상 쓰지 않는다)
 
-int num_of_cases[MAX];     // DFS로 고른 병원 인덱스들
+int num_of_cases[MAX];     // 고른 병원의 인덱스들
 
-// 좌표 구조체
+// 좌표 한 쌍
 struct RC
 {
 	int r;
@@ -55,10 +63,10 @@ RC person[MAX * 2];               // 사람 좌표 목록
 RC hospital[MAX_HOSPITAL];        // 병원 좌표 목록
 int pcnt, hcnt;                   // 사람 수, 병원 수
 
-int minAnswer;                    // 거리 합의 최소값
+int minAnswer;                    // 도시의 병원 거리 최솟값
 
 // ---------------------------
-// 입력 함수
+// 입력 (읽으면서 좌표 목록도 함께 만든다)
 // ---------------------------
 void input()
 {
@@ -72,13 +80,11 @@ void input()
 		{
 			scanf("%d", &MAP[r][c]);
 
-			// 사람 좌표 저장
 			if (MAP[r][c] == PERSON)
 			{
 				person[pcnt].r = r;
 				person[pcnt++].c = c;
 			}
-			// 병원 좌표 저장
 			else if (MAP[r][c] == HOSPITAL)
 			{
 				hospital[hcnt].r = r;
@@ -89,7 +95,7 @@ void input()
 }
 
 // ---------------------------
-// 디버그용 맵 출력
+// 디버그용 격자 출력
 // ---------------------------
 void printMap()
 {
@@ -103,7 +109,7 @@ void printMap()
 }
 
 // ---------------------------
-// 디버그용: 현재 고른 병원 인덱스 출력
+// 디버그용: 고른 병원 인덱스 출력
 // ---------------------------
 void printCases()
 {
@@ -113,7 +119,7 @@ void printCases()
 }
 
 // ---------------------------
-// 절댓값 함수
+// 절댓값 (stdlib.h 없이 직접 구현)
 // ---------------------------
 int abs(int x)
 {
@@ -121,10 +127,7 @@ int abs(int x)
 }
 
 // ---------------------------
-// 맨해튼 거리 계산
-//
-// (r1, c1) 와 (r2, c2) 사이 거리
-// = |r1-r2| + |c1-c2|
+// 맨해튼 거리 : |r1-r2| + |c1-c2|
 // ---------------------------
 int getDistance(int r1, int c1, int r2, int c2)
 {
@@ -132,31 +135,26 @@ int getDistance(int r1, int c1, int r2, int c2)
 }
 
 // ---------------------------
-// 현재 DFS로 선택한 병원 조합(num_of_cases[])에 대해
-// 전체 거리 합 계산
+// 현재 조합에서의 도시의 병원 거리
 //
-// 과정
-// 1. 어떤 병원이 선택되었는지 selectedHospital[]에 표시
-// 2. 각 사람마다
-//    선택된 병원들 중 가장 가까운 병원까지 거리(minDistance)를 찾음
-// 3. 그 값을 모두 더한 합을 반환
+//   1) 고른 병원에 표시
+//   2) 사람마다 표시된 병원까지의 거리 중 최솟값을 찾는다
+//   3) 그 최솟값들을 모두 더한다
 // ---------------------------
 int calculate()
 {
 	bool selectedHospital[MAX_HOSPITAL] = { 0 };
 
-	// 현재 선택된 병원들 표시
 	for (int i = 0; i < M; i++)
 		selectedHospital[num_of_cases[i]] = true;
 
 	int sum = 0;
 
-	// 모든 사람에 대해
 	for (int i = 0; i < pcnt; i++)
 	{
 		int minDistance = INF;
 
-		// 선택된 병원들 중 가장 가까운 곳 찾기
+		// 선택된 병원만 후보로 본다
 		for (int k = 0; k < hcnt; k++)
 		{
 			if (selectedHospital[k] == false)
@@ -170,7 +168,6 @@ int calculate()
 			minDistance = (distance < minDistance) ? distance : minDistance;
 		}
 
-		// 이 사람의 최소 거리 누적
 		sum += minDistance;
 	}
 
@@ -178,16 +175,14 @@ int calculate()
 }
 
 // ---------------------------
-// DFS로 병원 중 M개를 고르는 조합 생성
+// DFS : 병원 목록에서 M개를 고르는 조합 생성
 //
-// depth : 현재 몇 개의 병원을 골랐는지
-// start : 다음에 선택할 수 있는 시작 인덱스
-//
-// 조합이므로 DFS(depth+1, i+1) 형태를 사용한다.
+//   depth : 지금까지 고른 개수
+//   start : 이번에 고를 수 있는 최소 인덱스
 // ---------------------------
 void DFS(int depth, int start)
 {
-	// 병원 M개를 모두 고른 경우
+	// M개를 다 골랐으면 그 조합의 값을 계산
 	if (depth == M)
 	{
 		// printCases();
@@ -199,20 +194,18 @@ void DFS(int depth, int start)
 		return;
 	}
 
-	// 병원 후보들 중에서 하나씩 선택
 	for (int i = start; i < hcnt; i++)
 	{
 		num_of_cases[depth] = i;
 
-		// 다음 병원은 현재보다 뒤에서만 고름
+		// 조합이므로 다음은 i보다 뒤에서만 고른다
 		DFS(depth + 1, i + 1);
 	}
 }
 
 int main()
 {
-	// 원래 테스트케이스 형식이 있을 수도 있지만
-	// 현재 코드는 1회만 수행
+	// 이 문제는 테스트 케이스가 하나다
 	// scanf("%d", &T);
 	T = 1;
 
@@ -222,7 +215,6 @@ int main()
 
 		minAnswer = INF;
 
-		// 병원 M개 고르는 모든 조합 탐색
 		DFS(0, 0);
 
 		printf("%d\n", minAnswer);
