@@ -222,6 +222,12 @@
     <ClCompile Include="코드트리_2021_상반기오후2번_미로타워디펜스.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="코드트리_2021_하반기오전1번_정육면제한번더굴리기.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2021_하반기오전2번_냉바시스템.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">

@@ -344,7 +344,13 @@
     <ClCompile Include="코드트리_2021_상반기오후1번_나무타이쿤.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="코드트리_2021_상반기오후2번_미로타워디펜스.cpp" />
+    <ClCompile Include="코드트리_2021_상반기오후2번_미로타워디펜스.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="코드트리_2021_하반기오전1번_정육면제한번더굴리기.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="코드트리_2021_하반기오전2번_냉바시스템.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt" />
