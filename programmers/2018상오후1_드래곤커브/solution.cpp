@@ -1,0 +1,181 @@
+/*
+	[코드트리] 2018 상반기 오후 1번 - 드래곤 커브
+	https://www.codetree.ai/training-field/frequent-problems/problems/dragon-curve
+
+	■ 문제 요약
+	  100 x 100 격자 위에 드래곤 커브를 N개 그린다.
+	  각 커브는 시작 좌표, 시작 방향 d, 세대 g로 주어진다.
+	  모두 그린 뒤, 네 꼭짓점이 전부 커브 위에 놓인 1x1 정사각형의 개수를 출력한다.
+
+	  (백준 15685 "드래곤 커브"와 같은 문제다)
+
+	■ 드래곤 커브 만들기
+	  커브를 "이동 방향의 나열"로 보면 규칙이 아주 단순해진다.
+
+	    0세대 : [d]  (시작 방향으로 한 칸)
+	    다음 세대 : 현재 방향열을 "뒤에서부터" 읽으면서 각 방향에 +1(mod 4)한 값을 뒤에 이어 붙인다
+
+	  예 (d = 0일 때)
+	    0세대 : [0]
+	    1세대 : [0, 1]
+	    2세대 : [0, 1, 2, 1]
+	    3세대 : [0, 1, 2, 1, 2, 3, 2, 1]
+
+	  세대마다 길이가 정확히 두 배가 되므로 g세대의 이동 횟수는 2^g이다.
+	  (g는 10 이하라 길이는 최대 1024)
+
+	  코드의 확장 루프는 이 규칙을 그대로 옮긴 것이다.
+
+	      for (i = length + 1; i <= length * 2; i++)
+	          dragonPosition[i - 1] = (dragonPosition[length * 2 - i] + 1) % 4;
+
+	  새로 채우는 자리가 앞으로 갈수록 원본은 뒤에서 앞으로 읽히도록 인덱스를 뒤집어 놨다.
+
+	■ 그리기와 세기
+	  방향열이 완성되면 시작점을 찍고, 방향대로 한 칸씩 옮기며 지나간 점을 MAP에 1로 표시한다.
+	  마지막에 (r,c) (r+1,c) (r,c+1) (r+1,c+1) 네 점의 합이 4인 자리를 세면 정답이다.
+
+	■ 주의할 점 (좌표 순서)
+	  방향 표는 "MAP[행][열]" 기준으로 되어 있다.
+
+	      0 = 오른쪽(열 +1), 1 = 위쪽(행 -1), 2 = 왼쪽(열 -1), 3 = 아래쪽(행 +1)
+
+	  그런데 시작점은 입력에서 읽은 순서 그대로 (r, c)에 담는다.
+	  문제가 좌표를 (x = 열, y = 행) 순서로 준다면 읽는 순서를 뒤집어야 방향 표와 맞는다.
+	  그대로 두면 그림이 대각선 대칭으로 뒤집힌 채 그려지는데,
+	  정사각형 개수 자체는 대칭에 영향을 받지 않아 답이 맞아떨어지는 경우가 많다.
+	  다만 좌표가 격자 밖으로 밀려날 수 있으니, 문제의 좌표 정의를 한 번 확인해 두는 편이 안전하다.
+*/
+
+#include <stdio.h>
+#include <vector>              // [추가] 함수형 인자/반환용
+
+#define MAX (100 + 20)
+
+int T;
+
+int N;                         // 드래곤 커브 개수
+int MAP[MAX][MAX];             // 그 점이 커브 위에 있으면 1
+int dragonPosition[2000];      // 방향열 (최대 2^10 = 1024보다 넉넉하게)
+
+// 방향 번호 : 0 = 오른쪽, 1 = 위쪽, 2 = 왼쪽, 3 = 아래쪽
+int dr[] = { 0, -1, 0, 1 };
+int dc[] = { 1,  0,-1, 0 };
+
+// ---------------------------
+// 커브를 모두 만들어 MAP에 표시
+// ---------------------------
+// [수정] scanf 대신 인자로 받는다
+void makeDragonCurve(const std::vector<std::vector<int>>& curves)
+{
+	N = (int)curves.size();   // [수정] scanf 대체
+
+	for (int i = 0; i < N; i++)
+	{
+		int r, c, d, g;   // 시작점, 시작 방향, 세대
+		r = curves[i][0];   // [수정] scanf 대체
+		c = curves[i][1];
+		d = curves[i][2];
+		g = curves[i][3];
+
+		// 0세대의 방향열은 시작 방향 하나뿐
+		dragonPosition[0] = d;
+
+		int length = 1;   // 현재 방향열의 길이
+
+		// 1세대부터 g세대까지 한 세대씩 두 배로 늘린다
+		for (int step = 1; step <= g; step++)
+		{
+			// 새로 붙는 부분의 길이는 지금 길이와 같다.
+			// 앞에서부터 채우면서 원본은 뒤에서부터 읽고, 각 방향에 +1(mod 4)을 한다.
+			//
+			//   기존 [0, 1]  ->  뒤에서부터 읽으면 [1, 0]  ->  +1 하면 [2, 1]
+			//   결과 [0, 1, 2, 1]
+			for (int i = length + 1; i <= length * 2; i++)
+			{
+				dragonPosition[i - 1] = (dragonPosition[length * 2 - i] + 1) % 4;
+			}
+
+			// 디버그용
+			// for (int i = 0; i < length * 2; i++)
+			//     printf("%d, ", dragonPosition[i]);
+			// putchar('\n');
+
+			length *= 2;
+		}
+
+		// 시작점도 커브 위의 점이다
+		MAP[r][c] = 1;
+
+		// g세대의 이동 횟수는 2^g
+		int moveCount = 1 << g;
+
+		// 방향열대로 한 칸씩 이동하며 지나간 점을 표시
+		for (int k = 0; k < moveCount; k++)
+		{
+			r = r + dr[dragonPosition[k]];
+			c = c + dc[dragonPosition[k]];
+
+			MAP[r][c] = 1;
+		}
+	}
+}
+
+// ---------------------------
+// 네 꼭짓점이 모두 커브 위에 있는 1x1 정사각형 개수
+//
+//   (r, c) (r+1, c) (r, c+1) (r+1, c+1)
+//   값이 모두 1이면 합이 4가 된다.
+// ---------------------------
+int countSquare()
+{
+	int sum = 0;
+
+	// 좌표가 0 ~ 100이므로 왼쪽 위 꼭짓점은 0 ~ 99까지만 볼 수 있다
+	for (int r = 0; r < 100; r++)
+	{
+		for (int c = 0; c < 100; c++)
+		{
+			if (MAP[r][c] + MAP[r + 1][c] + MAP[r][c + 1] + MAP[r + 1][c + 1] == 4)
+				sum++;
+		}
+	}
+
+	return sum;
+}
+
+// [수정] main() -> solution().  T 루프 껍데기는 제거했다.
+int solution(std::vector<std::vector<int>> curves)
+{
+	// [추가] 재호출 대비.
+	//        원본은 MAP 을 한 번도 비우지 않고 1만 찍어서, 두 번째 호출이면 이전 곡선이 그대로 남는다.
+	for (int r = 0; r < MAX; r++)
+		for (int c = 0; c < MAX; c++)
+			MAP[r][c] = 0;
+
+	makeDragonCurve(curves);
+
+	return countSquare();   // [수정] printf -> return
+}
+
+// ==========================================================
+// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
+// ==========================================================
+#ifdef LOCAL_TEST
+int main()
+{
+	int n;
+	scanf("%d", &n);                 // 원본 scanf 순서 그대로
+	std::vector<std::vector<int>> curves(n, std::vector<int>(4));
+	for (int i = 0; i < n; i++)
+		scanf("%d %d %d %d", &curves[i][0], &curves[i][1], &curves[i][2], &curves[i][3]);
+
+	int ans = solution(curves);
+#ifdef REPEAT_TEST
+	int ans2 = solution(curves);
+	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
+#endif
+	printf("%d\n", ans);
+	return 0;
+}
+#endif

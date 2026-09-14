@@ -1,0 +1,321 @@
+/*
+	[코드트리] 2018 하반기 오후 1번 - 바이러스 실험
+	https://www.codetree.ai/training-field/frequent-problems/problems/virus-experiment
+
+	■ 문제 요약
+	  N x N 격자에서 K년 동안 실험을 한다. 각 칸에는 양분이 있고 바이러스가 여러 마리 살 수 있다.
+	  바이러스마다 나이를 가진다. 처음 양분은 모든 칸이 5이고, 초기 바이러스 M마리가 주어진다.
+
+	  1년은 네 계절로 나뉜다.
+
+	    봄   : 한 칸의 바이러스들이 "어린 것부터" 자기 나이만큼 양분을 먹고 나이가 1 늘어난다.
+	           남은 양분이 자기 나이보다 적으면 먹지 못하고 죽는다.
+	    여름 : 봄에 죽은 바이러스는 (죽을 때 나이 / 2)만큼 양분으로 바뀌어 그 칸에 더해진다.
+	    가을 : 나이가 5의 배수인 바이러스는 인접 8칸에 나이 1짜리 바이러스를 하나씩 번식시킨다.
+	    겨울 : 각 칸에 MAP[r][c]만큼 양분이 더해진다.
+
+	  K년이 지난 뒤 살아 있는 바이러스의 총 수를 출력한다.
+
+	  (백준 16235 "나무 재테크"와 같은 문제다)
+
+	■ 핵심 : 한 칸의 바이러스를 "나이 오름차순 덱"으로 유지한다
+	  봄에 어린 순서로 먹어야 하므로 각 칸의 나이 목록이 항상 정렬돼 있어야 한다.
+	  매년 정렬을 다시 하면 느리므로, 정렬 상태가 저절로 유지되게 자료구조를 설계한다.
+
+	    - 봄에 살아남은 바이러스는 나이가 1씩 늘 뿐 서로의 순서는 그대로다
+	      -> 앞에서 꺼내(front++) 뒤에 붙이면(back++) 뒤쪽 구간이 다시 오름차순이 된다
+	    - 가을에 태어나는 바이러스는 나이가 1이라 무조건 가장 어리다
+	      -> 앞쪽에 넣으면(--front) 정렬이 유지된다
+
+	  앞뒤 양쪽에 넣고 빼야 하므로 덱이 필요하고,
+	  여기서는 칸마다 큰 배열 하나와 front / back 인덱스로 덱을 흉내 냈다.
+	  실제 데이터 구간은 virus[r][c][front ... back-1] 이고, 마릿수는 back - front 다.
+	  양쪽으로 자라야 하니 시작점을 배열 한가운데(OFFSET)에 둔다.
+
+	■ 봄과 여름을 한 함수에서 처리하는 이유
+	  나이가 오름차순이므로, 앞에서부터 먹이다가 처음으로 못 먹는 바이러스를 만나면
+	  그 뒤는 모두 나이가 더 많아 절대 못 먹는다. 그래서 break 한 번으로 생사가 갈린다.
+
+	    [start, t)  : 살아남아 나이 +1  -> 뒤쪽에 다시 넣는다
+	    [t, end)    : 전부 죽음         -> 나이/2 만큼 양분으로 돌려주고 버린다
+
+	  두 루프 모두 front를 앞으로 밀어(fr++) 옛 구간을 소비 처리하므로,
+	  함수가 끝나면 front == end 가 되고 살아남은 것들만 [end, back) 에 남는다.
+
+	■ 가을 처리에서 헷갈리기 쉬운 점
+	  이웃 칸의 앞쪽에 나이 1을 밀어 넣는데, 아직 처리하지 않은 칸이라면
+	  그 칸 차례가 왔을 때 방금 태어난 바이러스까지 훑게 된다.
+	  하지만 나이 1은 5의 배수가 아니라 번식 조건에 걸리지 않으므로 결과에 영향이 없다.
+
+	■ 메모리에 대해
+	  virus 배열이 [15][15][100000] 이라 90MB 가까이 된다. 한 칸의 덱을 재사용하지 않고
+	  앞뒤로 계속 밀기만 하기 때문에 이만큼 여유를 잡아 둔 것이다.
+	  메모리가 빠듯한 환경이라면 칸마다 필요한 만큼만 잡거나,
+	  매년 구간을 앞으로 되감아 재사용하는 방식으로 줄일 수 있다.
+*/
+
+#include <stdio.h>
+#include <vector>              // [추가] 함수형 인자/반환용
+
+#define MAX (10 + 5)
+#define MAX_VIRUS (100000)
+#define OFFSET (10000)
+
+int T;
+
+int N, M, K;
+int food[MAX][MAX];   // 그 칸에 남아 있는 양분
+int MAP[MAX][MAX];    // 겨울마다 더해지는 양분
+
+// virus[r][c][front ... back-1] : (r, c)에 있는 바이러스들의 나이 (오름차순)
+int virus[MAX][MAX][MAX_VIRUS];
+int front[MAX][MAX];
+int back[MAX][MAX];
+
+// 8방향: 북, 북동, 동, 남동, 남, 남서, 서, 북서
+int dr[] = { -1, -1, 0, 1, 1, 1, 0, -1 };
+int dc[] = { 0,  1, 1, 1, 0,-1,-1, -1 };
+
+// ---------------------------
+// 입력
+// ---------------------------
+// [수정] scanf 대신 인자로 받는다. M(초기 바이러스 수)은 viruses 길이로 대신한다.
+void input(int k, const std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& viruses)
+{
+	N = (int)board.size();        // [수정] scanf 대체
+	M = (int)viruses.size();      // [수정] scanf 대체
+	K = k;                        // [수정] scanf 대체
+
+	// 겨울마다 추가될 양분
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+		{
+			MAP[r][c] = board[r - 1][c - 1];   // [수정] scanf 대체
+		}
+	}
+
+	// 초기 양분은 모든 칸이 5
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+		{
+			food[r][c] = 5;
+		}
+	}
+
+	// 각 칸의 덱을 배열 한가운데에서 시작시킨다.
+	// 앞(가을 번식)과 뒤(봄 생존) 양쪽으로 자라야 하기 때문.
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+		{
+			front[r][c] = back[r][c] = OFFSET;
+		}
+	}
+
+	// 초기 바이러스. 입력이 나이 오름차순으로 주어진다고 보고 뒤에 순서대로 넣는다.
+	for (int i = 0; i < M; i++)
+	{
+		int r, c, age;
+
+		r = viruses[i][0];     // [수정] scanf 대체
+		c = viruses[i][1];     // [수정] scanf 대체
+		age = viruses[i][2];   // [수정] scanf 대체
+
+		int& virusCount = back[r][c];
+		virus[r][c][virusCount++] = age;
+	}
+}
+
+// ---------------------------
+// 디버그용: 칸별 바이러스 나이 목록 출력
+// ---------------------------
+void printVirus()
+{
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+		{
+			if ((back[r][c] - front[r][c]) == 0)
+				continue;
+
+			printf("%d, %d : ", r, c);
+			for (int t = front[r][c]; t < back[r][c]; t++)
+				printf("%d ", virus[r][c][t]);
+			putchar('\n');
+		}
+	}
+	putchar('\n');
+}
+
+// --------------------------------------------------
+// 봄 + 여름
+//
+// 나이가 오름차순이라 "처음 못 먹는 지점"에서 잘라 앞은 생존, 뒤는 전멸로 나눌 수 있다.
+// --------------------------------------------------
+void step1_2()
+{
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+		{
+			// 올해 시작 시점의 구간을 먼저 붙잡아 둔다.
+			// 아래에서 fr / bk를 움직여도 이 값들은 변하지 않는다.
+			int start = front[r][c];
+			int end = back[r][c];
+
+			int& fr = front[r][c];
+			int& bk = back[r][c];
+
+			int t;
+
+			// ----- 봄 : 어린 것부터 먹인다 -----
+			for (t = start; t < end; t++)
+			{
+				if (virus[r][c][t] <= food[r][c])
+				{
+					food[r][c] -= virus[r][c][t];   // 자기 나이만큼 먹고
+					virus[r][c][t]++;               // 나이가 하나 는다
+
+					fr++;                           // 앞 구간에서 소비 처리
+
+					// 살아남은 바이러스를 뒤에 다시 붙인다.
+					// 원래 순서 그대로 붙으므로 뒤쪽 구간도 오름차순을 유지한다.
+					virus[r][c][bk++] = virus[r][c][t];
+				}
+				else
+				{
+					// 나이순이므로 여기서부터 뒤는 전부 못 먹는다
+					break;
+				}
+			}
+
+			// ----- 여름 : 죽은 것들을 양분으로 -----
+			for (; t < end; t++)
+			{
+				food[r][c] += (virus[r][c][t] / 2);
+				fr++;
+			}
+
+			// 이제 front == end 이고, 살아남은 바이러스는 [end, back) 구간에 있다
+		}
+	}
+}
+
+// --------------------------------------------------
+// 가을 : 나이가 5의 배수인 바이러스가 인접 8칸에 나이 1을 번식
+// --------------------------------------------------
+void step3()
+{
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+		{
+			int start = front[r][c];
+			int end = back[r][c];
+
+			for (int t = start; t < end; t++)
+			{
+				if (virus[r][c][t] % 5 != 0)
+					continue;
+
+				for (int i = 0; i < 8; i++)
+				{
+					int nr, nc;
+
+					nr = r + dr[i];
+					nc = c + dc[i];
+
+					// 격자 밖
+					if (nr < 1 || nc < 1 || nr > N || nc > N)
+						continue;
+
+					// 나이 1은 가장 어리므로 덱의 앞쪽에 넣어야 정렬이 유지된다.
+					// (아직 처리 전인 칸이라면 이 새 바이러스도 훑게 되지만,
+					//  1은 5의 배수가 아니라 번식하지 않으므로 문제없다)
+					int& fr = front[nr][nc];
+					virus[nr][nc][--fr] = 1;
+				}
+			}
+		}
+	}
+}
+
+// --------------------------------------------------
+// 겨울 : 칸마다 정해진 양분 추가
+// --------------------------------------------------
+void step4()
+{
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+		{
+			food[r][c] += MAP[r][c];
+		}
+	}
+}
+
+// ---------------------------
+// 살아 있는 바이러스 총 수 = 칸마다 (back - front)의 합
+// ---------------------------
+int getAnswer()
+{
+	int sum = 0;
+
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+		{
+			sum += (back[r][c] - front[r][c]);
+		}
+	}
+
+	return sum;
+}
+
+// [수정] main() -> solution().  T 루프 껍데기는 제거했다.
+int solution(int k, std::vector<std::vector<int>> board, std::vector<std::vector<int>> viruses)
+{
+	input(k, board, viruses);
+
+	// K년 = 네 계절 x K회
+	for (int time = 0; time < K; time++)
+	{
+		step1_2(); // 봄 + 여름
+		step3();   // 가을
+		step4();   // 겨울
+	}
+
+	return getAnswer();   // [수정] printf -> return
+}
+
+// ==========================================================
+// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
+//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
+//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
+// ==========================================================
+#ifdef LOCAL_TEST
+int main()
+{
+	int n, m, k;
+	scanf("%d %d %d", &n, &m, &k);   // 원본 scanf 순서 그대로
+
+	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	for (int r = 0; r < n; r++)
+		for (int c = 0; c < n; c++)
+			scanf("%d", &board[r][c]);
+
+	std::vector<std::vector<int>> viruses(m, std::vector<int>(3));
+	for (int i = 0; i < m; i++)
+		scanf("%d %d %d", &viruses[i][0], &viruses[i][1], &viruses[i][2]);
+
+	int ans = solution(k, board, viruses);
+#ifdef REPEAT_TEST
+	int ans2 = solution(k, board, viruses);
+	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
+#endif
+	printf("%d\n", ans);
+	return 0;
+}
+#endif

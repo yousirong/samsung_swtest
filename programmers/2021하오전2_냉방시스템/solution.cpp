@@ -1,4 +1,5 @@
-#include <stdio.h>	
+#include <stdio.h>
+#include <vector>              // [ì¶”ê°€] í•¨ìˆ˜í˜• ì¸ì/ë°˜í™˜ìš©	
 
 #define MAX (20+10)
 
@@ -49,13 +50,28 @@ struct WALL
 
 WALL wall[MAX][MAX];
 
-// -, -, ¡ç, ¡è, ¡æ, ¡é
+// -, -, â†, â†‘, â†’, â†“
 int dr[] = { 0,0,0,-1,0,1 };
 int dc[] = { 0,0,-1,0,1,0 };
 
-void input()
+// [ìˆ˜ì •] scanf ëŒ€ì‹  ì¸ìë¡œ ë°›ëŠ”ë‹¤. walls[i] = {r, c, s}
+void input(int k, const std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& walls)
 {
-	scanf("%d %d %d", &N, &W, &K);
+	N = (int)board.size();    // [ìˆ˜ì •] scanf ëŒ€ì²´
+	W = (int)walls.size();    // [ìˆ˜ì •] scanf ëŒ€ì²´
+	K = k;                    // [ìˆ˜ì •] scanf ëŒ€ì²´
+
+	// [ì¶”ê°€] ì¬í˜¸ì¶œ ëŒ€ë¹„.
+	//        ì›ë³¸ì€ wall ì— true ë§Œ ì°ê³  temperature ë„ ë˜ëŒë¦¬ì§€ ì•Šì•„,
+	//        ê°™ì€ í”„ë¡œì„¸ìŠ¤ì—ì„œ ë‘ ë²ˆì§¸ í˜¸ì¶œí•˜ë©´ ì´ì „ ë²½ê³¼ ì˜¨ë„ê°€ ê·¸ëŒ€ë¡œ ë‚¨ëŠ”ë‹¤.
+	for (int r = 0; r <= N + 1; r++)
+	{
+		for (int c = 0; c <= N + 1; c++)
+		{
+			temperature[r][c] = 0;
+			for (int d = 0; d < 6; d++) wall[r][c].direction[d] = false;
+		}
+	}
 
 	ocnt = acnt = 0;
 
@@ -63,7 +79,7 @@ void input()
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			scanf("%d", &MAP[r][c]);
+			MAP[r][c] = board[r - 1][c - 1];   // [ìˆ˜ì •] scanf ëŒ€ì²´
 
 			if (MAP[r][c] == OFFICE)
 			{
@@ -78,12 +94,14 @@ void input()
 			}
 		}
 	}
-	
+
 	for (int w = 0; w < W; w++)
 	{
 		int r, c, s;
 
-		scanf("%d %d %d", &r, &c, &s);
+		r = walls[w][0];   // [ìˆ˜ì •] scanf ëŒ€ì²´
+		c = walls[w][1];   // [ìˆ˜ì •] scanf ëŒ€ì²´
+		s = walls[w][2];   // [ìˆ˜ì •] scanf ëŒ€ì²´
 
 		if (s == 0)
 		{
@@ -142,12 +160,12 @@ void BFS(int r, int c, int dir)
 
 			nc = out.c + dc[dir];
 
-			// ¢Ø ¢Ö À§
+			// â†– â†— ìœ„
 			nr = out.r - 1;
 			if (visit[nr][nc] == false
-				//(r,c) ¿Í (r-1,c) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				//(r,c) ì™€ (r-1,c) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[out.r][out.c].direction[UP] == false)
-				//(r-1,c) ¿Í (r-1,c + dc[dir]) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				//(r-1,c) ì™€ (r-1,c + dc[dir]) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[nr][out.c].direction[dir] == false))
 			{
 				queue[wp].r = nr;
@@ -157,10 +175,10 @@ void BFS(int r, int c, int dir)
 				visit[nr][nc] = true;
 			}
 
-			// ¡ç ¡æ ¿·
+			// â† â†’ ì˜†
 			nr = out.r;
 			if (visit[nr][nc] == false
-				// (r,c)¿Í (r, c+dc[dir]) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				// (r,c)ì™€ (r, c+dc[dir]) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[out.r][out.c].direction[dir] = false))
 			{
 				queue[wp].r = nr;
@@ -170,12 +188,12 @@ void BFS(int r, int c, int dir)
 				visit[nr][nc] = true;
 			}
 				
-			// ¢× ¢Ù ¾Æ·¡
+			// â†™ â†˜ ì•„ë˜
 			nr = out.r + 1;
 			if (visit[nr][nc] == false
-				// (r, c)¿Í (r + 1, c) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				// (r, c)ì™€ (r + 1, c) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[out.r][out.c].direction[DOWN] == false)
-				// (r + 1, c)¿Í (r + 1, c + dc[dir]) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				// (r + 1, c)ì™€ (r + 1, c + dc[dir]) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[nr][out.c].direction[dir] == false))
 			{
 				queue[wp].r = nr;
@@ -191,12 +209,12 @@ void BFS(int r, int c, int dir)
 
 			nr = out.r + dr[dir];
 
-			// ¢Ø ¢× ¿Ş
+			// â†– â†™ ì™¼
 			nc = out.c - 1;
 			if (visit[nr][nc] == false
-				// (r, c)¿Í (r, c - 1) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				// (r, c)ì™€ (r, c - 1) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[out.r][out.c].direction[LEFT] == false)
-				// (r, c - 1)¿Í (r + dr[dir], c - 1) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				// (r, c - 1)ì™€ (r + dr[dir], c - 1) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[out.r][nc].direction[dir] == false))
 			{
 				queue[wp].r = nr;
@@ -206,10 +224,10 @@ void BFS(int r, int c, int dir)
 				visit[nr][nc] = true;
 			}
 
-			// ¡è ¡é À§, ¾Æ·¡
+			// â†‘ â†“ ìœ„, ì•„ë˜
 			nc = out.c;
 			if (visit[nr][nc] == false
-				// (r, c)¿Í (r + dr[dir], c) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				// (r, c)ì™€ (r + dr[dir], c) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[out.r][out.c].direction[dir] == false))
 			{
 				queue[wp].r = nr;
@@ -219,12 +237,12 @@ void BFS(int r, int c, int dir)
 				visit[nr][nc] = true;
 			}
 
-			// ¢Ö ¢Ù
+			// â†— â†˜
 			nc = out.c + 1;
 			if (visit[nr][nc] == false
-				// (r, c)¿Í (r, c + 1) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				// (r, c)ì™€ (r, c + 1) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[out.r][out.c].direction[RIGHT] == false)
-				// (r, c + 1)¿Í (r + dr[dir], c + 1) »çÀÌ¿¡ º®ÀÌ ¾ø¾î¾ß ÇÑ´Ù.
+				// (r, c + 1)ì™€ (r + dr[dir], c + 1) ì‚¬ì´ì— ë²½ì´ ì—†ì–´ì•¼ í•œë‹¤.
 				&& (wall[out.r][nc].direction[dir] == false))
 			{
 				queue[wp].r = nr;
@@ -336,16 +354,33 @@ int simulate()
 }
 
 
+// [ìˆ˜ì •] main() -> solution().  T ë£¨í”„ ê»ë°ê¸°ëŠ” ì œê±°í–ˆë‹¤.
+int solution(int k, std::vector<std::vector<int>> board, std::vector<std::vector<int>> walls)
+{
+	input(k, board, walls);
+
+	return simulate();   // [ìˆ˜ì •] printf -> return
+}
+
+// ==========================================================
+// [ì¶”ê°€] ë¡œì»¬ ëŒ€ì¡°ìš© í•˜ë„¤ìŠ¤. ì œì¶œí•  ë•ŒëŠ” ì´ ë¸”ë¡ ì „ì²´ë¥¼ ì§€ìš´ë‹¤.
+// ==========================================================
+#ifdef LOCAL_TEST
 int main()
 {
-	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
-	{
-		input();
+	int n, w, k;
+	scanf("%d %d %d", &n, &w, &k);   // ì›ë³¸ scanf ìˆœì„œ ê·¸ëŒ€ë¡œ
+	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) scanf("%d", &board[r][c]);
+	std::vector<std::vector<int>> walls(w, std::vector<int>(3));
+	for (int i = 0; i < w; i++) scanf("%d %d %d", &walls[i][0], &walls[i][1], &walls[i][2]);
 
-		printf("%d\n", simulate());
-	}
-	
+	int ans = solution(k, board, walls);
+#ifdef REPEAT_TEST
+	int ans2 = solution(k, board, walls);
+	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
+#endif
+	printf("%d\n", ans);
 	return 0;
 }
+#endif

@@ -1,0 +1,248 @@
+/*
+	[코드트리] 2017 하반기 오전 2번 - 보도블럭
+	https://www.codetree.ai/training-field/frequent-problems/problems/crosswalk
+	(= 백준 14890 경사로  https://www.acmicpc.net/problem/14890)
+
+	■ 문제 요약
+	  N x N 높이 지도가 주어진다. 모든 가로줄 N개와 세로줄 N개, 합쳐서 2N개의 길 중에서
+	  "지나갈 수 있는 길"이 몇 개인지 센다.
+
+	  길을 지나가려면 높이가 모두 같거나, 높이가 달라지는 곳에 길이 L짜리 경사로를 놓아야 한다.
+
+	    - 인접한 두 칸의 높이 차가 2 이상이면 어떤 경사로로도 이을 수 없다
+	    - 경사로는 낮은 쪽에 놓이며, 그 L칸이 모두 같은 높이여야 한다
+	    - 경사로가 지도 밖으로 나가면 안 된다
+	    - 한 칸에 경사로를 두 번 놓을 수 없다 (경사로끼리 겹치면 안 된다)
+
+	■ 세로줄 처리 : 전치 행렬
+	  세로줄을 위한 코드를 따로 쓰지 않고, 입력받을 때 전치 행렬 TMAP을 같이 만든다.
+
+	      TMAP[c][r] = MAP[r][c]
+
+	  그러면 "MAP의 c번째 세로줄"이 "TMAP의 c번째 가로줄"이 되므로
+	  줄 하나를 검사하는 함수 checkRow() 하나만 있으면 가로/세로를 모두 처리할 수 있다.
+
+	■ 한 줄 검사 : 뒤집어서 두 번 훑기
+	  왼쪽에서 오른쪽으로 훑으면 내리막(높은 칸 -> 낮은 칸)은 처리하기 쉽다.
+	  낮아지는 지점 바로 뒤 L칸이 평평한지 보고 경사로를 놓으면 되기 때문이다.
+	  반대로 오르막은 "이미 지나온 뒤쪽"에 경사로를 놓아야 해서 처리가 번거롭다.
+
+	  그래서 배열을 통째로 뒤집어 한 번 더 같은 검사를 돌린다.
+	  뒤집은 배열에서의 내리막이 곧 원래 배열의 오르막이므로,
+	  내리막 처리 코드 하나로 양쪽을 다 볼 수 있다.
+
+	    1단계 : 원래 배열을 훑으며 내리막에 경사로를 놓고 visit에 표시
+	    2단계 : 배열과 visit을 함께 뒤집어 inverse / visit_inverse를 만든다
+	    3단계 : inverse를 훑으며 내리막(= 원래의 오르막)을 처리하되,
+	            놓으려는 칸에 이미 1단계의 경사로가 있으면(visit_inverse) 실패
+
+	  visit도 같이 뒤집어야 위치가 맞는다는 점이 핵심이다.
+
+	■ 왜 같은 방향끼리는 겹침 검사를 안 해도 되는가
+	  내리막 경사로는 c+1 ~ c+L 칸을 차지하는데 그 구간은 전부 같은 높이다.
+	  따라서 다음 높이 변화는 아무리 빨라도 c+L 이후에 생기고,
+	  그때 놓이는 경사로는 c+L+1부터 시작한다. 같은 방향 경사로끼리는 절대 겹치지 않는다.
+	  겹칠 수 있는 것은 "내리막 경사로 vs 오르막 경사로"뿐이라 그 검사만 하면 된다.
+*/
+
+#include <stdio.h>
+#include <vector>              // [추가] 함수형 인자/반환용
+#include <stdbool.h>
+
+#define MAX (100 + 20)
+
+int T;
+int N, L;              // N: 지도 크기, L: 경사로 길이
+int MAP[MAX][MAX];     // 원본 지도
+int TMAP[MAX][MAX];    // 전치 행렬 (세로줄을 가로줄처럼 다루기 위함)
+
+// ---------------------------
+// 입력
+// ---------------------------
+// [수정] scanf 대신 인자로 받는다. L은 격자 크기가 아니라 경사로 길이다.
+void input(int l, const std::vector<std::vector<int>>& board)
+{
+	N = (int)board.size();   // [수정] scanf 대체
+	L = l;                   // [수정] scanf 대체
+
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+		{
+			MAP[r][c] = board[r - 1][c - 1];   // [수정] scanf 대체
+
+			// 읽는 김에 전치 행렬도 같이 채운다.
+			// 나중에 TMAP[c]를 넘기면 MAP의 c번째 세로줄을 검사하는 셈이 된다.
+			TMAP[c][r] = MAP[r][c];
+		}
+	}
+}
+
+// ---------------------------
+// 절댓값 (stdlib.h 없이 직접 구현)
+// ---------------------------
+int abs(int x)
+{
+	return (x > 0) ? x : -x;
+}
+
+// ---------------------------
+// arr[start] ~ arr[end] 가 전부 같은 높이인지
+//
+// 경사로는 평평한 L칸 위에만 놓을 수 있으므로 이 검사가 필요하다.
+// ---------------------------
+bool isFlat(int arr[MAX], int start, int end)
+{
+	int value = arr[start];
+
+	for (int i = start + 1; i <= end; i++)
+	{
+		if (value != arr[i])
+			return false;
+	}
+
+	return true;
+}
+
+// ---------------------------
+// 줄 하나가 지나갈 수 있는 길인지 검사
+//
+//   반환값 : 가능하면 1, 불가능하면 0
+//            (그대로 더하면 개수가 되도록 bool 대신 int로 돌려준다)
+// ---------------------------
+int checkRow(int arr[MAX])
+{
+	bool visit[MAX] = { 0 };          // 원래 방향에서 경사로를 놓은 칸
+
+	int inverse[MAX] = { 0 };         // 뒤집은 배열
+	bool visit_inverse[MAX] = { 0 };  // 뒤집은 좌표계로 옮긴 경사로 표시
+
+	// ----------------------------------------
+	// 1단계 : 원래 방향(왼쪽 -> 오른쪽)으로 훑으며 "내리막"만 처리
+	// ----------------------------------------
+	for (int c = 1; c <= N - 1; c++)
+	{
+		// 높이가 같으면 아무 처리도 필요 없다
+		if (arr[c] == arr[c + 1])
+			continue;
+
+		// 높이 차가 2 이상이면 어떤 경사로로도 이을 수 없다
+		if (abs(arr[c] - arr[c + 1]) > 1)
+			return 0;
+
+		// 현재 칸이 더 높다 = 내리막. 낮아진 쪽 L칸에 경사로를 놓는다.
+		if (arr[c] > arr[c + 1])
+		{
+			// 경사로가 지도 밖으로 나가면 안 된다
+			if (c + L > N)
+				return 0;
+
+			// 놓을 자리가 평평해야 한다
+			if (isFlat(arr, c + 1, c + L) == false)
+				return 0;
+
+			// 경사로 설치 표시
+			for (int k = c + 1; k <= c + L; k++)
+				visit[k] = true;
+		}
+
+		// 오르막(arr[c] < arr[c+1])은 여기서 처리하지 않고 3단계로 넘긴다
+	}
+
+	// ----------------------------------------
+	// 2단계 : 배열과 경사로 표시를 함께 뒤집는다
+	//         좌표가 어긋나지 않도록 visit도 반드시 같이 뒤집어야 한다
+	// ----------------------------------------
+	for (int c = 1; c <= N; c++)
+	{
+		inverse[c] = arr[N + 1 - c];
+		visit_inverse[c] = visit[N + 1 - c];
+	}
+
+	// ----------------------------------------
+	// 3단계 : 뒤집은 배열의 "내리막" = 원래 배열의 "오르막" 처리
+	// ----------------------------------------
+	for (int c = 1; c <= N - 1; c++)
+	{
+		if (inverse[c] == inverse[c + 1])
+			continue;
+
+		if (abs(inverse[c] - inverse[c + 1]) > 1)
+			return 0;
+
+		if (inverse[c] > inverse[c + 1])
+		{
+			// 경사로가 밖으로 나가면 안 된다
+			if (c + L > N)
+				return 0;
+
+			// 놓을 자리가 평평해야 한다
+			if (isFlat(inverse, c + 1, c + L) == false)
+				return 0;
+
+			// 1단계에서 이미 경사로를 놓은 칸과 겹치면 안 된다.
+			// (같은 방향끼리는 절대 겹치지 않으므로 이 교차 검사만 하면 충분하다)
+			for (int k = c + 1; k <= c + L; k++)
+			{
+				if (visit_inverse[k] == true)
+					return 0;
+			}
+		}
+	}
+
+	// 모든 조건 통과
+	return 1;
+}
+
+// ---------------------------
+// 가로줄 N개 + 세로줄 N개를 모두 검사
+//
+//   MAP[r]  : r번째 가로줄
+//   TMAP[r] : r번째 세로줄 (전치해 뒀으므로 가로줄처럼 다룰 수 있다)
+// ---------------------------
+int checkAllRow()
+{
+	int sum = 0;
+
+	for (int r = 1; r <= N; r++)
+	{
+		sum += checkRow(MAP[r]);
+		sum += checkRow(TMAP[r]);
+	}
+
+	return sum;
+}
+
+// [수정] main() -> solution().  T 루프 껍데기는 제거했다.
+int solution(int l, std::vector<std::vector<int>> board)
+{
+	input(l, board);
+
+	return checkAllRow();   // [수정] printf -> return
+}
+
+// ==========================================================
+// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
+//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
+//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
+// ==========================================================
+#ifdef LOCAL_TEST
+int main()
+{
+	int n, x;
+	scanf("%d %d", &n, &x);          // 원본 scanf 순서 그대로
+
+	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	for (int r = 0; r < n; r++)
+		for (int c = 0; c < n; c++)
+			scanf("%d", &board[r][c]);
+
+	int ans = solution(x, board);
+#ifdef REPEAT_TEST
+	int ans2 = solution(x, board);
+	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
+#endif
+	printf("%d\n", ans);
+	return 0;
+}
+#endif
