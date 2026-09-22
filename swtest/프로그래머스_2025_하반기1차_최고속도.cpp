@@ -6,7 +6,7 @@
 	main()만 있고 solution()이 없어서 프로그래머스에 그대로 내면 링크가 실패한다.
 	    undefined reference to `solution(vector<vector<int>>, vector<vector<int>>)`
 	제출용은 programmers/2025카카오1차_최고속도/solution.cpp 를 통째로 붙여 넣는다.
-	(그 파일의 #ifdef LOCAL_TEST 블록은 채점기에서 컴파일되지 않으니 지우지 않아도 된다)
+	(로컬 대조는 그 폴더의 local_test.cpp 로 한다)
 
 	■ 문제 요약
 	  2차원 평면에 도시 n개(점)와 도로 m개(x축 또는 y축에 평행한 선분)가 있다.
@@ -69,6 +69,8 @@
 	  - 점은 도로마다 따로 모아 한 배열에 이어 붙이고, 도로 r의 시작 위치만 base[r]에 적어 둔다.
 	    같은 좌표라도 도로가 다르면 다른 노드지만, 두 도로가 만나는 점은 간선으로 이어 준다.
 	    (좌표를 전역으로 합쳐 번호를 매기지 않아도 되므로 정렬을 도로마다 작게 나눠 할 수 있다)
+	  - 점을 모을 때는 "두 도로 위에 모두 있는 좌표"만 넣어야 한다.
+	    한쪽 박스만 검사하면 나란한 도로의 좌표까지 통과해 점이 수십 배로 불어난다.
 	  - 점 개수 상한 : 교차점은 두 도로당 최대 한 개라 전체 교차 쌍이 25만 개를 넘지 않고,
 	    도로마다 도시 100개와 끝점/중점이 더해져도 60만 개 안쪽이다.
 */
@@ -76,9 +78,9 @@
 
 #define MAX_CITY (100 + 5)
 #define MAX_ROAD (1000 + 5)
-#define MAX_POINT (800000)   // 점 개수 상한 : 교차점 50만 + 도시/끝점 여유
-#define MAX_EDGE (1200000)  // 간선 개수 상한 (도로 위 이웃 + 교차 연결)
-#define MAX_TMP (4000)
+#define MAX_POINT (1000000)  // 점 개수 상한 : 최악(가로 500 x 세로 500)이 50만 개라 두 배로 잡았다
+#define MAX_EDGE (1600000)  // 간선 개수 상한 (도로 위 이웃 + 교차 연결). 실제 최악은 75만
+#define MAX_TMP (4 * MAX_ROAD + MAX_CITY + 10)   // 한 도로에 쌓이는 후보 : 도로마다 최대 4개씩 + 도시 + 끝점/중점
 #define INF (0x7fffffff)
 
 int T;
@@ -145,6 +147,7 @@ bool onRoad(int r, long long x, long long y)
 void addTmp(int r, long long x, long long y)
 {
 	if (onRoad(r, x, y) == false) return;
+	if (tcnt >= MAX_TMP) return;   // 넘칠 일은 없지만, 넘쳐도 배열 밖을 건드리지 않게
 
 	tmpX[tcnt] = x;
 	tmpY[tcnt] = y;
@@ -204,6 +207,7 @@ int findNode(int r, long long k)
 void addEdge(int a, int b)
 {
 	if (a < 0 || b < 0) return;
+	if (ecnt + 1 >= MAX_EDGE * 2) return;   // 같은 이유의 안전장치
 
 	dest[ecnt] = b; nxt[ecnt] = head[a]; head[a] = ecnt++;
 	dest[ecnt] = a; nxt[ecnt] = head[b]; head[b] = ecnt++;
@@ -235,14 +239,18 @@ void buildGraph()
 		{
 			if (s == r) continue;
 
-			// 가로 x 세로 : 세로 도로의 x와 가로 도로의 y가 만나는 자리
-			// (두 조합을 다 넣고, 실제로 도로 위인지는 addTmp가 걸러 준다)
-			addTmp(r, roadSX[s], roadSY[r]);
-			addTmp(r, roadSX[r], roadSY[s]);
+			// 후보 네 개를 만들어 두고, 두 도로 위에 "모두" 있는 것만 넣는다.
+			// r 쪽만 보면 나란한 도로의 엉뚱한 좌표까지 통과한다.
+			// (가로 도로끼리라도 x 범위만 겹치면 r의 박스 검사는 통과하기 때문이다)
+			long long qx[4], qy[4];
 
-			// 같은 방향 도로끼리 끝에서 닿는 경우
-			addTmp(r, roadSX[s], roadSY[s]);
-			addTmp(r, roadEX[s], roadEY[s]);
+			qx[0] = roadSX[s]; qy[0] = roadSY[r];   // 세로 s 와 가로 r 이 만나는 자리
+			qx[1] = roadSX[r]; qy[1] = roadSY[s];   // 세로 r 과 가로 s 가 만나는 자리
+			qx[2] = roadSX[s]; qy[2] = roadSY[s];   // s 의 양 끝점 (같은 방향끼리 끝에서 닿는 경우)
+			qx[3] = roadEX[s]; qy[3] = roadEY[s];
+
+			for (int i = 0; i < 4; i++)
+				if (onRoad(s, qx[i], qy[i])) addTmp(r, qx[i], qy[i]);
 		}
 
 		sortTmp(0, tcnt - 1);
@@ -254,6 +262,8 @@ void buildGraph()
 		{
 			// 같은 key는 같은 점이다 (도로 위에서는 key가 한 축을 따라 단조 증가)
 			if (i > 0 && tmpKey[i] == tmpKey[i - 1]) continue;
+
+			if (pcnt >= MAX_POINT) break;   // 같은 이유의 안전장치
 
 			px[pcnt] = tmpX[i];
 			py[pcnt] = tmpY[i];
