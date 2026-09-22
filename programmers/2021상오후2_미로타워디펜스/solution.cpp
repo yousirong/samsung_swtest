@@ -1,8 +1,9 @@
 /*
 	[코드트리] 2021 상반기 오후 2번 - 미로 타워 디펜스
-	원본 : swtest/코드트리_2021_상반기오후2번_미로타워디펜스.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2021_상반기오후2번_미로타워디펜스.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/maze-tower-defense
 	(백준 21611 "마법사 상어와 블리자드"를 타워 디펜스로 바꿔 낸 문제다)
@@ -369,33 +370,3 @@ int solution(vector<vector<int>> board, vector<vector<int>> commands)
 
 	return simulate();   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
-//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, m;
-	scanf("%d %d", &n, &m);          // 원본 scanf 순서 그대로
-
-	vector<vector<int>> board(n, vector<int>(n));
-	for (int r = 0; r < n; r++)
-		for (int c = 0; c < n; c++)
-			scanf("%d", &board[r][c]);
-
-	vector<vector<int>> queries(m, vector<int>(2));
-	for (int i = 0; i < m; i++)
-		scanf("%d %d", &queries[i][0], &queries[i][1]);
-
-	int ans = solution(board, queries);
-#ifdef REPEAT_TEST
-	int ans2 = solution(board, queries);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-	printf("%d\n", ans);
-	return 0;
-}
-#endif

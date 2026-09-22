@@ -1,8 +1,9 @@
 /*
 	[코드트리] 2016 하반기 1번 - 정육면체 굴리기
-	원본 : swtest/코드트리_2016_하반기1번_정육면체굴리기.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2016_하반기1번_정육면체굴리기.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/cube-rounding
 
@@ -57,7 +58,8 @@
 
 using namespace std;
 
-vector<int> answerList;   // [추가] simulate가 printf 하던 윗면 값들을 모아 둔다
+int answerList[1000 + 10];   // [추가] simulate가 printf 하던 윗면 값들을 모아 둔다 (명령 수 K <= 1000)
+int answerCount;             // [추가] answerList에 담긴 개수
 
 #define MAX (20 + 10)
 
@@ -263,7 +265,7 @@ void simulate()
 		}
 
 		// 5) 이동에 성공한 경우에만 윗면 출력
-		answerList.push_back(cube.top);   // [수정] printf -> 결과 배열에 담기
+		answerList[answerCount++] = cube.top;   // [수정] printf -> 결과 배열에 담기
 	}
 }
 
@@ -272,7 +274,7 @@ void simulate()
 //        그 값들을 전역 배열에 모아 여기서 통째로 반환한다.
 vector<int> solution(int r0, int c0, vector<vector<int>> board, vector<int> commands)
 {
-	answerList.clear();   // [추가] 재호출 대비 - 이전 호출의 결과가 남아 있으면 안 된다
+	answerCount = 0;   // [추가] 재호출 대비 - 이전 호출의 결과가 남아 있으면 안 된다
 
 	// 주사위 여섯 면은 전역이라 재호출 시 이전 상태가 남는다. 문제 조건대로 전부 0으로 되돌린다.
 	cube.up = cube.left = cube.top = cube.right = cube.down = cube.bottom = 0;   // [추가] 재호출 대비
@@ -281,33 +283,6 @@ vector<int> solution(int r0, int c0, vector<vector<int>> board, vector<int> comm
 
 	simulate();
 
-	return answerList;   // [수정] printf -> return
+	// [수정] printf -> 모아 둔 배열을 그대로 반환
+	return vector<int>(answerList, answerList + answerCount);
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, m, r0, c0, k;
-	scanf("%d %d %d %d %d", &n, &m, &r0, &c0, &k);   // 원본 scanf 순서 그대로
-
-	vector<vector<int>> board(n, vector<int>(m));
-	for (int r = 0; r < n; r++)
-		for (int c = 0; c < m; c++)
-			scanf("%d", &board[r][c]);
-
-	vector<int> commands(k);
-	for (int i = 0; i < k; i++) scanf("%d", &commands[i]);
-
-	vector<int> ans = solution(r0, c0, board, commands);
-#ifdef REPEAT_TEST
-	vector<int> ans2 = solution(r0, c0, board, commands);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-	for (size_t i = 0; i < ans.size(); i++)
-		printf("%d\n", ans[i]);      // 원본은 이동에 성공할 때마다 윗면을 한 줄씩
-	return 0;
-}
-#endif

@@ -1,9 +1,10 @@
 /*
 	[프로그래머스 함수형] BOJ 10866 - 덱
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
 
-	원본 : swtest/21_BOJ_10866_덱.cpp
+	[프로그래머스 제출용]  원본 : swtest/21_BOJ_10866_덱.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
+
 	복습 노트 : docs/review/G02/21_BOJ_10866_덱.md
 
 	원본은 main 안에서 scanf로 명령을 하나씩 읽어 그 자리에서 printf 했다.
@@ -150,47 +151,3 @@ vector<int> solution(vector<string> commands)
 
 	return answer;   // [수정] return 0 -> 결과 배열 반환
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
-//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n;
-	scanf("%d", &n);   // 원본과 같은 형식
-
-	vector<string> commands;
-	for (int i = 0; i < n; i++)
-	{
-		char cmd[100];
-		scanf("%s", cmd);
-
-		string line = cmd;
-		if (line == "push_front" || line == "push_back")
-		{
-			int v;
-			scanf("%d", &v);
-
-			char buf[32];
-			sprintf(buf, " %d", v);
-			line += buf;
-		}
-		commands.push_back(line);
-	}
-
-	vector<int> ans = solution(commands);
-
-#ifdef REPEAT_TEST
-	vector<int> ans2 = solution(commands);   // 같은 인자로 한 번 더
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-
-	for (size_t i = 0; i < ans.size(); i++)
-		printf("%d\n", ans[i]);   // 원본 출력 형식 그대로 (조회 명령마다 한 줄)
-
-	return 0;
-}
-#endif

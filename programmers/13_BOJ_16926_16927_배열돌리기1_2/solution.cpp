@@ -1,8 +1,9 @@
 /*
 	[BOJ] 16926 배열 돌리기 1 / 16927 배열 돌리기 2
-	원본 : swtest/13_BOJ_16926_16927_배열돌리기1_2.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/13_BOJ_16926_16927_배열돌리기1_2.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/16926
 	https://www.acmicpc.net/problem/16927
@@ -235,36 +236,3 @@ vector<vector<int>> solution(int r, vector<vector<int>> board)
 
 	return answer;
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
-//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, m, r;
-	scanf("%d %d %d", &n, &m, &r);
-
-	vector<vector<int>> board(n, vector<int>(m));
-	for (int i = 0; i < n; i++)
-		for (int j = 0; j < m; j++)
-			scanf("%d", &board[i][j]);
-
-	vector<vector<int>> ans = solution(r, board);
-
-#ifdef REPEAT_TEST
-	if (solution(r, board) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-
-	for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < m; j++)
-			printf("%d ", ans[i][j]);   // 원본 printMap과 같은 형식
-		putchar('\n');
-	}
-
-	return 0;
-}
-#endif

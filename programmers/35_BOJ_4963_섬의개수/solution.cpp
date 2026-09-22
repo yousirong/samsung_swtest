@@ -1,8 +1,9 @@
 /*
 	[BOJ] 4963 - 섬의 개수
-	원본 : swtest/35_BOJ_4963_섬의개수.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/35_BOJ_4963_섬의개수.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/4963
 
@@ -171,36 +172,3 @@ int solution(vector<vector<int>> board)
 
 	return ansCount;   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// 원본처럼 "0 0"이 나올 때까지 케이스를 반복한다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	while (1)
-	{
-		int w, h;
-		scanf("%d %d", &w, &h);
-
-		if (w == 0 && h == 0) break;
-
-		vector<vector<int>> board(h, vector<int>(w));
-		for (int r = 0; r < h; r++)
-			for (int c = 0; c < w; c++)
-				scanf("%d", &board[r][c]);
-
-		int ans = solution(board);
-
-#ifdef REPEAT_TEST
-		int ans2 = solution(board);
-		if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-		printf("%d\n", ans);
-	}
-
-	return 0;
-}
-#endif

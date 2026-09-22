@@ -1,8 +1,9 @@
 /*
 	[코드트리] 2022 상반기 오전 1번 - 술래잡기
-	원본 : swtest/코드트리_2022_상반기오전1번_술래잡기.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2022_상반기오전1번_술래잡기.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/hide-and-seek
 
@@ -340,31 +341,3 @@ int solution(int n, int k, vector<vector<int>> runners, vector<vector<int>> tree
 
 	return simulate();   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, m, h, k;
-	scanf("%d %d %d %d", &n, &m, &h, &k);
-
-	vector<vector<int>> runners(m, vector<int>(3));
-	for (int i = 0; i < m; i++) scanf("%d %d %d", &runners[i][0], &runners[i][1], &runners[i][2]);
-
-	vector<vector<int>> trees(h, vector<int>(2));
-	for (int i = 0; i < h; i++) scanf("%d %d", &trees[i][0], &trees[i][1]);
-
-	int ans = solution(n, k, runners, trees);
-
-#ifdef REPEAT_TEST
-	int ans2 = solution(n, k, runners, trees);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-	printf("%d\n", ans);
-
-	return 0;
-}
-#endif

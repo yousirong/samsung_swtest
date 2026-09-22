@@ -1,8 +1,9 @@
 /*
 	[BOJ] 9012 - 괄호
-	원본 : swtest/18_BOJ_9012_괄호.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/18_BOJ_9012_괄호.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/9012
 
@@ -81,31 +82,3 @@ string solution(string parens)
 
 	return "YES";
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// 원본처럼 T개의 문자열을 읽어 한 줄씩 출력한다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int t;
-	scanf("%d", &t);
-
-	for (int tc = 0; tc < t; tc++)
-	{
-		char buf[50 + 5];
-		scanf("%s", buf);
-
-		string ans = solution(buf);
-
-#ifdef REPEAT_TEST
-		if (solution(buf) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-
-		printf("%s\n", ans.c_str());
-	}
-
-	return 0;
-}
-#endif

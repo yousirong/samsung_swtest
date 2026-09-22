@@ -1,8 +1,9 @@
 /*
 	[BOJ] 2194 - 유닛 이동시키기
-	원본 : swtest/41_BOJ_2194_유닛이동시키기.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/41_BOJ_2194_유닛이동시키기.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/2194
 
@@ -206,31 +207,3 @@ int solution(int n, int m, int a, int b, vector<vector<int>> obstacles,
 
 	return BFS(sr, sc);   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, m, a, b, k;
-	scanf("%d %d %d %d %d", &n, &m, &a, &b, &k);
-
-	vector<vector<int>> obstacles(k, vector<int>(2));
-	for (int i = 0; i < k; i++) scanf("%d %d", &obstacles[i][0], &obstacles[i][1]);
-
-	int s1, s2, e1, e2;
-	scanf("%d %d %d %d", &s1, &s2, &e1, &e2);
-
-	int ans = solution(n, m, a, b, obstacles, s1, s2, e1, e2);
-
-#ifdef REPEAT_TEST
-	int ans2 = solution(n, m, a, b, obstacles, s1, s2, e1, e2);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-	printf("%d\n", ans);
-
-	return 0;
-}
-#endif

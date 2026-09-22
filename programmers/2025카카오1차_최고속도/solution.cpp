@@ -1,7 +1,9 @@
 /*
 	[프로그래머스] 2025 카카오 하반기 1차 - 최고 속도 (Lv. 3)
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/프로그래머스_2025_하반기1차_최고속도.cpp — 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/프로그래머스_2025_하반기1차_최고속도.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 	https://school.programmers.co.kr/learn/courses/30/lessons/468376
 
 	■ 문제 요약
@@ -463,38 +465,3 @@ vector<int> solution(vector<vector<int>> city, vector<vector<int>> road)
 
 	return result;
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
-//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
-// 원본(swtest/프로그래머스_2025_하반기1차_최고속도.cpp)과 똑같은 형식으로 읽고 출력한다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n;
-	scanf("%d", &n);
-
-	vector<vector<int>> city(n, vector<int>(2));
-	for (int i = 0; i < n; i++) scanf("%d %d", &city[i][0], &city[i][1]);
-
-	int m;
-	scanf("%d", &m);
-
-	vector<vector<int>> road(m, vector<int>(5));
-	for (int i = 0; i < m; i++)
-		scanf("%d %d %d %d %d", &road[i][0], &road[i][1], &road[i][2], &road[i][3], &road[i][4]);
-
-	vector<int> ans = solution(city, road);
-
-#ifdef REPEAT_TEST
-	if (solution(city, road) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-
-	for (size_t i = 0; i < ans.size(); i++) printf("%d ", ans[i]);
-	putchar('\n');
-
-	return 0;
-}
-#endif

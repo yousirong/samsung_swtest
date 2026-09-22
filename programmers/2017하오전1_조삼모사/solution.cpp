@@ -1,8 +1,9 @@
 /*
 	[코드트리] 2017 하반기 오전 1번 - 조삼모사
-	원본 : swtest/코드트리_2017_하반기오전1번_조삼모사.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2017_하반기오전1번_조삼모사.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/three-at-dawn-and-four-at-dusk
 
@@ -194,31 +195,3 @@ int solution(vector<vector<int>> board)
 
 	return minAnswer;   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
-//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n;
-	scanf("%d", &n);                 // 원본 scanf 순서 그대로
-
-	vector<vector<int>> board(n, vector<int>(n));
-	for (int r = 0; r < n; r++)
-		for (int c = 0; c < n; c++)
-			scanf("%d", &board[r][c]);
-
-	int ans = solution(board);
-
-#ifdef REPEAT_TEST
-	int ans2 = solution(board);      // 같은 인자로 한 번 더
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-	printf("%d\n", ans);             // 원본 출력 형식 그대로
-	return 0;
-}
-#endif

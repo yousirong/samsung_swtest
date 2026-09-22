@@ -1,8 +1,9 @@
 /*
     [코드트리] 2020 상반기 오후 1번 - 승자독식 모노폴리
-	원본 : swtest/코드트리_2020_상반기오후1번_승자독식모노폴리.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2020_상반기오후1번_승자독식모노폴리.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 
     ■ 문제 요약
@@ -341,32 +342,3 @@ int solution(int k, vector<vector<int>> board,
 
     return simulate();   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-    int n, m, k;
-    scanf("%d %d %d", &n, &m, &k);   // 원본 scanf 순서 그대로
-
-    vector<vector<int>> board(n, vector<int>(n));
-    for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) scanf("%d", &board[r][c]);
-
-    vector<int> dirs(m);
-    for (int i = 0; i < m; i++) scanf("%d", &dirs[i]);
-
-    vector<vector<int>> priorities(m * 4, vector<int>(4));
-    for (int i = 0; i < m * 4; i++)
-        scanf("%d %d %d %d", &priorities[i][0], &priorities[i][1], &priorities[i][2], &priorities[i][3]);
-
-    int ans = solution(k, board, dirs, priorities);
-#ifdef REPEAT_TEST
-    int ans2 = solution(k, board, dirs, priorities);
-    if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-    printf("%d\n", ans);
-    return 0;
-}
-#endif

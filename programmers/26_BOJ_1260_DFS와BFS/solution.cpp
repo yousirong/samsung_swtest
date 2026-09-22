@@ -1,8 +1,9 @@
 /*
 	[BOJ] 1260 - DFS와 BFS
-	원본 : swtest/26_BOJ_1260_DFS와BFS.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/26_BOJ_1260_DFS와BFS.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/1260
 
@@ -43,7 +44,8 @@ int MAP[MAX][MAX];    // 인접 행렬. MAP[a][b] == 1 이면 a-b 연결
 
 int queue[MAX * MAX]; // BFS용 큐 (실제로는 정점 수만큼만 있으면 충분하다)
 bool visit[MAX];      // 방문 여부
-vector<int> order;   // [추가] 방문 순서를 담는 목록 (원본의 printf 자리)
+int order[MAX];      // [추가] 방문 순서를 담는 배열 (원본의 printf 자리)
+int ocnt;            // [추가] order에 담긴 개수
 
 // ---------------------------
 // 입력
@@ -100,7 +102,7 @@ void DFS(int node)
 	visit[node] = true;
 
 	// DFS의 방문 시점 = 함수에 들어온 순간
-	order.push_back(node);   // [수정] printf -> 목록에 담기
+	order[ocnt++] = node;   // [수정] printf -> 목록에 담기
 
 	// 1번부터 N번까지 순서대로 보므로 자연히 "작은 번호 우선"이 된다
 	for (int c = 1; c <= N; c++)
@@ -135,7 +137,7 @@ void BFS(int node)
 		int out = queue[rp++];
 
 		// BFS의 방문 시점 = 큐에서 꺼낸 순간
-		order.push_back(out);   // [수정] printf -> 목록에 담기
+		order[ocnt++] = out;   // [수정] printf -> 목록에 담기
 
 		// 이웃을 작은 번호부터 확인해서 큐에 넣는다
 		for (int c = 1; c <= N; c++)
@@ -161,9 +163,9 @@ vector<vector<int>> solution(int n, int v, vector<vector<int>> edges)
 	input(n, v, edges);
 
 	// 1) DFS 방문 순서
-	order.clear();   // [추가] 결과를 담을 목록 비우기
+	ocnt = 0;   // [추가] 결과를 담을 자리를 비운다
 	DFS(V);
-	vector<int> dfsOrder = order;
+	vector<int> dfsOrder(order, order + ocnt);   // [수정] 배열을 그대로 옮겨 담는다
 
 	// 2) BFS를 돌리기 전에 visit을 반드시 초기화한다.
 	//    DFS가 이미 전부 true로 만들어 놨기 때문에, 빼먹으면 BFS 결과가 통째로 틀린다.
@@ -171,9 +173,9 @@ vector<vector<int>> solution(int n, int v, vector<vector<int>> edges)
 		visit[i] = false;
 
 	// 3) BFS 방문 순서
-	order.clear();
+	ocnt = 0;
 	BFS(V);
-	vector<int> bfsOrder = order;
+	vector<int> bfsOrder(order, order + ocnt);
 
 	vector<vector<int>> answer;   // [수정] printf -> 두 줄을 그대로 반환
 	answer.push_back(dfsOrder);
@@ -181,32 +183,3 @@ vector<vector<int>> solution(int n, int v, vector<vector<int>> edges)
 
 	return answer;
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// 원본 출력 형식("%d " 뒤에 줄바꿈)을 그대로 흉내 낸다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, m, v;
-	scanf("%d %d %d", &n, &m, &v);
-
-	vector<vector<int>> edges(m, vector<int>(2));
-	for (int i = 0; i < m; i++) scanf("%d %d", &edges[i][0], &edges[i][1]);
-
-	vector<vector<int>> ans = solution(n, v, edges);
-
-#ifdef REPEAT_TEST
-	if (solution(n, v, edges) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-
-	for (size_t i = 0; i < ans.size(); i++)
-	{
-		for (size_t k = 0; k < ans[i].size(); k++) printf("%d ", ans[i][k]);
-		putchar('\n');
-	}
-
-	return 0;
-}
-#endif

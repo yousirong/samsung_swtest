@@ -1,9 +1,10 @@
 /*
 	[코드트리] 2021 하반기 오전 1번 - 정육면체 한번 더 굴리기
-	원본 : swtest/코드트리_2021_하반기오전1번_정육면제한번더굴리기.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
-	[버그수정] 원본에 있던 버그는 이 사본에서 고쳐 옮겼다. 고친 자리마다 // [버그수정] 표시가 있다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2021_하반기오전1번_정육면제한번더굴리기.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
+	[버그수정] 원본에 있던 버그는 이 사본에서 고쳤다. 고친 자리마다 // [버그수정] 표시가 있다.
 
 	https://www.codetree.ai/ko/frequent-problems/samsung-sw/problems/cube-rounding-again/description
 	(백준 23288 "주사위 굴리기 2"와 같은 문제다)
@@ -308,29 +309,3 @@ int solution(int m, vector<vector<int>> board)
 
 	return simulate();   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
-//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, x;
-	scanf("%d %d", &n, &x);          // 원본 scanf 순서 그대로
-
-	vector<vector<int>> board(n, vector<int>(n));
-	for (int r = 0; r < n; r++)
-		for (int c = 0; c < n; c++)
-			scanf("%d", &board[r][c]);
-
-	int ans = solution(x, board);
-#ifdef REPEAT_TEST
-	int ans2 = solution(x, board);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-	printf("%d\n", ans);
-	return 0;
-}
-#endif

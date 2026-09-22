@@ -1,8 +1,11 @@
 /*
 	[프로그래머스] 2025 카카오 하반기 2차 - 기차 선로 (Lv. 3)
-	[프로그래머스 함수형 사본]  swtest/프로그래머스_2025_하반기2차_기차선로.cpp 를 옮긴 것이다.
+
+	[프로그래머스 제출용]  원본 : swtest/프로그래머스_2025_하반기2차_기차선로.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
+	[버그수정] 원본에 있던 버그는 이 사본에서 고쳤다. 고친 자리마다 // [버그수정] 표시가 있다.
 	[버그수정] 원본의 버그 4곳을 고쳤다. 고친 자리마다 // [버그수정] 표시가 있다.
-	이 문제는 원래 함수형이라 solution() 시그니처는 그대로다.
 	https://school.programmers.co.kr/learn/courses/30/lessons/468381
 
 	■ 문제 요약
@@ -257,36 +260,3 @@ int solution(int** grid, size_t grid_rows, size_t grid_cols)
 // [추가] 로컬 확인용 하네스. 제출할 때는 이 블록 전체를 지운다.
 //   빌드 : g++ -O2 -DLOCAL_TEST -o run solution.cpp
 // 문제의 입출력 예 6개를 그대로 돌려 본다.
-// ==========================================================
-#ifdef LOCAL_TEST
-#include <vector>
-
-using namespace std;
-
-static int run(vector<vector<int>> g)
-{
-	int rows = (int)g.size(), cols = (int)g[0].size();
-	vector<int*> p(rows);
-	for (int i = 0; i < rows; i++) p[i] = &g[i][0];
-
-	return solution(&p[0], rows, cols);
-}
-
-int main()
-{
-	int expected[6] = { 2, 2, 4, 644, 1, 0 };
-	int got[6] = {
-		run({ {1,0,-1}, {0,0,7}, {0,0,2} }),
-		run({ {1,0,0,0,0,-1,-1}, {-1,0,0,1,0,0,1} }),
-		run({ {1,0,0,0,0}, {0,0,3,0,2}, {0,0,0,0,2} }),
-		run({ {1,0,0,0}, {0,0,0,0}, {0,0,0,0}, {0,0,0,0}, {0,0,0,1} }),
-		run({ {1,7}, {0,2} }),
-		run({ {1,-1,0,0}, {-1,0,0,0}, {0,0,0,-1}, {0,0,-1,1} })
-	};
-
-	for (int i = 0; i < 6; i++)
-		printf("예제%d 기대 %d / 결과 %d %s\n", i + 1, expected[i], got[i], expected[i] == got[i] ? "O" : "X");
-
-	return 0;
-}
-#endif

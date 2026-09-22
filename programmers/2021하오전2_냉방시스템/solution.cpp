@@ -1,9 +1,10 @@
 /*
 	[코드트리] 2021 하반기 오전 2번 - 냉방 시스템
-	원본 : swtest/코드트리_2021_하반기오전2번_냉방시스템.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
-	[버그수정] 원본에 있던 버그는 이 사본에서 고쳐 옮겼다. 고친 자리마다 // [버그수정] 표시가 있다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2021_하반기오전2번_냉방시스템.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
+	[버그수정] 원본에 있던 버그는 이 사본에서 고쳤다. 고친 자리마다 // [버그수정] 표시가 있다.
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/cooling-system
 	(백준 23289 "온풍기 안녕!"과 거의 같은 문제다. 온풍기 -> 에어컨, 온도 조사칸 -> 사무실)
@@ -435,26 +436,3 @@ int solution(int k, vector<vector<int>> board, vector<vector<int>> walls)
 
 	return simulate();   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, w, k;
-	scanf("%d %d %d", &n, &w, &k);   // 원본 scanf 순서 그대로
-	vector<vector<int>> board(n, vector<int>(n));
-	for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) scanf("%d", &board[r][c]);
-	vector<vector<int>> walls(w, vector<int>(3));
-	for (int i = 0; i < w; i++) scanf("%d %d %d", &walls[i][0], &walls[i][1], &walls[i][2]);
-
-	int ans = solution(k, board, walls);
-#ifdef REPEAT_TEST
-	int ans2 = solution(k, board, walls);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-	printf("%d\n", ans);
-	return 0;
-}
-#endif

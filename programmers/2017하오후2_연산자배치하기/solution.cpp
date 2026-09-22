@@ -1,8 +1,9 @@
 /*
 	[코드트리] 2017 하반기 오후 2번 - 연산자 배치하기
-	원본 : swtest/코드트리_2017_하반기오후2번_연산자배치하기.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2017_하반기오후2번_연산자배치하기.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/arrange-operator
 
@@ -165,26 +166,3 @@ vector<int> solution(vector<int> numbers, vector<int> ops)
 
 	return vector<int>{ minAnswer, maxAnswer };   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n;
-	scanf("%d", &n);                 // 원본 scanf 순서 그대로
-	vector<int> numbers(n);
-	for (int i = 0; i < n; i++) scanf("%d", &numbers[i]);
-	vector<int> ops(3);
-	for (int i = 0; i < 3; i++) scanf("%d", &ops[i]);
-
-	vector<int> ans = solution(numbers, ops);
-#ifdef REPEAT_TEST
-	vector<int> ans2 = solution(numbers, ops);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-	printf("%d %d\n", ans[0], ans[1]);   // 원본은 한 줄에 최솟값 최댓값
-	return 0;
-}
-#endif

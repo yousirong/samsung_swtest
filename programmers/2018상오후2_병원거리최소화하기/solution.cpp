@@ -1,8 +1,9 @@
 /*
 	[코드트리] 2018 상반기 오후 2번 - 병원 거리 최소화하기
-	원본 : swtest/코드트리_2018_상반기오후2번_병원거리최소화하기.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2018_상반기오후2번_병원거리최소화하기.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/min-of-hospital-distance
 
@@ -223,31 +224,3 @@ int solution(int m, vector<vector<int>> board)
 
 	return minAnswer;   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
-//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, m;
-	scanf("%d %d", &n, &m);          // 원본 scanf 순서 그대로 (M은 격자 크기가 아니다)
-
-	vector<vector<int>> board(n, vector<int>(n));
-	for (int r = 0; r < n; r++)
-		for (int c = 0; c < n; c++)
-			scanf("%d", &board[r][c]);
-
-	int ans = solution(m, board);
-
-#ifdef REPEAT_TEST
-	int ans2 = solution(m, board);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-	printf("%d\n", ans);
-	return 0;
-}
-#endif

@@ -1,10 +1,14 @@
-# 21 덱 (BOJ 10866) — 프로그래머스 함수형
+# [프로그래머스 함수형] BOJ 10866 - 덱
 
-덱을 배열 하나와 포인터 둘(`front`, `back`)로 구현하고 8가지 명령을 처리한다.
+`swtest/` 의 표준입출력형 풀이를 프로그래머스 제출형으로 옮긴 것이다.
+**코드는 swtest 판과 같다.** `input()`이 인자를 받고 `main()`이 `solution()`이 된 것만 다르다.
 
-- 원본 : [swtest/21_BOJ_10866_덱.cpp](../../swtest/21_BOJ_10866_덱.cpp)
-- 복습 노트 : [docs/review/G02/21_BOJ_10866_덱.md](../../docs/review/G02/21_BOJ_10866_덱.md)
-- 원문제 : https://www.acmicpc.net/problem/10866
+| 항목 | 내용 |
+|---|---|
+| 원본 | [swtest/21_BOJ_10866_덱.cpp](../../swtest/21_BOJ_10866_덱.cpp) |
+| 반환 타입 | `vector<int>` |
+| 제출 파일 | `solution.cpp` (통째로 붙여 넣기) |
+| 로컬 테스트 | `local_test.cpp` (제출하지 않음) |
 
 ## 시그니처
 
@@ -12,82 +16,39 @@
 vector<int> solution(vector<string> commands)
 ```
 
-## stdin → 인자 대응
+## 원본 stdin을 어떻게 인자로 바꿨나
 
-| 원본 stdin | 원본 코드 | solution |
-|---|---|---|
-| 1행 `N` | `scanf("%d", &N)` | **인자 아님** — `commands.size()`로 대신한다 |
-| N줄 명령 | `scanf("%s", command)` + push면 `scanf("%d", &value)` | `commands[i]` — `"push_back 10"` / `"pop_front"` 처럼 **한 줄 통째로** |
-
-반환 → 원본 출력 : 조회 명령(`pop_front` `pop_back` `size` `empty` `front` `back`)마다 한 줄씩 찍던 정수들을 순서대로 담은 배열.
-`push_front` / `push_back`은 출력이 없으므로 배열에도 들어가지 않는다.
-
-## 이 문제의 변환 포인트 — `input()`이 없는 유형
-
-대부분의 풀이는 `void input()`이 따로 있지만, 이 파일은 **`scanf`가 `main` 안에서 로직과 섞여 있다**
-(16·17·18·19·20·21번과 드래곤커브가 같은 구조다).
-
-이럴 때 명령 파싱을 STL로 "개선"하면 분기 로직이 통째로 다른 코드가 된다.
-여기서는 **`scanf` → `sscanf` 치환만** 했다. 읽는 대상이 stdin에서 문자열로 바뀔 뿐이라
-원본의 `strcmp` 사슬은 한 글자도 건드리지 않는다.
+`local_test.cpp` 가 원본과 똑같은 형식으로 읽어 `solution()`에 넘긴다.
+즉 아래 읽기 순서가 곧 인자 순서다.
 
 ```cpp
-sscanf(commands[i].c_str(), "%s", command);          // 명령 이름
-sscanf(commands[i].c_str(), "%*s %d", &value);       // push 계열의 인자 (%*s 로 앞 토큰 버림)
+scanf("%d", &n);   // 원본과 같은 형식
+scanf("%s", cmd);
+scanf("%d", &v);
 ```
 
 ## 바뀐 지점
 
 | 위치 | 변경 |
 |---|---|
-| 헤더 | `#include <vector>`, `#include <string>` 추가 |
-| `main()` → `solution()` | `scanf("%d", &N)` → `commands.size()`, 각 `scanf` → `sscanf` |
-| 출력 | `printf("%d\n", ...)` 9곳 → `answer.push_back(...)` |
-| 반환 | `return 0;` → `return answer;` |
-| 로직 | **무변경** (`strcmp` 구현, `front`/`back` 조작, 8개 분기 전부 그대로) |
+| 헤더 | `#include <vector>` 추가, `using namespace std;` (프로그래머스 템플릿과 같은 형태) |
+| `input()` | `scanf`를 인자 대입으로 교체. 전역 초기화 루프는 원본 그대로 |
+| `main()` → `solution()` | `T` 루프 껍데기 제거, `printf` → `return` |
+| 로직 함수 | 무변경. 전역 배열을 쓰는 C 스타일 그대로다 |
 
-## 재호출 주의점
+## 검증
 
-`front = back = OFFSET;` 이 원본에서도 `main` 첫 줄에 있었고, 그대로 `solution()` 첫 줄로 옮겨 왔다.
-이 한 줄이 곧 재호출 초기화 역할을 한다 — 덱의 내용(`deque[]`)은 `[front, back)` 구간만 읽으므로
-이전 호출의 잔상이 남아 있어도 결과에 영향이 없다.
+랜덤 입력을 만들어 원본 실행 파일과 `cmp` 로 대조했고, 전부 일치했다.
+`-DREPEAT_TEST` 로 빌드해 같은 인자로 두 번 호출해도 결과가 같은 것(재호출 안전)까지 확인했다.
 
-> `-DREPEAT_TEST` 로 300케이스 검사 통과.
-
-## ⚠️ 원본에 남아 있는 주의사항 (고치지 않음)
-
-원본 주석이 이미 지적하고 있는 내용이라 그대로 옮겨 왔다.
-
-- `OFFSET`이 `MAX/2`(= 5250)인데 N은 최대 10,000이다. `push_front`만 계속 들어오면 `front`가 0 아래로 내려가 배열 밖을 건드린다. `OFFSET`을 `MAX`로 두면 안전하다.
-- 전역 `strcmp`가 표준 `strcmp`와 이름이 같다. 여기서는 `<vector>` / `<string>`을 추가해도 컴파일이 통과하는 것을 확인했지만, `<cstring>`을 직접 넣으면 깨진다.
-
-## 전역 `deque`와 `using namespace std;` — 이 파일이 대표 사례
-
-이 파일에는 전역 `int deque[MAX * 2];` 가 있다. `using namespace std;`를 쓰면서도
-`<deque>`를 include 하지 않기 때문에 `std::deque`가 아예 선언되지 않아 충돌하지 않는다.
-
-즉 문제는 `using namespace std;` 자체가 아니라 **어떤 헤더를 끌어오느냐**다.
-`#include <bits/stdc++.h>` 로 시작하면 이 파일은 그 자리에서 깨진다.
 ## 로컬 테스트
 
 ```bash
 cd programmers/21_BOJ_10866_덱
-g++ -O2 -DLOCAL_TEST -o run solution.cpp
-printf '8\npush_front 1\npush_back 2\nfront\nback\nsize\nempty\npop_front\npop_back\n' | ./run
-# 1
-# 2
-# 2
-# 0
-# 1
-# 2
-```
-
-원본과 대조:
-
-```bash
+g++ -O2 -o run local_test.cpp                # solution.cpp 를 include 해서 빌드
+g++ -O2 -DREPEAT_TEST -o rep local_test.cpp  # 재호출 검사
 g++ -O2 -o orig ../../swtest/21_BOJ_10866_덱.cpp
-printf '8\npush_front 1\npush_back 2\nfront\nback\nsize\nempty\npop_front\npop_back\n' > in.txt
-./orig < in.txt > a.out; ./run < in.txt > b.out; cmp a.out b.out
+./orig < in.txt > a.txt; ./run < in.txt > b.txt; cmp a.txt b.txt
 ```
 
-> 제출할 때는 `solution.cpp` 맨 아래 `#ifdef LOCAL_TEST` 블록을 빼고 복사한다.
+> 제출할 때는 `solution.cpp` 를 통째로 붙여 넣는다. `local_test.cpp` 는 제출하지 않는다.

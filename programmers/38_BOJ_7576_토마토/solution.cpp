@@ -1,8 +1,9 @@
 /*
 	[BOJ] 7576 - 토마토
-	원본 : swtest/38_BOJ_7576_토마토.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/38_BOJ_7576_토마토.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/7576
 
@@ -197,31 +198,3 @@ int solution(vector<vector<int>> box)
 
 	return getAnswer();   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// 원본 입력 순서(M N = 가로 세로)를 그대로 지킨다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int m, n;
-	scanf("%d %d", &m, &n);
-
-	vector<vector<int>> box(n, vector<int>(m));
-	for (int r = 0; r < n; r++)
-		for (int c = 0; c < m; c++)
-			scanf("%d", &box[r][c]);
-
-	int ans = solution(box);
-
-#ifdef REPEAT_TEST
-	int ans2 = solution(box);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-	printf("%d\n", ans);
-
-	return 0;
-}
-#endif

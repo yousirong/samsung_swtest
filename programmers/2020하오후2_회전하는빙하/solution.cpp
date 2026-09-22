@@ -1,7 +1,9 @@
 /*
     [코드트리] 2020 하반기 오후 2번 - 회전하는 빙하
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2020_하반기오후2번_회전하는빙하.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
     (백준 20058 "마법사 상어와 파이어스톰"과 같은 문제다  https://www.acmicpc.net/problem/20058)
 
@@ -61,7 +63,6 @@
 
 /*
 	[프로그래머스 함수형] 2020 하반기 오후 2번 - 회전하는 빙하
-	원본 : swtest/코드트리_2020_하반기오후2번_회전하는빙하.cpp
 	복습 노트 : docs/review/G06/2020하오후2_회전하는빙하.md
 
 	원본은 답이 2개(남은 얼음 총합, 가장 큰 덩어리 크기)라 printf로 두 줄을 찍었다.
@@ -329,36 +330,3 @@ vector<int> solution(int n, vector<vector<int>> board, vector<int> levels)
 
     return vector<int>{ iceCount, groupCount };   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
-//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-    int n, q;
-    scanf("%d %d", &n, &q);      // 원본 scanf 순서 그대로
-
-    int side = 1 << n;           // 격자 한 변은 입력 n이 아니라 2^n 이다
-    vector<vector<int>> board(side, vector<int>(side));
-    for (int r = 0; r < side; r++)
-        for (int c = 0; c < side; c++)
-            scanf("%d", &board[r][c]);
-
-    vector<int> levels(q);
-    for (int i = 0; i < q; i++)
-        scanf("%d", &levels[i]);
-
-    vector<int> ans = solution(n, board, levels);
-
-#ifdef REPEAT_TEST
-    vector<int> ans2 = solution(n, board, levels);   // 같은 인자로 한 번 더
-    if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-
-    printf("%d\n%d\n", ans[0], ans[1]);   // 원본 출력 형식 그대로 (두 줄)
-    return 0;
-}
-#endif

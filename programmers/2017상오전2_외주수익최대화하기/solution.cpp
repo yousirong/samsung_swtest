@@ -1,8 +1,9 @@
 /*
 	[코드트리] 2017 상반기 오전 2번 - 외주 수익 최대화하기
-	원본 : swtest/코드트리_2017_상반기오전2번_외주수익최대화하기.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2017_상반기오전2번_외주수익최대화하기.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/max-of-outsourcing-profit
 
@@ -189,24 +190,3 @@ int solution(vector<vector<int>> jobs)
 
 	return maxAnswer;   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n;
-	scanf("%d", &n);                 // 원본 scanf 순서 그대로
-	vector<vector<int>> jobs(n, vector<int>(2));
-	for (int i = 0; i < n; i++) scanf("%d %d", &jobs[i][0], &jobs[i][1]);
-
-	int ans = solution(jobs);
-#ifdef REPEAT_TEST
-	int ans2 = solution(jobs);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-	printf("%d\n", ans);
-	return 0;
-}
-#endif

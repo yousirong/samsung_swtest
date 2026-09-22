@@ -1,8 +1,9 @@
 /*
 	[BOJ] 2178 - 미로 탐색
-	원본 : swtest/36_BOJ_2178_미로탐색.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/36_BOJ_2178_미로탐색.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/2178
 
@@ -167,30 +168,3 @@ int solution(vector<vector<int>> board)
 	// 도착점까지의 최단 거리 (문제에서 항상 도달 가능하다고 보장한다)
 	return MAP[N][M];   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, m;
-	scanf("%d %d", &n, &m);
-
-	vector<vector<int>> board(n, vector<int>(m));
-	for (int r = 0; r < n; r++)
-		for (int c = 0; c < m; c++)
-			scanf("%1d", &board[r][c]);
-
-	int ans = solution(board);
-
-#ifdef REPEAT_TEST
-	int ans2 = solution(board);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-	printf("%d\n", ans);
-
-	return 0;
-}
-#endif

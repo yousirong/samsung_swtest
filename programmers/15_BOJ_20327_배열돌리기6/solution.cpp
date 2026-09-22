@@ -1,8 +1,9 @@
 /*
 	[BOJ] 20327 - 배열 돌리기 6
-	원본 : swtest/15_BOJ_20327_배열돌리기6.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/15_BOJ_20327_배열돌리기6.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/20327
 
@@ -302,38 +303,3 @@ vector<vector<int>> solution(vector<vector<int>> board, vector<vector<int>> comm
 
 	return answer;
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, r;
-	scanf("%d %d", &n, &r);   // 원본과 같은 형식 (n은 지수, 배열 한 변은 2^n)
-
-	int s = (1 << n);
-	vector<vector<int>> board(s, vector<int>(s));
-	for (int i = 0; i < s; i++)
-		for (int j = 0; j < s; j++)
-			scanf("%d", &board[i][j]);
-
-	vector<vector<int>> commands(r, vector<int>(2));
-	for (int i = 0; i < r; i++) scanf("%d %d", &commands[i][0], &commands[i][1]);
-
-	vector<vector<int>> ans = solution(board, commands);
-
-#ifdef REPEAT_TEST
-	if (solution(board, commands) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-
-	for (int i = 0; i < s; i++)
-	{
-		for (int j = 0; j < s; j++)
-			printf("%d ", ans[i][j]);
-		putchar('\n');
-	}
-
-	return 0;
-}
-#endif

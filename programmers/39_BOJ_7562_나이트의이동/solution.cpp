@@ -1,8 +1,9 @@
 /*
 	[BOJ] 7562 - 나이트의 이동
-	원본 : swtest/39_BOJ_7562_나이트의이동.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/39_BOJ_7562_나이트의이동.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/7562
 
@@ -160,31 +161,3 @@ int solution(int l, int startR, int startC, int endR, int endC)
 
 	return BFS(sr, sc);   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int t;
-	scanf("%d", &t);
-
-	for (int tc = 0; tc < t; tc++)
-	{
-		int l, a, b, c, d;
-		scanf("%d %d %d %d %d", &l, &a, &b, &c, &d);
-
-		int ans = solution(l, a, b, c, d);
-
-#ifdef REPEAT_TEST
-		int ans2 = solution(l, a, b, c, d);
-		if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-		printf("%d\n", ans);
-	}
-
-	return 0;
-}
-#endif

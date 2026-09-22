@@ -1,8 +1,9 @@
 /*
 	[BOJ] 2606 - 바이러스 (DFS 풀이)
-	원본 : swtest/24_BOJ_2606_바이러스DFS.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/24_BOJ_2606_바이러스DFS.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/2606
 
@@ -127,28 +128,3 @@ int solution(int v, vector<vector<int>> edges)
 	// 1번을 제외한 감염된 컴퓨터 수
 	return count;   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int v, e;
-	scanf("%d %d", &v, &e);
-
-	vector<vector<int>> edges(e, vector<int>(2));
-	for (int i = 0; i < e; i++) scanf("%d %d", &edges[i][0], &edges[i][1]);
-
-	int ans = solution(v, edges);
-
-#ifdef REPEAT_TEST
-	int ans2 = solution(v, edges);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-	printf("%d\n", ans);
-
-	return 0;
-}
-#endif

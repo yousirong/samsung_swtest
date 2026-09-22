@@ -1,8 +1,10 @@
 /*
 	[코드트리] 2021 하반기 오후 1번 - 팩맨
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
-	[버그수정] 원본에 있던 버그는 이 사본에서 고쳐 옮겼다. 고친 자리마다 // [버그수정] 표시가 있다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2021_하반기오후1번_팩맨.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
+	[버그수정] 원본에 있던 버그는 이 사본에서 고쳤다. 고친 자리마다 // [버그수정] 표시가 있다.
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/pacman
 	(백준 23290 "마법사 상어와 복제"와 같은 문제다. 상어 -> 팩맨, 물고기 -> 몬스터)
@@ -367,32 +369,3 @@ int solution(int t, int r, int c, vector<vector<int>> monsters)
 
 	return getAnswer();   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-//   빌드      : g++ -O2 -DLOCAL_TEST -o run solution.cpp
-//   재호출 검사 : g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp
-// 원본과 똑같은 형식으로 읽고 똑같은 형식으로 출력해야 cmp 대조가 성립한다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int m, t, pr, pc;
-
-	scanf("%d %d %d %d", &m, &t, &pr, &pc);   // 원본 scanf 순서 그대로 (원본의 %D 오타는 %d로 정정)
-
-	vector<vector<int>> monsters(m, vector<int>(3));
-	for (int i = 0; i < m; i++)
-		scanf("%d %d %d", &monsters[i][0], &monsters[i][1], &monsters[i][2]);
-
-	int ans = solution(t, pr, pc, monsters);
-
-#ifdef REPEAT_TEST
-	int ans2 = solution(t, pr, pc, monsters);   // 같은 인자로 한 번 더
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-	printf("%d\n", ans);   // 원본 출력 형식 그대로
-	return 0;
-}
-#endif

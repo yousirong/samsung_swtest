@@ -1,8 +1,9 @@
 /*
 	[BOJ] 10845 큐 / 18258 큐 2
-	원본 : swtest/19_BOJ_10845_18258_큐_큐2.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/19_BOJ_10845_18258_큐_큐2.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/10845
 	https://www.acmicpc.net/problem/18258
@@ -52,7 +53,6 @@
 
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
-#include <stdlib.h>            // [추가] atoi
 #include <string>              // [추가] 명령 문자열용
 
 using namespace std;
@@ -105,20 +105,17 @@ vector<int> solution(vector<string> commands)
 
 	for (int i = 0; i < N; i++)
 	{
-		// [수정] scanf("%s", command) 대신 목록에서 꺼낸다 (공백 앞까지가 명령어)
-		const string& line = commands[i];
-		char command[100] = { 0 };
+		char command[100];
+		int value = 0;
 
-		size_t pos = line.find(' ');
-		string head = (pos == string::npos) ? line : line.substr(0, pos);
-		for (size_t k = 0; k < head.size() && k < 99; k++) command[k] = head[k];
+		// [수정] scanf -> sscanf (읽는 대상만 바뀐다). "push 10" 이면 값까지 한 번에 읽힌다.
+		sscanf(commands[i].c_str(), "%s %d", command, &value);
 
 		// ---------------------------
 		// push X : 맨 뒤에 추가
 		// ---------------------------
 		if (strCompare(command, "push") == 0)
 		{
-			int value = atoi(line.c_str() + pos + 1);   // [수정] scanf("%d", &value) 대체
 
 			// 현재 wp 자리에 넣고 wp를 한 칸 앞으로
 			queue[wp++] = value;
@@ -178,35 +175,3 @@ vector<int> solution(vector<string> commands)
 
 	return answer;
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n;
-	scanf("%d", &n);
-
-	vector<string> commands;
-	for (int i = 0; i < n; i++)
-	{
-		char buf[100];
-		scanf("%s", buf);
-		string line = buf;
-
-		if (line == "push") { int v; scanf("%d", &v); char num[20]; sprintf(num, " %d", v); line += num; }
-		commands.push_back(line);
-	}
-
-	vector<int> ans = solution(commands);
-
-#ifdef REPEAT_TEST
-	if (solution(commands) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-
-	for (size_t i = 0; i < ans.size(); i++) printf("%d\n", ans[i]);
-
-	return 0;
-}
-#endif

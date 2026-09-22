@@ -1,8 +1,9 @@
 /*
 	[코드트리] 2022 상반기 오후 1번 - 꼬리잡기놀이
-	원본 : swtest/코드트리_2022_상반기오후1번_꼬리잡기놀이.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2022_상반기오후1번_꼬리잡기놀이.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/tail-catch-play
 
@@ -457,30 +458,3 @@ int solution(vector<vector<int>> board, int k)
 
 	return simulate();   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n, m, k;
-	scanf("%d %d %d", &n, &m, &k);   // 원본과 같은 형식 (m은 solution에서 격자로부터 다시 구한다)
-
-	vector<vector<int>> board(n, vector<int>(n));
-	for (int r = 0; r < n; r++)
-		for (int c = 0; c < n; c++)
-			scanf("%d", &board[r][c]);
-
-	int ans = solution(board, k);
-
-#ifdef REPEAT_TEST
-	int ans2 = solution(board, k);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
-#endif
-
-	printf("%d\n", ans);
-
-	return 0;
-}
-#endif

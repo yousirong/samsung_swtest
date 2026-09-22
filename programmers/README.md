@@ -23,6 +23,7 @@
 | `// [수정]` | 원래 있던 줄을 고침 (scanf → 인자 대입, printf → return, main → solution) |
 | `// [추가]` | 원래 없던 줄을 새로 넣음 (include, 재호출 초기화) |
 | `// [버그수정]` | 원본 버그를 고친 곳 (드묾. README에 근거를 반드시 적는다) |
+| `// [이름변경]` | `using namespace std;` 와 겹쳐 전역 이름을 바꾼 곳 (윷놀이사기단 한 곳뿐) |
 
 ### 2. `using namespace std;`를 쓴다 — 단, 전역 이름 충돌만 조심
 
@@ -75,16 +76,45 @@ include 하지 않으면 `std::queue` · `std::stack` · `std::deque` · `std::c
 
 ---
 
+### 6. 내부는 swtest와 같은 C 스타일로 둔다
+
+프로그래머스 C++ 제출은 `solution()` 시그니처를 피할 수 없다. 그래서 STL은 **경계에서만** 쓴다.
+
+| 자리 | 쓰는 것 |
+|---|---|
+| `solution()` 시그니처 | `vector` / `string` (어쩔 수 없음) |
+| `input()` 안 | 인자 `vector`를 전역 배열로 옮겨 담기만 한다 |
+| 로직 함수 | 전역 고정 배열, 직접 만든 큐/스택. **swtest 판과 한 글자도 다르지 않다** |
+| 반환 직전 | 전역 배열을 `vector`로 옮겨 담는다 |
+
+그래서 정렬도 `sort` 대신 원본의 선택 정렬을, 큐도 `queue` 대신 `rp`/`wp` 배열 큐를 그대로 쓴다.
+명령 문자열을 파싱할 때도 `substr`이 아니라 `sscanf(commands[i].c_str(), "%s %d", ...)` 로 읽는다.
+
+## 폴더 구성
+
+```
+programmers/<문제>/
+  solution.cpp    ← 제출용. swtest 판과 같은 코드이고 input()/solution()만 다르다
+  local_test.cpp  ← 로컬 대조용. solution.cpp 를 include 하고 main()을 갖는다
+  README.md
+```
+
+제출할 때는 `solution.cpp` 를 통째로 붙여 넣는다. `main`이 없으므로 채점기와 부딪히지 않는다.
+
+> 반대로 `swtest/` 파일을 그대로 내면 `main`이 겹치고 `solution`이 없어서 링크가 깨진다.
+> ```
+> undefined reference to `solution(...)`
+> ```
+
 ## 검증 방법
 
-`solution.cpp` 맨 아래에 `#ifdef LOCAL_TEST`로 감싼 `main`이 들어 있다.
-원본과 **똑같은 형식으로 읽고 똑같은 형식으로 출력**하므로 바이트 단위 대조가 된다.
+`local_test.cpp` 는 원본과 **똑같은 형식으로 읽고 똑같은 형식으로 출력**하므로 바이트 단위 대조가 된다.
 
 ```bash
 cd programmers/<문제>
-g++ -O2 -DLOCAL_TEST -o run solution.cpp                       # 대조용
-g++ -O2 -DLOCAL_TEST -DREPEAT_TEST -o rep solution.cpp         # 재호출 검사용
-g++ -O2 -o orig ../../swtest/<원본>.cpp                         # 기준
+g++ -O2 -o run local_test.cpp                 # 대조용
+g++ -O2 -DREPEAT_TEST -o rep local_test.cpp   # 재호출 검사용
+g++ -O2 -o orig ../../swtest/<원본>.cpp        # 기준
 
 ./orig < in.txt > a.out
 ./run  < in.txt > b.out
@@ -94,29 +124,26 @@ cmp a.out b.out          # diff 대신 cmp — 줄 끝 공백/마지막 개행 �
 
 통과 기준 4가지
 
-1. `-DLOCAL_TEST` **없이** 빌드하면 `main`이 없어 링크가 실패한다 → 제출 코드가 순수함
-2. `-DLOCAL_TEST` 빌드 성공
-3. 랜덤 입력 300개 전부 `cmp` 일치
+1. `solution.cpp` 만으로 컴파일해도 `main`이 없다 → 제출 코드가 순수함
+2. `local_test.cpp` 빌드 성공
+3. 랜덤 입력 전부 `cmp` 일치
 4. `-DREPEAT_TEST` 전부 통과
-
-> 제출할 때는 `#ifdef LOCAL_TEST` 블록을 빼고 복사한다.
 
 ### 재호출 안전성이 왜 중요한가
 
 원본은 프로세스당 한 번만 돌아서 전역이 더러워도 문제가 없었다. 함수형은 그 가정이 깨진다.
-아래 파일들은 전역을 되돌리지 않으므로 변환할 때 초기화를 추가해야 한다.
+아래 파일들은 전역을 되돌리지 않으므로 변환할 때 초기화를 추가했다.
 
-| 원본 | 되돌려지지 않는 전역 |
+| 원본 | 되돌려지지 않던 전역 |
 |---|---|
-| 2018상오후1 드래곤커브 | `MAP` — 치명적 |
-| 2021하오전2 냉방시스템 | `wall`, `temperature` — 치명적 |
+| 2018상오후1 드래곤커브 | `MAP` |
+| 2021하오전2 냉방시스템 | `wall`, `temperature` |
+| 2022상오후2 나무박멸 | `herbicide` |
 | 2020하오후1 청소는즐거워 | `tcnt` |
 | 2016하1 정육면체굴리기 | `cube` |
 | 2020상오후1 승자독식모노폴리 | `time[][]` |
 | 2020하오전1 불안한무빙워크 | `position[]` |
 | 24 · 25 · 26 · 34 · 36 · 41 (BOJ) | `MAP`, `visit` 등 |
-
----
 
 ## 진행 현황 — 71개 전부 변환 완료
 

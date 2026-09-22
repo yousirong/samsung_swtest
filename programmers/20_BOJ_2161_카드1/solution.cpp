@@ -1,8 +1,9 @@
 /*
 	[BOJ] 2161 - 카드1
-	원본 : swtest/20_BOJ_2161_카드1.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/20_BOJ_2161_카드1.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.acmicpc.net/problem/2161
 
@@ -74,26 +75,3 @@ vector<int> solution(int n)
 
 	return answer;
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// 원본 출력 형식(버린 카드는 "%d ", 마지막은 "%d\n")을 그대로 흉내 낸다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	int n;
-	scanf("%d", &n);
-
-	vector<int> ans = solution(n);
-
-#ifdef REPEAT_TEST
-	if (solution(n) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-
-	for (size_t i = 0; i + 1 < ans.size(); i++) printf("%d ", ans[i]);
-	printf("%d\n", ans[ans.size() - 1]);
-
-	return 0;
-}
-#endif

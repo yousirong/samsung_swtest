@@ -1,8 +1,9 @@
 /*
 	[코드트리] 2017 하반기 오후 1번 - 돌아가는 팔각의자
-	원본 : swtest/코드트리_2017_하반기오후1번_돌아가는팔각의자.cpp
-	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
-	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2017_하반기오후1번_돌아가는팔각의자.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 
 	https://www.codetree.ai/training-field/frequent-problems/problems/rounding-eight-angle
 
@@ -208,32 +209,3 @@ int solution(vector<string> chairs, vector<vector<int>> rotations)
 
 	return getScore();   // [수정] printf -> return
 }
-
-// ==========================================================
-// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
-// ==========================================================
-#ifdef LOCAL_TEST
-int main()
-{
-	vector<string> chairs(4);
-	for (int i = 0; i < 4; i++)
-	{
-		char buf[32];
-		scanf("%s", buf);            // 원본은 %1d 로 한 자리씩 읽지만 결과는 같다
-		chairs[i] = buf;
-	}
-
-	int k;
-	scanf("%d", &k);
-	vector<vector<int>> rotations(k, vector<int>(2));
-	for (int i = 0; i < k; i++) scanf("%d %d", &rotations[i][0], &rotations[i][1]);
-
-	int ans = solution(chairs, rotations);
-#ifdef REPEAT_TEST
-	int ans2 = solution(chairs, rotations);
-	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
-#endif
-	printf("%d\n", ans);
-	return 0;
-}
-#endif
