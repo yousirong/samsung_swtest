@@ -80,6 +80,8 @@
 int ansScore, ansBlockCount;   // [추가] simulate가 printf 하던 두 값을 담아 둔다
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (10 + 3)
 #define MAX_K (10000 + 500)
 
@@ -104,7 +106,7 @@ int C[MAX_K];
     입력 + 벽 세우기
 */
 // [수정] scanf 대신 인자로 받는다. blocks[i] = {종류, 행, 열}
-void input(const std::vector<std::vector<int>>& blocks)
+void input(const vector<vector<int>>& blocks)
 {
     for (int r = 0; r < MAX; r++)
         for (int c = 0; c < MAX; c++)
@@ -375,13 +377,13 @@ void simulate()
 
 // [수정] main() -> solution().
 //        원본은 simulate() 안에서 printf 했으므로, 그 값을 전역에 담아 여기서 반환한다.
-std::vector<int> solution(std::vector<std::vector<int>> blocks)
+vector<int> solution(vector<vector<int>> blocks)
 {
     input(blocks);
 
     simulate();
 
-    return std::vector<int>{ ansScore, ansBlockCount };   // [수정] printf -> return
+    return vector<int>{ ansScore, ansBlockCount };   // [수정] printf -> return
 }
 
 // ==========================================================
@@ -392,13 +394,13 @@ int main()
 {
     int k;
     scanf("%d", &k);                 // 원본 scanf 순서 그대로
-    std::vector<std::vector<int>> blocks(k, std::vector<int>(3));
+    vector<vector<int>> blocks(k, vector<int>(3));
     for (int i = 0; i < k; i++)
         scanf("%d %d %d", &blocks[i][0], &blocks[i][1], &blocks[i][2]);
 
-    std::vector<int> ans = solution(blocks);
+    vector<int> ans = solution(blocks);
 #ifdef REPEAT_TEST
-    std::vector<int> ans2 = solution(blocks);
+    vector<int> ans2 = solution(blocks);
     if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
 #endif
     printf("%d\n%d\n", ans[0], ans[1]);   // 원본은 점수와 남은 블록 수를 각각 다른 줄에

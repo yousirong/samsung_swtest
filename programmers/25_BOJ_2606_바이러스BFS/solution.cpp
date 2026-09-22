@@ -38,6 +38,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (100 + 10)  // 최대 정점 수 (문제 조건 100 + 여유)
 
 int V, E;               // V: 정점(컴퓨터) 수, E: 간선(연결) 수
@@ -51,7 +53,7 @@ int infected;           // [추가] BFS 결과(감염 수)를 담아 두는 전�
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(int v, const std::vector<std::vector<int>>& edges)
+void input(int v, const vector<vector<int>>& edges)
 {
     V = v;                        // [수정] scanf("%d %d", &V, &E) 대체
     E = (int)edges.size();
@@ -138,7 +140,7 @@ void BFS(int node)
 // 메인
 // ---------------------------
 // [수정] main() -> solution()
-int solution(int v, std::vector<std::vector<int>> edges)
+int solution(int v, vector<vector<int>> edges)
 {
     input(v, edges);
 
@@ -156,7 +158,7 @@ int main()
     int v, e;
     scanf("%d %d", &v, &e);
 
-    std::vector<std::vector<int>> edges(e, std::vector<int>(2));
+    vector<vector<int>> edges(e, vector<int>(2));
     for (int i = 0; i < e; i++) scanf("%d %d", &edges[i][0], &edges[i][1]);
 
     int ans = solution(v, edges);

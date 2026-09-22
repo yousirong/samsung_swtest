@@ -65,7 +65,7 @@
 	복습 노트 : docs/review/G06/2020하오후2_회전하는빙하.md
 
 	원본은 답이 2개(남은 얼음 총합, 가장 큰 덩어리 크기)라 printf로 두 줄을 찍었다.
-	함수형에서는 std::vector<int> 하나로 {얼음총합, 최대덩어리} 를 반환한다.
+	함수형에서는 vector<int> 하나로 {얼음총합, 최대덩어리} 를 반환한다.
 
 	위 블록 주석에 적힌 rotate() 문제(L >= 2에서 90도 회전과 다름)는 원본 그대로 두었다.
 	자세한 내용은 README.md 참고.
@@ -74,6 +74,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <vector>              // [추가] 함수형 인자/반환용
+
+using namespace std;
 
 #define MAX (64 + 5)
 
@@ -111,7 +113,7 @@ int dc[] = { 0, 1, 0,-1 };
     입력
 */
 // [수정] scanf 대신 인자로 받는다
-void input(int n, const std::vector<std::vector<int>>& board, const std::vector<int>& levels)
+void input(int n, const vector<vector<int>>& board, const vector<int>& levels)
 {
     N = n;                      // [수정] scanf 대체
     Q = (int)levels.size();     // [수정] scanf 대체 - 명령 개수는 배열 길이로 알 수 있다
@@ -316,7 +318,7 @@ int getGroupCount()
 // [수정] main() -> solution()
 //        원본의 T 루프 껍데기는 제거했다. 채점기가 케이스마다 한 번씩 부른다.
 //        답이 2개라 vector<int> 로 {얼음총합, 최대덩어리} 순서로 돌려준다.
-std::vector<int> solution(int n, std::vector<std::vector<int>> board, std::vector<int> levels)
+vector<int> solution(int n, vector<vector<int>> board, vector<int> levels)
 {
     input(n, board, levels);
 
@@ -325,7 +327,7 @@ std::vector<int> solution(int n, std::vector<std::vector<int>> board, std::vecto
     int iceCount = getIceCount();
     int groupCount = getGroupCount();
 
-    return std::vector<int>{ iceCount, groupCount };   // [수정] printf -> return
+    return vector<int>{ iceCount, groupCount };   // [수정] printf -> return
 }
 
 // ==========================================================
@@ -340,19 +342,19 @@ int main()
     scanf("%d %d", &n, &q);      // 원본 scanf 순서 그대로
 
     int side = 1 << n;           // 격자 한 변은 입력 n이 아니라 2^n 이다
-    std::vector<std::vector<int>> board(side, std::vector<int>(side));
+    vector<vector<int>> board(side, vector<int>(side));
     for (int r = 0; r < side; r++)
         for (int c = 0; c < side; c++)
             scanf("%d", &board[r][c]);
 
-    std::vector<int> levels(q);
+    vector<int> levels(q);
     for (int i = 0; i < q; i++)
         scanf("%d", &levels[i]);
 
-    std::vector<int> ans = solution(n, board, levels);
+    vector<int> ans = solution(n, board, levels);
 
 #ifdef REPEAT_TEST
-    std::vector<int> ans2 = solution(n, board, levels);   // 같은 인자로 한 번 더
+    vector<int> ans2 = solution(n, board, levels);   // 같은 인자로 한 번 더
     if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
 #endif
 

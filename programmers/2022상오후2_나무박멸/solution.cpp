@@ -51,6 +51,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (20 + 5)
 #define WALL (-1)
 
@@ -76,7 +78,7 @@ int dr2[] = { -1, -1, 1, 1 };
 int dc2[] = { -1, 1, 1, -1 };
 
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board, int m, int k, int c)
+void input(const vector<vector<int>>& board, int m, int k, int c)
 {
 	N = (int)board.size();   // [수정] scanf("%d %d %d %d", &N, &M, &K, &C) 대체
 	M = m;
@@ -297,7 +299,7 @@ int simulate()
 }
 
 // [수정] main() -> solution()
-int solution(std::vector<std::vector<int>> board, int m, int k, int c)
+int solution(vector<vector<int>> board, int m, int k, int c)
 {
 	input(board, m, k, c);
 
@@ -313,7 +315,7 @@ int main()
 	int n, m, k, c;
 	scanf("%d %d %d %d", &n, &m, &k, &c);
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int col = 0; col < n; col++)
 			scanf("%d", &board[r][col]);

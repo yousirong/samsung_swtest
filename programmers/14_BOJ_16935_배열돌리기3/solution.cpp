@@ -43,6 +43,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (100 + 10)
 
 // 명령 번호를 이름으로 정의 (main의 분기를 읽기 쉽게)
@@ -61,7 +63,7 @@ int temp[MAX][MAX];   // 연산 직전 상태 스냅샷(읽기 전용으로 사�
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board, int r)
+void input(const vector<vector<int>>& board, int r)
 {
 	N = (int)board.size();          // [수정] scanf("%d %d %d", &N, &M, &R) 대체
 	M = (int)board[0].size();
@@ -341,7 +343,7 @@ void split_counterClockwise()
 // 메인
 // ---------------------------
 // [수정] main() -> solution(). 연산 목록을 인자로 받는다.
-std::vector<std::vector<int>> solution(std::vector<std::vector<int>> board, std::vector<int> commands)
+vector<vector<int>> solution(vector<vector<int>> board, vector<int> commands)
 {
 	input(board, (int)commands.size());
 
@@ -366,7 +368,7 @@ std::vector<std::vector<int>> solution(std::vector<std::vector<int>> board, std:
 
 	// [수정] printMap() -> 격자를 그대로 반환
 	// 주의 : 회전 연산이 N, M을 서로 바꾸므로 최종 크기로 만들어야 한다.
-	std::vector<std::vector<int>> answer(N, std::vector<int>(M));
+	vector<vector<int>> answer(N, vector<int>(M));
 	for (int row = 1; row <= N; row++)
 		for (int c = 1; c <= M; c++)
 			answer[row - 1][c - 1] = MAP[row][c];
@@ -383,15 +385,15 @@ int main()
 	int n, m, r;
 	scanf("%d %d %d", &n, &m, &r);
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(m));
+	vector<vector<int>> board(n, vector<int>(m));
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < m; j++)
 			scanf("%d", &board[i][j]);
 
-	std::vector<int> commands(r);
+	vector<int> commands(r);
 	for (int i = 0; i < r; i++) scanf("%d", &commands[i]);
 
-	std::vector<std::vector<int>> ans = solution(board, commands);
+	vector<vector<int>> ans = solution(board, commands);
 
 #ifdef REPEAT_TEST
 	if (solution(board, commands) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

@@ -45,6 +45,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (1000000 + 50000)
 
 typedef long long ll;
@@ -60,7 +62,7 @@ int leader, member;     // 팀장 1명 / 팀원 1명이 검사할 수 있는 인
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다.
 //        전역 leader / member 와 이름이 겹치지 않게 인자는 뒤에 _ 를 붙였다.
-void input(const std::vector<int>& restaurants, int leader_, int member_)
+void input(const vector<int>& restaurants, int leader_, int member_)
 {
 	N = (int)restaurants.size();   // [수정] scanf 대체
 
@@ -74,7 +76,7 @@ void input(const std::vector<int>& restaurants, int leader_, int member_)
 }
 
 // [수정] main() -> solution().  답 계산이 main 안에 있던 유형이라 본문을 그대로 옮겨 왔다.
-long long solution(std::vector<int> restaurants, int leader_, int member_)
+long long solution(vector<int> restaurants, int leader_, int member_)
 {
 	input(restaurants, leader_, member_);
 
@@ -107,7 +109,7 @@ int main()
 {
 	int n;
 	scanf("%d", &n);                 // 원본 scanf 순서 그대로
-	std::vector<int> restaurants(n);
+	vector<int> restaurants(n);
 	for (int i = 0; i < n; i++) scanf("%d", &restaurants[i]);
 	int a, b;
 	scanf("%d %d", &a, &b);

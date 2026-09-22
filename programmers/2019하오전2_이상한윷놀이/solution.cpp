@@ -55,6 +55,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 // 배열 최대 크기 (N 최대 12 + 여유)
 #define MAX (12+5)
 
@@ -87,7 +89,7 @@ int dr[] = { 0,  0, 0, -1, 1 };
 int dc[] = { 0,  1,-1,  0, 0 };
 
 // [수정] scanf 대신 인자로 받는다. horses[i] = {r, c, dir}
-void input(const std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& horses)
+void input(const vector<vector<int>>& board, const vector<vector<int>>& horses)
 {
     N = (int)board.size();     // [수정] scanf 대체
     K = (int)horses.size();    // [수정] scanf 대체
@@ -256,7 +258,7 @@ int simulation()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::vector<int>> board, std::vector<std::vector<int>> horses)
+int solution(vector<vector<int>> board, vector<vector<int>> horses)
 {
     input(board, horses);
 
@@ -271,9 +273,9 @@ int main()
 {
     int n, k;
     scanf("%d %d", &n, &k);          // 원본 scanf 순서 그대로
-    std::vector<std::vector<int>> board(n, std::vector<int>(n));
+    vector<vector<int>> board(n, vector<int>(n));
     for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) scanf("%d", &board[r][c]);
-    std::vector<std::vector<int>> horses(k, std::vector<int>(3));
+    vector<vector<int>> horses(k, vector<int>(3));
     for (int i = 0; i < k; i++) scanf("%d %d %d", &horses[i][0], &horses[i][1], &horses[i][2]);
 
     int ans = solution(board, horses);

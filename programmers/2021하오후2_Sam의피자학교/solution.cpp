@@ -59,6 +59,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (100+10)
 #define INF (0x7fff0000)
 
@@ -78,7 +80,7 @@ int dr[] = { -1, 0, 1, 0 };
 int dc[] = { 0, 1, 0, -1 };
 
 // [수정] scanf 대신 인자로 받는다
-void input(int k, const std::vector<int>& flour)
+void input(int k, const vector<int>& flour)
 {
 	N = (int)flour.size();   // [수정] scanf("%d %d", &N, &K) 대체
 	K = k;
@@ -301,7 +303,7 @@ int simulate()
 }
 
 // [수정] main() -> solution()
-int solution(int k, std::vector<int> flour)
+int solution(int k, vector<int> flour)
 {
 	input(k, flour);
 
@@ -317,7 +319,7 @@ int main()
 	int n, k;
 	scanf("%d %d", &n, &k);
 
-	std::vector<int> flour(n);
+	vector<int> flour(n);
 	for (int i = 0; i < n; i++) scanf("%d", &flour[i]);
 
 	int ans = solution(k, flour);

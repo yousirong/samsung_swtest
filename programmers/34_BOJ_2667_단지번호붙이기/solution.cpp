@@ -35,6 +35,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (25 + 5)   // 문제의 최대 N은 25, 경계 여유를 위해 +5
 
 int N;                 // 지도의 크기 (N x N)
@@ -79,7 +81,7 @@ void printVisit()
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board)
+void input(const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf("%d", &N) 대체
 
@@ -147,7 +149,7 @@ int BFS(int r, int c)
 // [수정] main() -> solution().
 // 원본은 단지 수와 크기들을 출력했다. 단지 수는 목록의 크기로 알 수 있으므로
 // "오름차순으로 정렬한 단지 크기 목록"만 반환한다.
-std::vector<int> solution(std::vector<std::vector<int>> board)
+vector<int> solution(vector<vector<int>> board)
 {
 	input(board);
 
@@ -182,7 +184,7 @@ std::vector<int> solution(std::vector<std::vector<int>> board)
 	}
 
 	// [수정] printf -> 목록으로 반환 (단지 수 = answer.size())
-	std::vector<int> answer;
+	vector<int> answer;
 	for (int i = 0; i < ansCount; i++)
 		answer.push_back(answers[i]);
 
@@ -199,12 +201,12 @@ int main()
 	int n;
 	scanf("%d", &n);
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%1d", &board[r][c]);   // 원본과 같은 형식(붙어 있는 입력)
 
-	std::vector<int> ans = solution(board);
+	vector<int> ans = solution(board);
 
 #ifdef REPEAT_TEST
 	if (solution(board) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

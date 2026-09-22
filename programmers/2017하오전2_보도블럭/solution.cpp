@@ -53,6 +53,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (100 + 20)
 
 int T;
@@ -64,7 +66,7 @@ int TMAP[MAX][MAX];    // 전치 행렬 (세로줄을 가로줄처럼 다루기 
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. L은 격자 크기가 아니라 경사로 길이다.
-void input(int l, const std::vector<std::vector<int>>& board)
+void input(int l, const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf 대체
 	L = l;                   // [수정] scanf 대체
@@ -218,7 +220,7 @@ int checkAllRow()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int l, std::vector<std::vector<int>> board)
+int solution(int l, vector<vector<int>> board)
 {
 	input(l, board);
 
@@ -236,7 +238,7 @@ int main()
 	int n, x;
 	scanf("%d %d", &n, &x);          // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);

@@ -42,6 +42,8 @@
 #include <string>              // [추가] 명령 문자열용
 #include <stdlib.h>            // [추가] atoi
 
+using namespace std;
+
 #define MAX (10000 + 500)
 
 int N;            // 명령의 개수
@@ -83,9 +85,9 @@ void printStack()
 // ---------------------------
 // [수정] main() -> solution(). 명령을 문자열 목록으로 받고,
 // 출력이 있는 명령(pop, size, empty, top)의 결과만 순서대로 담아 반환한다.
-std::vector<int> solution(std::vector<std::string> commands)
+vector<int> solution(vector<string> commands)
 {
-	std::vector<int> answer;
+	vector<int> answer;
 
 	sp = 0;   // [추가] 재호출 대비 : 빈 스택으로 시작
 	N = (int)commands.size();   // [수정] scanf("%d", &N) 대체
@@ -94,11 +96,11 @@ std::vector<int> solution(std::vector<std::string> commands)
 	{
 		// [수정] scanf("%s", command) 대신 목록에서 꺼낸다.
 		// "push X"처럼 값이 붙어 오므로 공백 앞까지가 명령어다.
-		const std::string& line = commands[i];
+		const string& line = commands[i];
 		char command[100] = { 0 };
 
 		size_t pos = line.find(' ');
-		std::string head = (pos == std::string::npos) ? line : line.substr(0, pos);
+		string head = (pos == string::npos) ? line : line.substr(0, pos);
 		for (size_t k = 0; k < head.size() && k < 99; k++) command[k] = head[k];
 
 		// ---------------------------
@@ -165,18 +167,18 @@ int main()
 	int n;
 	scanf("%d", &n);
 
-	std::vector<std::string> commands;
+	vector<string> commands;
 	for (int i = 0; i < n; i++)
 	{
 		char buf[100];
 		scanf("%s", buf);
-		std::string line = buf;
+		string line = buf;
 
 		if (line == "push") { int v; scanf("%d", &v); char num[20]; sprintf(num, " %d", v); line += num; }
 		commands.push_back(line);
 	}
 
-	std::vector<int> ans = solution(commands);
+	vector<int> ans = solution(commands);
 
 #ifdef REPEAT_TEST
 	if (solution(commands) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

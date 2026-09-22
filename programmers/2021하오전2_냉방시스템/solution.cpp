@@ -52,6 +52,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (20+10)
 
 #define OFFICE (1)
@@ -108,7 +110,7 @@ int dr[] = { 0,0,0,-1,0,1 };
 int dc[] = { 0,0,-1,0,1,0 };
 
 // [수정] scanf 대신 인자로 받는다. walls[i] = {r, c, s}
-void input(int k, const std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& walls)
+void input(int k, const vector<vector<int>>& board, const vector<vector<int>>& walls)
 {
 	N = (int)board.size();    // [수정] scanf 대체
 	W = (int)walls.size();    // [수정] scanf 대체
@@ -427,7 +429,7 @@ int simulate()
 
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int k, std::vector<std::vector<int>> board, std::vector<std::vector<int>> walls)
+int solution(int k, vector<vector<int>> board, vector<vector<int>> walls)
 {
 	input(k, board, walls);
 
@@ -442,9 +444,9 @@ int main()
 {
 	int n, w, k;
 	scanf("%d %d %d", &n, &w, &k);   // 원본 scanf 순서 그대로
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) scanf("%d", &board[r][c]);
-	std::vector<std::vector<int>> walls(w, std::vector<int>(3));
+	vector<vector<int>> walls(w, vector<int>(3));
 	for (int i = 0; i < w; i++) scanf("%d %d %d", &walls[i][0], &walls[i][1], &walls[i][2]);
 
 	int ans = solution(k, board, walls);

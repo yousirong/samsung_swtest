@@ -47,6 +47,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (128 + 10)
 
 // 명령 번호를 이름으로 정의
@@ -67,7 +69,7 @@ int temp[MAX][MAX];   // 블록 하나를 잠시 담아 두는 버퍼, 0-based�
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board, int r)
+void input(const vector<vector<int>>& board, int r)
 {
 	// [수정] scanf("%d %d", &N, &R) 대체.
 	// 배열 한 변의 길이 S가 곧 2^N 이므로 N은 S에서 거꾸로 구한다.
@@ -264,7 +266,7 @@ void splitCounterClockwise(int level)
 // 메인
 // ---------------------------
 // [수정] main() -> solution(). 연산 목록 {연산 번호, 레벨}을 인자로 받는다.
-std::vector<std::vector<int>> solution(std::vector<std::vector<int>> board, std::vector<std::vector<int>> commands)
+vector<vector<int>> solution(vector<vector<int>> board, vector<vector<int>> commands)
 {
 	input(board, (int)commands.size());
 
@@ -293,7 +295,7 @@ std::vector<std::vector<int>> solution(std::vector<std::vector<int>> board, std:
 	}
 
 	// [수정] printMap() -> 격자를 그대로 반환
-	std::vector<std::vector<int>> answer(S, std::vector<int>(S));
+	vector<vector<int>> answer(S, vector<int>(S));
 	for (int row = 1; row <= S; row++)
 		for (int c = 1; c <= S; c++)
 			answer[row - 1][c - 1] = MAP[row][c];
@@ -311,15 +313,15 @@ int main()
 	scanf("%d %d", &n, &r);   // 원본과 같은 형식 (n은 지수, 배열 한 변은 2^n)
 
 	int s = (1 << n);
-	std::vector<std::vector<int>> board(s, std::vector<int>(s));
+	vector<vector<int>> board(s, vector<int>(s));
 	for (int i = 0; i < s; i++)
 		for (int j = 0; j < s; j++)
 			scanf("%d", &board[i][j]);
 
-	std::vector<std::vector<int>> commands(r, std::vector<int>(2));
+	vector<vector<int>> commands(r, vector<int>(2));
 	for (int i = 0; i < r; i++) scanf("%d %d", &commands[i][0], &commands[i][1]);
 
-	std::vector<std::vector<int>> ans = solution(board, commands);
+	vector<vector<int>> ans = solution(board, commands);
 
 #ifdef REPEAT_TEST
 	if (solution(board, commands) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

@@ -57,6 +57,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (50 + 10)
 #define TORNADO_POSITION (-1)
 
@@ -84,7 +86,7 @@ int dc[] = { 0, 1, 0, -1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. 전역 time 과 이름이 겹치지 않도록 인자는 sec 로 둔다.
-void input(int sec, const std::vector<std::vector<int>>& board)
+void input(int sec, const vector<vector<int>>& board)
 {
 	N = (int)board.size();        // [수정] scanf 대체
 	M = (int)board[0].size();     // [수정] scanf 대체
@@ -260,7 +262,7 @@ int getAnswer()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int sec, std::vector<std::vector<int>> board)
+int solution(int sec, vector<vector<int>> board)
 {
 	input(sec, board);
 
@@ -285,7 +287,7 @@ int main()
 	int n, m, k;
 	scanf("%d %d %d", &n, &m, &k);   // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(m));
+	vector<vector<int>> board(n, vector<int>(m));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < m; c++)
 			scanf("%d", &board[r][c]);

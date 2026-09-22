@@ -72,6 +72,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX_CITY (100 + 5)
 #define MAX_ROAD (1000 + 5)
 #define MAX_POINT (800000)   // 점 개수 상한 : 교차점 50만 + 도시/끝점 여유
@@ -120,7 +122,7 @@ int tcnt;
 
 // [수정] scanf 대신 인자로 받는다
 // city[i] = {x, y}  (i+1번 도시), road[i] = {x1, y1, x2, y2, limit}
-void input(const std::vector<std::vector<int>>& city, const std::vector<std::vector<int>>& road)
+void input(const vector<vector<int>>& city, const vector<vector<int>>& road)
 {
 	N = (int)city.size();   // [수정] scanf("%d", &N) 대체
 
@@ -447,7 +449,7 @@ void solve()
 }
 
 // [수정] main() -> solution(). 2번 도시부터 순서대로 최고 속도를 담아 반환한다.
-std::vector<int> solution(std::vector<std::vector<int>> city, std::vector<std::vector<int>> road)
+vector<int> solution(vector<vector<int>> city, vector<vector<int>> road)
 {
 	input(city, road);
 
@@ -455,7 +457,7 @@ std::vector<int> solution(std::vector<std::vector<int>> city, std::vector<std::v
 
 	solve();
 
-	std::vector<int> result;   // [수정] printf -> 목록으로 반환
+	vector<int> result;   // [수정] printf -> 목록으로 반환
 	for (int i = 1; i < N; i++)
 		result.push_back(answer[i]);
 
@@ -474,17 +476,17 @@ int main()
 	int n;
 	scanf("%d", &n);
 
-	std::vector<std::vector<int>> city(n, std::vector<int>(2));
+	vector<vector<int>> city(n, vector<int>(2));
 	for (int i = 0; i < n; i++) scanf("%d %d", &city[i][0], &city[i][1]);
 
 	int m;
 	scanf("%d", &m);
 
-	std::vector<std::vector<int>> road(m, std::vector<int>(5));
+	vector<vector<int>> road(m, vector<int>(5));
 	for (int i = 0; i < m; i++)
 		scanf("%d %d %d %d %d", &road[i][0], &road[i][1], &road[i][2], &road[i][3], &road[i][4]);
 
-	std::vector<int> ans = solution(city, road);
+	vector<int> ans = solution(city, road);
 
 #ifdef REPEAT_TEST
 	if (solution(city, road) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

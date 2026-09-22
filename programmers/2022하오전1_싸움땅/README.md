@@ -7,13 +7,13 @@
 |---|---|
 | 원본 | [swtest/코드트리_2022_하반기오전1번_싸움땅.cpp](../../swtest/코드트리_2022_하반기오전1번_싸움땅.cpp) |
 | 문제 | https://www.codetree.ai/training-field/frequent-problems/problems/battle-ground |
-| 반환 타입 | `std::vector<int>` |
+| 반환 타입 | `` |
 | 원본 버그 | 없음 |
 
 ## 시그니처
 
 ```cpp
-std::vector<int> solution(int k, std::vector<std::vector<int>> guns, std::vector<std::vector<int>> players)
+
 ```
 
 ## 원본 stdin을 어떻게 인자로 바꿨나
@@ -31,7 +31,7 @@ scanf("%d %d %d %d", &players[i][0], &players[i][1], &players[i][2], &players[i]
 
 | 위치 | 변경 |
 |---|---|
-| 헤더 | `#include <vector>` 추가. `using namespace std;`는 쓰지 않는다 ([이유](../README.md#2-using-namespace-std를-쓰지-않는다)) |
+| 헤더 | `#include <vector>` 추가. `using namespace std;` (프로그래머스 템플릿과 같은 형태) |
 | `input()` | `scanf`를 인자 대입으로 교체. 전역 초기화 루프는 원본 그대로 |
 | `main()` → `solution()` | `T` 루프 껍데기 제거, `printf` → `return` |
 | 로직 함수 | 무변경 |

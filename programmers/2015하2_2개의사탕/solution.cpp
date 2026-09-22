@@ -61,6 +61,8 @@
 #include <string>              // [추가] 문자 격자용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (10 + 5)
 #define INF (0x7fff0000)
 
@@ -92,7 +94,7 @@ int dc[] = { 0, 1, 0,-1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. 문자 격자라 vector<string> 으로 받는다.
-void input(const std::vector<std::string>& board)
+void input(const vector<string>& board)
 {
 	N = (int)board.size();        // [수정] scanf 대체
 	M = (int)board[0].size();     // [수정] scanf 대체
@@ -284,7 +286,7 @@ void DFS(int depth, int direction)
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::string> board)
+int solution(vector<string> board)
 {
 	input(board);
 
@@ -309,7 +311,7 @@ int main()
 	int n, m;
 	scanf("%d %d", &n, &m);          // 원본 scanf 순서 그대로
 
-	std::vector<std::string> board(n);
+	vector<string> board(n);
 	for (int r = 0; r < n; r++)
 	{
 		char buf[64];

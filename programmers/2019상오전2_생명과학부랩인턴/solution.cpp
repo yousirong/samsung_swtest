@@ -50,6 +50,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (100 + 20)
 
 int T;
@@ -77,7 +79,7 @@ int dc[] = { 0,  0, 0, 1,-1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. molds[i] = {r, c, s, d, b}
-void input(int n, int m, const std::vector<std::vector<int>>& molds)
+void input(int n, int m, const vector<vector<int>>& molds)
 {
 	N = n;                     // [수정] scanf 대체
 	M = m;                     // [수정] scanf 대체
@@ -232,7 +234,7 @@ int simulate()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int n, int m, std::vector<std::vector<int>> molds)
+int solution(int n, int m, vector<vector<int>> molds)
 {
 	input(n, m, molds);
 
@@ -247,7 +249,7 @@ int main()
 {
 	int n, m, k;
 	scanf("%d %d %d", &n, &m, &k);   // 원본 scanf 순서 그대로
-	std::vector<std::vector<int>> molds(k, std::vector<int>(5));
+	vector<vector<int>> molds(k, vector<int>(5));
 	for (int i = 0; i < k; i++)
 		scanf("%d %d %d %d %d", &molds[i][0], &molds[i][1], &molds[i][2], &molds[i][3], &molds[i][4]);
 

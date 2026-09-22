@@ -57,6 +57,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (20 + 5)
 #define WALL (-1)
 
@@ -93,8 +95,8 @@ int dc[] = { 0,  0, 0,-1, 1 };
 // [수정] scanf 대신 인자로 받는다.
 //        dirs[i-1] = i번 플레이어의 초기 방향
 //        priorities[(i-1)*4 + (d-1)] = i번 플레이어가 방향 d일 때의 시도 순서 4개
-void input(int k, const std::vector<std::vector<int>>& board,
-           const std::vector<int>& dirs, const std::vector<std::vector<int>>& priorities)
+void input(int k, const vector<vector<int>>& board,
+           const vector<int>& dirs, const vector<vector<int>>& priorities)
 {
     N = (int)board.size();    // [수정] scanf 대체
     M = (int)dirs.size();     // [수정] scanf 대체
@@ -144,7 +146,7 @@ void input(int k, const std::vector<std::vector<int>>& board,
     for (int i = 1; i <= M; i++)
         for (int d = 1; d <= 4; d++)
         {
-            const std::vector<int>& row = priorities[(i - 1) * 4 + (d - 1)];   // [수정] scanf 대체
+            const vector<int>& row = priorities[(i - 1) * 4 + (d - 1)];   // [수정] scanf 대체
             player[i].priority[d][1] = row[0];
             player[i].priority[d][2] = row[1];
             player[i].priority[d][3] = row[2];
@@ -332,8 +334,8 @@ int simulate()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int k, std::vector<std::vector<int>> board,
-             std::vector<int> dirs, std::vector<std::vector<int>> priorities)
+int solution(int k, vector<vector<int>> board,
+             vector<int> dirs, vector<vector<int>> priorities)
 {
     input(k, board, dirs, priorities);
 
@@ -349,13 +351,13 @@ int main()
     int n, m, k;
     scanf("%d %d %d", &n, &m, &k);   // 원본 scanf 순서 그대로
 
-    std::vector<std::vector<int>> board(n, std::vector<int>(n));
+    vector<vector<int>> board(n, vector<int>(n));
     for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) scanf("%d", &board[r][c]);
 
-    std::vector<int> dirs(m);
+    vector<int> dirs(m);
     for (int i = 0; i < m; i++) scanf("%d", &dirs[i]);
 
-    std::vector<std::vector<int>> priorities(m * 4, std::vector<int>(4));
+    vector<vector<int>> priorities(m * 4, vector<int>(4));
     for (int i = 0; i < m * 4; i++)
         scanf("%d %d %d %d", &priorities[i][0], &priorities[i][1], &priorities[i][2], &priorities[i][3]);
 

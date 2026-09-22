@@ -35,6 +35,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (50 + 5)
 
 int W, H;               // W: 가로(열 개수), H: 세로(행 개수)
@@ -75,7 +77,7 @@ void printVisit()
 // 입력 (테스트 케이스 하나)
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board)
+void input(const vector<vector<int>>& board)
 {
 	H = (int)board.size();        // [수정] scanf("%d %d", &W, &H) 대체
 	W = (int)board[0].size();
@@ -148,7 +150,7 @@ void BFS(int r, int c)
 // ---------------------------
 // [수정] main() -> solution().
 // 원본은 "0 0"이 나올 때까지 케이스를 반복했지만, solution()은 한 지도만 처리한다.
-int solution(std::vector<std::vector<int>> board)
+int solution(vector<vector<int>> board)
 {
 	input(board);
 
@@ -184,7 +186,7 @@ int main()
 
 		if (w == 0 && h == 0) break;
 
-		std::vector<std::vector<int>> board(h, std::vector<int>(w));
+		vector<vector<int>> board(h, vector<int>(w));
 		for (int r = 0; r < h; r++)
 			for (int c = 0; c < w; c++)
 				scanf("%d", &board[r][c]);

@@ -7,13 +7,13 @@
 |---|---|
 | 원본 | [swtest/프로그래머스_2025_하반기1차_최고속도.cpp](../../swtest/프로그래머스_2025_하반기1차_최고속도.cpp) |
 | 문제 | https://school.programmers.co.kr/learn/courses/30/lessons/468376 |
-| 반환 타입 | `std::vector<int>` |
+| 반환 타입 | `` |
 | 원본 버그 | 없음 |
 
 ## 시그니처
 
 ```cpp
-std::vector<int> solution(std::vector<std::vector<int>> city, std::vector<std::vector<int>> road)
+
 ```
 
 ## 원본 stdin을 어떻게 인자로 바꿨나
@@ -32,7 +32,7 @@ scanf("%d %d %d %d %d", &road[i][0], &road[i][1], &road[i][2], &road[i][3], &roa
 
 | 위치 | 변경 |
 |---|---|
-| 헤더 | `#include <vector>` 추가. `using namespace std;`는 쓰지 않는다 ([이유](../README.md#2-using-namespace-std를-쓰지-않는다)) |
+| 헤더 | `#include <vector>` 추가. `using namespace std;` (프로그래머스 템플릿과 같은 형태) |
 | `input()` | `scanf`를 인자 대입으로 교체. 전역 초기화 루프는 원본 그대로 |
 | `main()` → `solution()` | `T` 루프 껍데기 제거, `printf` → `return` |
 | 로직 함수 | 무변경 |
@@ -61,11 +61,10 @@ g++ -O2 -o orig ../../swtest/프로그래머스_2025_하반기1차_최고속도.
   그래서 도로를 노드로 삼으면 틀리고, 카메라·교차점·도시를 점으로 쪼개야 한다.
 - **최대 병목 경로**를 구한다. 다익스트라의 max-min 판으로도 되지만,
   여기서는 카메라를 제한이 큰 것부터 열며 유니온 파인드로 합치는 방식을 썼다.
-  카메라가 최대 1,000개라 "열 때마다 도시 100개 확인"이 부담이 없다.
 - `solution()`이 `vector<int>`를 돌려주지만 **길이는 n-1**이다. 1번 도시는 빼고 담는다.
-- 좌표 절댓값이 10^9이라 중점을 구할 때 `(x1 + x2) / 2`에서 int가 넘친다. `long long`으로 받는다.
-- `using namespace std;`를 쓰면 전역 `y1`이 `<math.h>`의 베셀 함수와 충돌한다.
-  이 저장소 규칙대로 `std::`를 명시하고 좌표 이름은 `roadSY` / `roadEY`로 두었다.
+- 좌표 절댓값이 10^9이라 `(x1 + x2) / 2` 에서 int가 넘친다. `long long`으로 받는다.
+- `using namespace std;` 를 쓰므로 전역 이름에 `y1` 을 쓰면 `<math.h>` 의 베셀 함수와 충돌한다.
+  그래서 좌표 이름을 `roadSY` / `roadEY` 로 두었다.
 
 ## 검증에 쓴 방법
 

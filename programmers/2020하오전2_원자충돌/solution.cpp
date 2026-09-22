@@ -64,6 +64,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (50 + 5)
 
 int T;
@@ -106,7 +108,7 @@ typedef struct INFO INFO;
     입력
 */
 // [수정] scanf 대신 인자로 받는다. M(원자 수)은 atoms 길이로 대신한다.
-void input(int n, int k, const std::vector<std::vector<int>>& atoms)
+void input(int n, int k, const vector<vector<int>>& atoms)
 {
     N = n;                      // [수정] scanf 대체
     M = (int)atoms.size();      // [수정] scanf 대체
@@ -268,7 +270,7 @@ int getAnswer()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int n, int k, std::vector<std::vector<int>> atoms)
+int solution(int n, int k, vector<vector<int>> atoms)
 {
     input(n, k, atoms);
 
@@ -288,7 +290,7 @@ int main()
     int n, m, k;
     scanf("%d %d %d", &n, &m, &k);   // 원본 scanf 순서 그대로
 
-    std::vector<std::vector<int>> atoms(m, std::vector<int>(5));
+    vector<vector<int>> atoms(m, vector<int>(5));
     for (int i = 0; i < m; i++)
         scanf("%d %d %d %d %d", &atoms[i][0], &atoms[i][1], &atoms[i][2], &atoms[i][3], &atoms[i][4]);
 

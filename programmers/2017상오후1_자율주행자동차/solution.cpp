@@ -50,6 +50,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (50 + 5)
 
 // 칸의 상태
@@ -71,7 +73,7 @@ int dc[] = { 0, 1, 0,-1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(int r0, int c0, int d0, const std::vector<std::vector<int>>& board)
+void input(int r0, int c0, int d0, const vector<vector<int>>& board)
 {
 	N = (int)board.size();        // [수정] scanf 대체
 	M = (int)board[0].size();     // [수정] scanf 대체
@@ -185,7 +187,7 @@ int getAnswer()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int r0, int c0, int d0, std::vector<std::vector<int>> board)
+int solution(int r0, int c0, int d0, vector<vector<int>> board)
 {
 	input(r0, c0, d0, board);
 
@@ -205,7 +207,7 @@ int main()
 	int n, m, r0, c0, d0;
 	scanf("%d %d %d %d %d", &n, &m, &r0, &c0, &d0);   // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(m));
+	vector<vector<int>> board(n, vector<int>(m));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < m; c++)
 			scanf("%d", &board[r][c]);

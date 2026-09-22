@@ -39,6 +39,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (100 + 10)
 
 int M, N, H;                 // M: 가로(열), N: 세로(행), H: 층 수
@@ -64,7 +66,7 @@ int dc[] = { 0, 1, 0,-1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다 (box[층][행][열])
-void input(const std::vector<std::vector<std::vector<int>>>& box)
+void input(const vector<vector<vector<int>>>& box)
 {
 	H = (int)box.size();          // [수정] scanf("%d %d %d", &M, &N, &H) 대체
 	N = (int)box[0].size();       // 원본 입력 순서는 M(가로) N(세로) H(층) 이었다
@@ -227,7 +229,7 @@ int getAnswer()
 // 메인
 // ---------------------------
 // [수정] main() -> solution()
-int solution(std::vector<std::vector<std::vector<int>>> box)
+int solution(vector<vector<vector<int>>> box)
 {
 	input(box);
 
@@ -246,7 +248,7 @@ int main()
 	int m, n, h;
 	scanf("%d %d %d", &m, &n, &h);
 
-	std::vector<std::vector<std::vector<int>>> box(h, std::vector<std::vector<int>>(n, std::vector<int>(m)));
+	vector<vector<vector<int>>> box(h, vector<vector<int>>(n, vector<int>(m)));
 	for (int k = 0; k < h; k++)
 		for (int r = 0; r < n; r++)
 			for (int c = 0; c < m; c++)

@@ -47,6 +47,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (50 + 5)
 
 // 방향 번호 (dr/dc 배열의 인덱스와 일치시켜 둔다)
@@ -126,7 +128,7 @@ int isOpen(int room1, int room2, int direction)
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& castle)
+void input(const vector<vector<int>>& castle)
 {
 	N = (int)castle.size();        // [수정] scanf("%d %d", &M, &N) 대체 (원본 입력은 가로 M, 세로 N 순서)
 	M = (int)castle[0].size();
@@ -221,7 +223,7 @@ int BFS(int r, int c, int mark)
 // [수정] main() -> solution().
 // 원본은 세 값을 세 줄로 출력했다. 순서를 그대로 지켜 목록으로 반환한다.
 //   [0] 방의 개수  [1] 가장 넓은 방  [2] 벽 하나 없앤 뒤 가장 넓은 방
-std::vector<int> solution(std::vector<std::vector<int>> castle)
+vector<int> solution(vector<vector<int>> castle)
 {
 	int answerCount;   // 다음에 쓸 answers 인덱스 (= 방 개수 + 1)
 	int mark;          // 다음에 붙일 방 번호
@@ -295,7 +297,7 @@ std::vector<int> solution(std::vector<std::vector<int>> castle)
 	}
 
 	// [수정] printf("%d\n%d\n%d\n", ...) -> 같은 순서로 목록 반환
-	std::vector<int> answer;
+	vector<int> answer;
 	answer.push_back(answerCount - 1);   // 1) 방의 개수
 	answer.push_back(maxAnswer);         // 2) 가장 넓은 방
 	answer.push_back(maxAreaSum);        // 3) 벽 하나 없앤 뒤 가장 넓은 방
@@ -313,12 +315,12 @@ int main()
 	int m, n;
 	scanf("%d %d", &m, &n);
 
-	std::vector<std::vector<int>> castle(n, std::vector<int>(m));
+	vector<vector<int>> castle(n, vector<int>(m));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < m; c++)
 			scanf("%d", &castle[r][c]);
 
-	std::vector<int> ans = solution(castle);
+	vector<int> ans = solution(castle);
 
 #ifdef REPEAT_TEST
 	if (solution(castle) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

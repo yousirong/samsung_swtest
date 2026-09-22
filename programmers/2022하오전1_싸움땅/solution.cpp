@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 
 #define MAX (20+5)	
 
@@ -36,7 +38,7 @@ int SCORE[30 + 5];
 // [수정] scanf 대신 인자로 받는다
 // guns[r][c] = 그 칸에 놓인 총의 공격력(0이면 없음)
 // players[i] = {행, 열, 방향, 초기 능력치}  (i + 1 번 플레이어)
-void input(int k, const std::vector<std::vector<int>>& guns, const std::vector<std::vector<int>>& players)
+void input(int k, const vector<vector<int>>& guns, const vector<vector<int>>& players)
 {
 	N = (int)guns.size();          // [수정] scanf("%d %d %d", &N, &M, &K) 대체
 	M = (int)players.size();
@@ -271,13 +273,13 @@ void simulate()
 }
 
 // [수정] main() -> solution(). 플레이어별 점수를 1번부터 순서대로 담아 반환한다.
-std::vector<int> solution(int k, std::vector<std::vector<int>> guns, std::vector<std::vector<int>> players)
+vector<int> solution(int k, vector<vector<int>> guns, vector<vector<int>> players)
 {
 	input(k, guns, players);
 
 	simulate();
 
-	std::vector<int> answer;   // [수정] printf -> 목록으로 반환
+	vector<int> answer;   // [수정] printf -> 목록으로 반환
 	for (int m = 1; m <= M; m++)
 		answer.push_back(SCORE[m]);
 
@@ -294,16 +296,16 @@ int main()
 	int n, m, k;
 	scanf("%d %d %d", &n, &m, &k);
 
-	std::vector<std::vector<int>> guns(n, std::vector<int>(n));
+	vector<vector<int>> guns(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &guns[r][c]);
 
-	std::vector<std::vector<int>> players(m, std::vector<int>(4));
+	vector<vector<int>> players(m, vector<int>(4));
 	for (int i = 0; i < m; i++)
 		scanf("%d %d %d %d", &players[i][0], &players[i][1], &players[i][2], &players[i][3]);
 
-	std::vector<int> ans = solution(k, guns, players);
+	vector<int> ans = solution(k, guns, players);
 
 #ifdef REPEAT_TEST
 	if (solution(k, guns, players) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

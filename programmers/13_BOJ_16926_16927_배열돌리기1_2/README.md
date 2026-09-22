@@ -7,13 +7,13 @@
 |---|---|
 | 원본 | [swtest/13_BOJ_16926_16927_배열돌리기1_2.cpp](../../swtest/13_BOJ_16926_16927_배열돌리기1_2.cpp) |
 | 문제 | https://www.acmicpc.net/problem/16926 |
-| 반환 타입 | `std::vector<std::vector<int>>` |
+| 반환 타입 | `` |
 | 원본 버그 | 없음 |
 
 ## 시그니처
 
 ```cpp
-std::vector<std::vector<int>> solution(int r, std::vector<std::vector<int>> board)
+
 ```
 
 ## 원본 stdin을 어떻게 인자로 바꿨나
@@ -30,7 +30,7 @@ scanf("%d", &board[i][j]);
 
 | 위치 | 변경 |
 |---|---|
-| 헤더 | `#include <vector>` 추가. `using namespace std;`는 쓰지 않는다 ([이유](../README.md#2-using-namespace-std를-쓰지-않는다)) |
+| 헤더 | `#include <vector>` 추가. `using namespace std;` (프로그래머스 템플릿과 같은 형태) |
 | `input()` | `scanf`를 인자 대입으로 교체. 전역 초기화 루프는 원본 그대로 |
 | `main()` → `solution()` | `T` 루프 껍데기 제거, `printf` → `return` |
 | 로직 함수 | 무변경 |

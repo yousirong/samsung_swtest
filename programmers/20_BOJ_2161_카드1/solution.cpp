@@ -34,6 +34,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (1000 + 100)
 
 int N;
@@ -43,9 +45,9 @@ int rp, wp;           // rp: 맨 위 카드 위치, wp: 다음에 넣을 위치
 // [수정] main() -> solution().
 // 원본은 버리는 카드를 "%d " 로, 마지막 남은 카드를 "%d\n" 으로 출력했다.
 // 여기서는 버린 순서 + 마지막 카드를 한 목록에 담아 반환한다. (길이 N)
-std::vector<int> solution(int n)
+vector<int> solution(int n)
 {
-	std::vector<int> answer;
+	vector<int> answer;
 
 	N = n;   // [수정] scanf("%d", &N) 대체
 
@@ -83,7 +85,7 @@ int main()
 	int n;
 	scanf("%d", &n);
 
-	std::vector<int> ans = solution(n);
+	vector<int> ans = solution(n);
 
 #ifdef REPEAT_TEST
 	if (solution(n) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

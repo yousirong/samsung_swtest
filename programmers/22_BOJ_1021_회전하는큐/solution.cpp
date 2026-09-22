@@ -43,6 +43,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (50 + 5)
 #define MAX_DEQUE (MAX * MAX * 2)
 #define OFFSET (MAX_DEQUE / 2)
@@ -62,7 +64,7 @@ int front, back;
 // 입력 및 초기 덱 구성
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(int n, const std::vector<int>& targets)
+void input(int n, const vector<int>& targets)
 {
 	N = n;                        // [수정] scanf("%d %d", &N, &M) 대체
 	M = (int)targets.size();
@@ -127,7 +129,7 @@ int getRightCount(int value)
 // 메인
 // ---------------------------
 // [수정] main() -> solution()
-int solution(int n, std::vector<int> targets)
+int solution(int n, vector<int> targets)
 {
 	input(n, targets);
 
@@ -180,7 +182,7 @@ int main()
 	int n, m;
 	scanf("%d %d", &n, &m);
 
-	std::vector<int> targets(m);
+	vector<int> targets(m);
 	for (int i = 0; i < m; i++) scanf("%d", &targets[i]);
 
 	int ans = solution(n, targets);

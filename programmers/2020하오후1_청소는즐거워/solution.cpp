@@ -60,6 +60,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (500 + 20)
 
 int T;
@@ -84,7 +86,7 @@ int dr[] = { 0, 1, 0, -1 };
 int dc[] = { -1, 0, 1, 0 };
 
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board)
+void input(const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf 대체
 
@@ -299,7 +301,7 @@ int simulate()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::vector<int>> board)
+int solution(vector<vector<int>> board)
 {
 	tcnt = 0;   // [추가] 재호출 대비 - makeSnail이 track[tcnt++]로 이어 쌓으므로 되돌려야 한다
 
@@ -321,7 +323,7 @@ int main()
 	int n;
 	scanf("%d", &n);                 // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);

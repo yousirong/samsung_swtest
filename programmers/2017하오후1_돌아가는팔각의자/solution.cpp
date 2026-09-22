@@ -53,6 +53,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <string>              // [추가] 톱니 문자열용
 
+using namespace std;
+
 #define MAX (100 + 10)
 
 #define CLOCKWISE (1)
@@ -70,7 +72,7 @@ int directions[MAX];       // k번째 명령의 회전 방향 (1 또는 -1)
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다.
 //        chairs[i] 는 "10001111" 같은 8자리 문자열, rotations[i] = {의자 번호, 방향}
-void input(const std::vector<std::string>& chairs, const std::vector<std::vector<int>>& rotations)
+void input(const vector<string>& chairs, const vector<vector<int>>& rotations)
 {
 	// 의자 4개의 톱니 상태. 원본은 %1d 로 한 자리씩 읽었다.
 	for (int number = 1; number <= 4; number++)
@@ -198,7 +200,7 @@ int getScore()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::string> chairs, std::vector<std::vector<int>> rotations)
+int solution(vector<string> chairs, vector<vector<int>> rotations)
 {
 	input(chairs, rotations);
 
@@ -213,7 +215,7 @@ int solution(std::vector<std::string> chairs, std::vector<std::vector<int>> rota
 #ifdef LOCAL_TEST
 int main()
 {
-	std::vector<std::string> chairs(4);
+	vector<string> chairs(4);
 	for (int i = 0; i < 4; i++)
 	{
 		char buf[32];
@@ -223,7 +225,7 @@ int main()
 
 	int k;
 	scanf("%d", &k);
-	std::vector<std::vector<int>> rotations(k, std::vector<int>(2));
+	vector<vector<int>> rotations(k, vector<int>(2));
 	for (int i = 0; i < k; i++) scanf("%d %d", &rotations[i][0], &rotations[i][1]);
 
 	int ans = solution(chairs, rotations);

@@ -9,7 +9,7 @@
 ## 시그니처
 
 ```cpp
-int solution(int t, int r, int c, std::vector<std::vector<int>> monsters)
+int solution(int t, int r, int c, vector<vector<int>> monsters)
 ```
 
 ## stdin → 인자 대응
@@ -27,24 +27,26 @@ int solution(int t, int r, int c, std::vector<std::vector<int>> monsters)
 
 | 위치 | 변경 |
 |---|---|
-| 헤더 | `#include <vector>` 추가. **`using namespace std;`는 쓰지 않는다** (아래 참고) |
-| `input()` | `input(int t, int pr, int pc, const std::vector<std::vector<int>>&)` — `scanf` 2곳을 인자 대입으로. 전역 초기화 루프는 원본 그대로 |
+| 헤더 | `#include <vector>` 추가, `using namespace std;` (프로그래머스 템플릿과 같은 형태) |
+| `input()` | `input(int t, int pr, int pc, const vector<vector<int>>&)` — `scanf` 2곳을 인자 대입으로. 전역 초기화 루프는 원본 그대로 |
 | `main()` → `solution()` | `T = 1; for (tc...)` 껍데기 제거, `printf` → `return` |
 | `solution()` 첫 줄 | `pcnt = 0;` 추가 |
 | 로직 함수 | **무변경** (`moveMonster` `getMonster` `movePackMan` `disappear` `simulate` `getAnswer`) |
 
-### `using namespace std;`를 쓰지 않는 이유
+### `using namespace std;`와 전역 이름
 
-이 파일 하나만 보면 써도 문제가 없다. 하지만 `programmers/` 전체에서 규칙을 하나로 맞췄다.
-다른 문제에는 `int move[]`, `int next[][]`, `int count;`, `int deque[]` 같은 전역이 있어
-`using namespace std;`를 넣으면 `std::move` 등과 이름이 겹쳐 **컴파일이 깨진다**.
+프로그래머스 템플릿과 같게 `using namespace std;`를 쓴다. 이 파일은 겹치는 전역이 없어 그냥 된다.
+
+다만 다른 문제에는 `int move[]`, `int next[][]`, `int count;`, `int deque[]` 같은 전역이 있다.
+`<vector>`가 `<utility>` · `<iterator>`를 끌고 오기 때문에 `move` · `next` 는 반드시 부딪히고,
+`count` · `deque` · `queue` · `stack` 은 해당 헤더를 include 하지 않으면 부딪히지 않는다.
 
 ```
 error: reference to 'move' is ambiguous
 ```
 
-그래서 63개 전부 `std::vector`를 명시하는 방식으로 통일했다.
-
+실제로 부딪힌 것은 2019하오후2 윷놀이사기단 하나뿐이라, 그 파일만 전역 이름을
+`moveList` · `nextTable` 로 바꿨다 (`// [이름변경]` 표시). 자세한 내용은 [상위 README](../README.md#2-using-namespace-std를-쓴다--단-전역-이름-충돌만-조심)에 있다.
 ## 재호출 주의점
 
 `position[64][3]`과 `pcnt`는 원본에서 `main()` 진입 직후 `DFS(0)`로 **딱 한 번** 만들어졌다.

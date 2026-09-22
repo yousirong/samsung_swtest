@@ -41,6 +41,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (1000 + 100)
 
 int M, N;               // M: 열 개수(가로), N: 행 개수(세로)  ※ 입력 순서가 M N 이다
@@ -65,7 +67,7 @@ int dc[] = {  0, 1, 0,-1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& box)
+void input(const vector<vector<int>>& box)
 {
 	N = (int)box.size();        // [수정] scanf("%d %d", &M, &N) 대체
 	M = (int)box[0].size();     // 원본 입력 순서는 M(가로) N(세로) 이었다
@@ -187,7 +189,7 @@ int getAnswer()
 // 메인
 // ---------------------------
 // [수정] main() -> solution()
-int solution(std::vector<std::vector<int>> box)
+int solution(vector<vector<int>> box)
 {
 	input(box);
 
@@ -206,7 +208,7 @@ int main()
 	int m, n;
 	scanf("%d %d", &m, &n);
 
-	std::vector<std::vector<int>> box(n, std::vector<int>(m));
+	vector<vector<int>> box(n, vector<int>(m));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < m; c++)
 			scanf("%d", &box[r][c]);

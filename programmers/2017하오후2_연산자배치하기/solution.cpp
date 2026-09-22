@@ -44,6 +44,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (11 + 5)
 #define INF (0x7fff0000)
 
@@ -66,7 +68,7 @@ int minAnswer, maxAnswer;
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. ops = {+ 개수, - 개수, * 개수}
-void input(const std::vector<int>& numbers, const std::vector<int>& ops)
+void input(const vector<int>& numbers, const vector<int>& ops)
 {
 	N = (int)numbers.size();   // [수정] scanf 대체
 
@@ -151,7 +153,7 @@ void DFS(int depth)
 }
 
 // [수정] main() -> solution().  답이 2개라 vector<int> 로 {최솟값, 최댓값} 을 돌려준다.
-std::vector<int> solution(std::vector<int> numbers, std::vector<int> ops)
+vector<int> solution(vector<int> numbers, vector<int> ops)
 {
 	input(numbers, ops);
 
@@ -161,7 +163,7 @@ std::vector<int> solution(std::vector<int> numbers, std::vector<int> ops)
 
 	DFS(0);
 
-	return std::vector<int>{ minAnswer, maxAnswer };   // [수정] printf -> return
+	return vector<int>{ minAnswer, maxAnswer };   // [수정] printf -> return
 }
 
 // ==========================================================
@@ -172,14 +174,14 @@ int main()
 {
 	int n;
 	scanf("%d", &n);                 // 원본 scanf 순서 그대로
-	std::vector<int> numbers(n);
+	vector<int> numbers(n);
 	for (int i = 0; i < n; i++) scanf("%d", &numbers[i]);
-	std::vector<int> ops(3);
+	vector<int> ops(3);
 	for (int i = 0; i < 3; i++) scanf("%d", &ops[i]);
 
-	std::vector<int> ans = solution(numbers, ops);
+	vector<int> ans = solution(numbers, ops);
 #ifdef REPEAT_TEST
-	std::vector<int> ans2 = solution(numbers, ops);
+	vector<int> ans2 = solution(numbers, ops);
 	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
 #endif
 	printf("%d %d\n", ans[0], ans[1]);   // 원본은 한 줄에 최솟값 최댓값

@@ -49,6 +49,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (100 + 10)
 
 int T;
@@ -76,7 +78,7 @@ int dc[] = { 0, 1, 0,-1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. L, R은 연합 조건(차이의 하한/상한)이다.
-void input(int l, int r_, const std::vector<std::vector<int>>& board)
+void input(int l, int r_, const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf 대체
 	L = l;                   // [수정] scanf 대체
@@ -210,7 +212,7 @@ bool simulate()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int l, int r_, std::vector<std::vector<int>> board)
+int solution(int l, int r_, vector<vector<int>> board)
 {
 	input(l, r_, board);
 
@@ -241,7 +243,7 @@ int main()
 	int n, a, b;
 	scanf("%d %d %d", &n, &a, &b);   // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);

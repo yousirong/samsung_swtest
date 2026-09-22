@@ -34,6 +34,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (1000 + 50)
 
 int N, M, V;          // N: 정점 수, M: 간선 수, V: 탐색을 시작할 정점
@@ -41,13 +43,13 @@ int MAP[MAX][MAX];    // 인접 행렬. MAP[a][b] == 1 이면 a-b 연결
 
 int queue[MAX * MAX]; // BFS용 큐 (실제로는 정점 수만큼만 있으면 충분하다)
 bool visit[MAX];      // 방문 여부
-std::vector<int> order;   // [추가] 방문 순서를 담는 목록 (원본의 printf 자리)
+vector<int> order;   // [추가] 방문 순서를 담는 목록 (원본의 printf 자리)
 
 // ---------------------------
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(int n, int v, const std::vector<std::vector<int>>& edges)
+void input(int n, int v, const vector<vector<int>>& edges)
 {
 	N = n;                        // [수정] scanf("%d %d %d", &N, &M, &V) 대체
 	M = (int)edges.size();
@@ -154,14 +156,14 @@ void BFS(int node)
 // ---------------------------
 // [수정] main() -> solution().
 // 원본은 DFS 순서와 BFS 순서를 두 줄로 출력했다. 두 줄을 그대로 2차원 배열로 반환한다.
-std::vector<std::vector<int>> solution(int n, int v, std::vector<std::vector<int>> edges)
+vector<vector<int>> solution(int n, int v, vector<vector<int>> edges)
 {
 	input(n, v, edges);
 
 	// 1) DFS 방문 순서
 	order.clear();   // [추가] 결과를 담을 목록 비우기
 	DFS(V);
-	std::vector<int> dfsOrder = order;
+	vector<int> dfsOrder = order;
 
 	// 2) BFS를 돌리기 전에 visit을 반드시 초기화한다.
 	//    DFS가 이미 전부 true로 만들어 놨기 때문에, 빼먹으면 BFS 결과가 통째로 틀린다.
@@ -171,9 +173,9 @@ std::vector<std::vector<int>> solution(int n, int v, std::vector<std::vector<int
 	// 3) BFS 방문 순서
 	order.clear();
 	BFS(V);
-	std::vector<int> bfsOrder = order;
+	vector<int> bfsOrder = order;
 
-	std::vector<std::vector<int>> answer;   // [수정] printf -> 두 줄을 그대로 반환
+	vector<vector<int>> answer;   // [수정] printf -> 두 줄을 그대로 반환
 	answer.push_back(dfsOrder);
 	answer.push_back(bfsOrder);
 
@@ -190,10 +192,10 @@ int main()
 	int n, m, v;
 	scanf("%d %d %d", &n, &m, &v);
 
-	std::vector<std::vector<int>> edges(m, std::vector<int>(2));
+	vector<vector<int>> edges(m, vector<int>(2));
 	for (int i = 0; i < m; i++) scanf("%d %d", &edges[i][0], &edges[i][1]);
 
-	std::vector<std::vector<int>> ans = solution(n, v, edges);
+	vector<vector<int>> ans = solution(n, v, edges);
 
 #ifdef REPEAT_TEST
 	if (solution(n, v, edges) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

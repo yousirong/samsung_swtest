@@ -39,6 +39,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (300 + 50)   // N, M 최대보다 여유 있게 선언
 
 int N, M, R;             // N: 행 수, M: 열 수, R: 회전 횟수
@@ -62,7 +64,7 @@ RC arr[MAX * MAX];
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(int r, const std::vector<std::vector<int>>& board)
+void input(int r, const vector<vector<int>>& board)
 {
 	N = (int)board.size();          // [수정] scanf("%d %d %d", &N, &M, &R) 대체
 	M = (int)board[0].size();
@@ -219,14 +221,14 @@ void rotate(int rotateCount)
 // 메인
 // ---------------------------
 // [수정] main() -> solution()
-std::vector<std::vector<int>> solution(int r, std::vector<std::vector<int>> board)
+vector<vector<int>> solution(int r, vector<vector<int>> board)
 {
 	input(r, board);   // N, M, R, 배열 세팅
 
 	rotate(R);         // 모든 테두리를 R칸씩 반시계 회전
 
 	// [수정] printMap() -> 격자를 그대로 반환
-	std::vector<std::vector<int>> answer(N, std::vector<int>(M));
+	vector<vector<int>> answer(N, vector<int>(M));
 	for (int row = 1; row <= N; row++)
 		for (int c = 1; c <= M; c++)
 			answer[row - 1][c - 1] = MAP[row][c];
@@ -245,12 +247,12 @@ int main()
 	int n, m, r;
 	scanf("%d %d %d", &n, &m, &r);
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(m));
+	vector<vector<int>> board(n, vector<int>(m));
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < m; j++)
 			scanf("%d", &board[i][j]);
 
-	std::vector<std::vector<int>> ans = solution(r, board);
+	vector<vector<int>> ans = solution(r, board);
 
 #ifdef REPEAT_TEST
 	if (solution(r, board) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

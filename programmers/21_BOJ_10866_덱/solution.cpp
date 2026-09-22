@@ -17,6 +17,8 @@
 #include <vector>              // [추가] 함수형 반환용
 #include <string>              // [추가] 명령 문자열용
 
+using namespace std;
+
 #define MAX (10000 + 500)
 #define OFFSET (MAX / 2)   // 덱이 시작하는 배열 중앙 위치
 
@@ -43,9 +45,9 @@ int strcmp(const char* a, const char* b)
 // [수정] main() -> solution()
 //        원본은 명령마다 printf 했지만, 여기서는 answer에 담아 한꺼번에 반환한다.
 // ---------------------------
-std::vector<int> solution(std::vector<std::string> commands)
+vector<int> solution(vector<string> commands)
 {
-	std::vector<int> answer;   // [추가] 원본이 printf 하던 값들을 모은다
+	vector<int> answer;   // [추가] 원본이 printf 하던 값들을 모은다
 
 	// 배열 중앙에서 시작해야 앞/뒤 어느 쪽으로도 늘어날 수 있다
 	// (원본에서 main 첫 줄에 있던 초기화. 재호출 대비 역할도 겸한다)
@@ -160,13 +162,13 @@ int main()
 	int n;
 	scanf("%d", &n);   // 원본과 같은 형식
 
-	std::vector<std::string> commands;
+	vector<string> commands;
 	for (int i = 0; i < n; i++)
 	{
 		char cmd[100];
 		scanf("%s", cmd);
 
-		std::string line = cmd;
+		string line = cmd;
 		if (line == "push_front" || line == "push_back")
 		{
 			int v;
@@ -179,10 +181,10 @@ int main()
 		commands.push_back(line);
 	}
 
-	std::vector<int> ans = solution(commands);
+	vector<int> ans = solution(commands);
 
 #ifdef REPEAT_TEST
-	std::vector<int> ans2 = solution(commands);   // 같은 인자로 한 번 더
+	vector<int> ans2 = solution(commands);   // 같은 인자로 한 번 더
 	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
 #endif
 

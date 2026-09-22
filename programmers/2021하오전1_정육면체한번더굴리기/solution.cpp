@@ -42,6 +42,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (20 +5)
 
 #define EAST (1)
@@ -81,7 +83,7 @@ int dr[] = { 0,0,0,-1,1 };
 int dc[] = { 0,1,-1,0,0 };
 
 // [수정] scanf 대신 인자로 받는다. M은 격자 크기가 아니라 "이동 횟수"다.
-void input(int m, const std::vector<std::vector<int>>& board)
+void input(int m, const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf 대체
 	M = m;                   // [수정] scanf 대체
@@ -298,7 +300,7 @@ int simulate()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int m, std::vector<std::vector<int>> board)
+int solution(int m, vector<vector<int>> board)
 {
 	input(m, board);
 
@@ -318,7 +320,7 @@ int main()
 	int n, x;
 	scanf("%d %d", &n, &x);          // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);

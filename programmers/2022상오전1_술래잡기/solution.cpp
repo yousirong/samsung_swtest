@@ -61,6 +61,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (100+50)
 
 int T;
@@ -91,7 +93,7 @@ int dc[] = { 0,1,0,-1 };
 
 // [수정] scanf 대신 인자로 받는다
 // runners[i] = {행, 열, 방향(1 좌우 / 2 상하)}, trees[i] = {행, 열}
-void input(int n, int k, const std::vector<std::vector<int>>& runners, const std::vector<std::vector<int>>& trees)
+void input(int n, int k, const vector<vector<int>>& runners, const vector<vector<int>>& trees)
 {
 	N = n;                        // [수정] scanf("%d %d %d %d", &N, &M, &H, &K) 대체
 	M = (int)runners.size();
@@ -330,7 +332,7 @@ int simulate()
 }
 
 // [수정] main() -> solution()
-int solution(int n, int k, std::vector<std::vector<int>> runners, std::vector<std::vector<int>> trees)
+int solution(int n, int k, vector<vector<int>> runners, vector<vector<int>> trees)
 {
 	input(n, k, runners, trees);
 
@@ -348,10 +350,10 @@ int main()
 	int n, m, h, k;
 	scanf("%d %d %d %d", &n, &m, &h, &k);
 
-	std::vector<std::vector<int>> runners(m, std::vector<int>(3));
+	vector<vector<int>> runners(m, vector<int>(3));
 	for (int i = 0; i < m; i++) scanf("%d %d %d", &runners[i][0], &runners[i][1], &runners[i][2]);
 
-	std::vector<std::vector<int>> trees(h, std::vector<int>(2));
+	vector<vector<int>> trees(h, vector<int>(2));
 	for (int i = 0; i < h; i++) scanf("%d %d", &trees[i][0], &trees[i][1]);
 
 	int ans = solution(n, k, runners, trees);

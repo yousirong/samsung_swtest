@@ -36,11 +36,13 @@
 #include <string>              // [추가] 문자열 인자용
 #include <stdbool.h>
 
+using namespace std;
+
 int T;   // 테스트 케이스 수
 
 // [수정] main() -> solution(). 여러 케이스를 돌던 T 루프는 하네스로 옮기고,
 // solution()은 괄호 문자열 하나만 판정한다.
-std::string solution(std::string parens)
+string solution(string parens)
 {
 	int sp;             // 아직 닫히지 않은 '(' 의 개수 (스택의 높이)
 	int length;         // 문자열 길이
@@ -95,7 +97,7 @@ int main()
 		char buf[50 + 5];
 		scanf("%s", buf);
 
-		std::string ans = solution(buf);
+		string ans = solution(buf);
 
 #ifdef REPEAT_TEST
 		if (solution(buf) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

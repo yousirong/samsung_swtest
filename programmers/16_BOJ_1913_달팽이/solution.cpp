@@ -44,6 +44,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (1000 + 100)
 
 int N, K;              // N: 배열 크기(홀수), K: 좌표를 찾아야 하는 숫자
@@ -138,14 +140,14 @@ void makesnail()
 // ---------------------------
 // [수정] main() -> solution(). 원본은 격자와 K의 좌표를 함께 출력했지만,
 // 좌표는 격자에서 K를 찾으면 나오므로 격자만 반환한다. (하네스가 좌표를 계산한다)
-std::vector<std::vector<int>> solution(int n, int k)
+vector<vector<int>> solution(int n, int k)
 {
 	N = n;   // [수정] scanf("%d %d", &N, &K) 대체
 	K = k;
 
 	makesnail();
 
-	std::vector<std::vector<int>> answer(N, std::vector<int>(N));
+	vector<vector<int>> answer(N, vector<int>(N));
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= N; c++)
 			answer[r - 1][c - 1] = MAP[r][c];
@@ -163,7 +165,7 @@ int main()
 	int n, k;
 	scanf("%d %d", &n, &k);
 
-	std::vector<std::vector<int>> ans = solution(n, k);
+	vector<vector<int>> ans = solution(n, k);
 
 #ifdef REPEAT_TEST
 	if (solution(n, k) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

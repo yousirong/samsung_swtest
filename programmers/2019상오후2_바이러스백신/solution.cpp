@@ -65,6 +65,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX_N (50 + 5)
 #define MAX_M (10 + 3)
 
@@ -107,7 +109,7 @@ int dc[] = { 0, 1, 0,-1 };
 // 입력 + 값 인코딩 전처리
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. M은 격자 크기가 아니라 "활성화할 병원 수"다.
-void input(int m, const std::vector<std::vector<int>>& board)
+void input(int m, const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf 대체
 	M = m;                   // [수정] scanf 대체
@@ -332,7 +334,7 @@ void DFS(int depth, int start)
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int m, std::vector<std::vector<int>> board)
+int solution(int m, vector<vector<int>> board)
 {
 	input(m, board);
 
@@ -358,7 +360,7 @@ int main()
 	int n, m;
 	scanf("%d %d", &n, &m);          // 원본 scanf 순서 그대로 (M은 격자 크기가 아니다)
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);

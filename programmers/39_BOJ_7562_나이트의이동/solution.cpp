@@ -37,6 +37,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (300 + 30)
 
 int T;                  // 테스트 케이스 수

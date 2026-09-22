@@ -47,6 +47,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (500 + 50)   // N 최대값보다 여유 있게 선언
 
 int T;                   // 테스트 케이스 수
@@ -58,7 +60,7 @@ int temp[MAX][MAX];      // 회전 직전 상태 스냅샷(읽기 전용으로 �
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(int d, const std::vector<std::vector<int>>& board)
+void input(int d, const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf("%d %d", &N, &D) 대체
 	D = d;
@@ -167,7 +169,7 @@ void rotate45CounterClockwise()
 // 메인
 // ---------------------------
 // [수정] main() -> solution(). 원본 main의 회전 횟수 계산을 그대로 옮겼다.
-std::vector<std::vector<int>> solution(int d, std::vector<std::vector<int>> board)
+vector<vector<int>> solution(int d, vector<vector<int>> board)
 {
 	input(d, board);   // N, D, 배열 세팅
 
@@ -187,7 +189,7 @@ std::vector<std::vector<int>> solution(int d, std::vector<std::vector<int>> boar
 	}
 
 	// [수정] printMap() -> 격자를 그대로 반환
-	std::vector<std::vector<int>> answer(N, std::vector<int>(N));
+	vector<vector<int>> answer(N, vector<int>(N));
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= N; c++)
 			answer[r - 1][c - 1] = MAP[r][c];
@@ -212,12 +214,12 @@ int main()
 		int n, d;
 		scanf("%d %d", &n, &d);
 
-		std::vector<std::vector<int>> board(n, std::vector<int>(n));
+		vector<vector<int>> board(n, vector<int>(n));
 		for (int r = 0; r < n; r++)
 			for (int c = 0; c < n; c++)
 				scanf("%d", &board[r][c]);
 
-		std::vector<std::vector<int>> ans = solution(d, board);
+		vector<vector<int>> ans = solution(d, board);
 
 #ifdef REPEAT_TEST
 		if (solution(d, board) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }

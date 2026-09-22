@@ -9,7 +9,7 @@
 ## 시그니처
 
 ```cpp
-std::vector<int> solution(std::vector<std::string> commands)
+vector<int> solution(vector<string> commands)
 ```
 
 ## stdin → 인자 대응
@@ -61,11 +61,13 @@ sscanf(commands[i].c_str(), "%*s %d", &value);       // push 계열의 인자 (%
 - `OFFSET`이 `MAX/2`(= 5250)인데 N은 최대 10,000이다. `push_front`만 계속 들어오면 `front`가 0 아래로 내려가 배열 밖을 건드린다. `OFFSET`을 `MAX`로 두면 안전하다.
 - 전역 `strcmp`가 표준 `strcmp`와 이름이 같다. 여기서는 `<vector>` / `<string>`을 추가해도 컴파일이 통과하는 것을 확인했지만, `<cstring>`을 직접 넣으면 깨진다.
 
-## `using namespace std;`를 쓰지 않는 이유 — 이 파일이 대표 사례
+## 전역 `deque`와 `using namespace std;` — 이 파일이 대표 사례
 
-이 파일에는 전역 `int deque[MAX * 2];` 가 있다. `using namespace std;`를 넣으면 `std::deque`와 겹친다.
-`programmers/` 전체가 같은 이유로 `std::vector` / `std::string`을 명시한다.
+이 파일에는 전역 `int deque[MAX * 2];` 가 있다. `using namespace std;`를 쓰면서도
+`<deque>`를 include 하지 않기 때문에 `std::deque`가 아예 선언되지 않아 충돌하지 않는다.
 
+즉 문제는 `using namespace std;` 자체가 아니라 **어떤 헤더를 끌어오느냐**다.
+`#include <bits/stdc++.h>` 로 시작하면 이 파일은 그 자리에서 깨진다.
 ## 로컬 테스트
 
 ```bash

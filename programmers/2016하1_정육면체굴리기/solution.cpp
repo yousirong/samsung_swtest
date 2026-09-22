@@ -55,7 +55,9 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
-std::vector<int> answerList;   // [추가] simulate가 printf 하던 윗면 값들을 모아 둔다
+using namespace std;
+
+vector<int> answerList;   // [추가] simulate가 printf 하던 윗면 값들을 모아 둔다
 
 #define MAX (20 + 10)
 
@@ -98,7 +100,7 @@ int dc[] = { 0, 1,-1,  0, 0 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. K(명령 수)는 commands 길이로 대신한다.
-void input(int r0, int c0, const std::vector<std::vector<int>>& board, const std::vector<int>& commands)
+void input(int r0, int c0, const vector<vector<int>>& board, const vector<int>& commands)
 {
 	N = (int)board.size();        // [수정] scanf 대체
 	M = (int)board[0].size();     // [수정] scanf 대체
@@ -268,7 +270,7 @@ void simulate()
 // [수정] main() -> solution().
 //        원본은 simulate() 안에서 이동에 성공할 때마다 printf 했으므로,
 //        그 값들을 전역 배열에 모아 여기서 통째로 반환한다.
-std::vector<int> solution(int r0, int c0, std::vector<std::vector<int>> board, std::vector<int> commands)
+vector<int> solution(int r0, int c0, vector<vector<int>> board, vector<int> commands)
 {
 	answerList.clear();   // [추가] 재호출 대비 - 이전 호출의 결과가 남아 있으면 안 된다
 
@@ -291,17 +293,17 @@ int main()
 	int n, m, r0, c0, k;
 	scanf("%d %d %d %d %d", &n, &m, &r0, &c0, &k);   // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(m));
+	vector<vector<int>> board(n, vector<int>(m));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < m; c++)
 			scanf("%d", &board[r][c]);
 
-	std::vector<int> commands(k);
+	vector<int> commands(k);
 	for (int i = 0; i < k; i++) scanf("%d", &commands[i]);
 
-	std::vector<int> ans = solution(r0, c0, board, commands);
+	vector<int> ans = solution(r0, c0, board, commands);
 #ifdef REPEAT_TEST
-	std::vector<int> ans2 = solution(r0, c0, board, commands);
+	vector<int> ans2 = solution(r0, c0, board, commands);
 	if (ans != ans2) { printf("!! NOT RE-ENTRANT\n"); return 1; }
 #endif
 	for (size_t i = 0; i < ans.size(); i++)

@@ -23,7 +23,7 @@
 
       그래서 판을 아예 표로 만들어 버린다.
 
-          next[pos][k] : pos에 있는 말이 k칸(1~5) 이동했을 때 도착하는 위치
+          nextTable[pos][k] : pos에 있는 말이 k칸(1~5) 이동했을 때 도착하는 위치
           score[pos]   : 그 위치의 점수
 
       한 번 표를 정확히 채워 두면, 이후 이동은 next 한 번 참조로 끝나고
@@ -41,7 +41,7 @@
         32       : 도착점 (DESTINATION). 점수는 0이고 여러 말이 함께 있어도 된다.
 
       지름길 진입은 next 표에 직접 반영되어 있다.
-      예를 들어 next[5][*]는 전부 지름길 쪽 번호(20~23, 29)를 가리킨다.
+      예를 들어 nextTable[5][*]는 전부 지름길 쪽 번호(20~23, 29)를 가리킨다.
       즉 "10점 칸에 멈추면 지름길로 간다"는 규칙이 표 안에 녹아 있는 셈이다.
 
     ■ simulate()에서 하는 일
@@ -52,18 +52,20 @@
       (maxAnswer가 0 이상이라 이런 경우는 자연스럽게 후보에서 밀려난다)
 
     ■ [주의] 이미 도착한 말을 다시 고르는 경우
-      next[32][*]는 채워 두지 않아 0이다. 그래서 도착점(32)에 있는 말을 또 고르면
+      nextTable[32][*]는 채워 두지 않아 0이다. 그래서 도착점(32)에 있는 말을 또 고르면
       위치가 0(시작점)으로 돌아가 판을 다시 도는 이상한 상태가 된다.
       점수를 다시 벌 수 있게 되므로 답이 실제보다 커질 여지가 있다.
 
       안전하게 하려면 도착점에 머무르도록 표를 채워 두면 된다.
 
-          for (int k = 1; k <= 5; k++) next[32][k] = 32;   // score[32] == 0 이라 점수도 안 늘어난다
+          for (int k = 1; k <= 5; k++) nextTable[32][k] = 32;   // score[32] == 0 이라 점수도 안 늘어난다
 */
 
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
+
+using namespace std;
 
 // 이동 횟수는 10번
 #define MAX (10 + 3)
@@ -76,11 +78,13 @@
 
 int T;
 
-// move[i] : i번째 턴에 움직일 칸 수
-int move[MAX];
+// moveList[i] : i번째 턴에 움직일 칸 수
+// [이름변경] using namespace std; 를 쓰면 std::move 와 겹쳐서 moveList 로 바꿨다
+int moveList[MAX];
 
-// next[pos][k] : pos에서 k칸 이동했을 때 도착하는 위치
-int next[MAX_BOARD][6];
+// nextTable[pos][k] : pos에서 k칸 이동했을 때 도착하는 위치
+// [이름변경] std::next 와 겹쳐서 nextTable 로 바꿨다
+int nextTable[MAX_BOARD][6];
 
 // score[pos] : 그 칸의 점수
 int score[MAX_BOARD];
@@ -97,9 +101,9 @@ int maxAnswer;
     보드 그림을 옆에 두고 한 줄씩 대조하며 채우는 것이 이 문제의 핵심 작업이다.
 */
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<int>& moves)
+void input(const vector<int>& moves)
 {
-    for (int i = 0; i < 10; i++) move[i] = moves[i];   // [수정] scanf 대체
+    for (int i = 0; i < 10; i++) moveList[i] = moves[i];   // [수정] scanf 대체
 
     // -------------------------
     // 칸별 점수
@@ -126,64 +130,64 @@ void input(const std::vector<int>& moves)
     // score[32](도착점)은 0으로 둔다
 
     // -------------------------
-    // 이동 표 next[pos][1..5]
+    // 이동 표 nextTable[pos][1..5]
     // -------------------------
 
     // 시작점
-    next[0][1] = 1; next[0][2] = 2; next[0][3] = 3; next[0][4] = 4; next[0][5] = 5;
+    nextTable[0][1] = 1; nextTable[0][2] = 2; nextTable[0][3] = 3; nextTable[0][4] = 4; nextTable[0][5] = 5;
 
     // 바깥 경로 (지름길 입구 직전까지는 그냥 +k)
-    next[1][1] = 2; next[1][2] = 3; next[1][3] = 4; next[1][4] = 5; next[1][5] = 6;
-    next[2][1] = 3; next[2][2] = 4; next[2][3] = 5; next[2][4] = 6; next[2][5] = 7;
-    next[3][1] = 4; next[3][2] = 5; next[3][3] = 6; next[3][4] = 7; next[3][5] = 8;
-    next[4][1] = 5; next[4][2] = 6; next[4][3] = 7; next[4][4] = 8; next[4][5] = 9;
+    nextTable[1][1] = 2; nextTable[1][2] = 3; nextTable[1][3] = 4; nextTable[1][4] = 5; nextTable[1][5] = 6;
+    nextTable[2][1] = 3; nextTable[2][2] = 4; nextTable[2][3] = 5; nextTable[2][4] = 6; nextTable[2][5] = 7;
+    nextTable[3][1] = 4; nextTable[3][2] = 5; nextTable[3][3] = 6; nextTable[3][4] = 7; nextTable[3][5] = 8;
+    nextTable[4][1] = 5; nextTable[4][2] = 6; nextTable[4][3] = 7; nextTable[4][4] = 8; nextTable[4][5] = 9;
 
     // 10점 칸(5번)은 지름길 입구다. 여기서 출발하면 무조건 지름길로 들어간다.
-    next[5][1] = 20; next[5][2] = 21; next[5][3] = 22; next[5][4] = 23; next[5][5] = 29;
+    nextTable[5][1] = 20; nextTable[5][2] = 21; nextTable[5][3] = 22; nextTable[5][4] = 23; nextTable[5][5] = 29;
 
-    next[6][1] = 7;  next[6][2] = 8;  next[6][3] = 9;  next[6][4] = 10; next[6][5] = 11;
-    next[7][1] = 8;  next[7][2] = 9;  next[7][3] = 10; next[7][4] = 11; next[7][5] = 12;
-    next[8][1] = 9;  next[8][2] = 10; next[8][3] = 11; next[8][4] = 12; next[8][5] = 13;
-    next[9][1] = 10; next[9][2] = 11; next[9][3] = 12; next[9][4] = 13; next[9][5] = 14;
+    nextTable[6][1] = 7;  nextTable[6][2] = 8;  nextTable[6][3] = 9;  nextTable[6][4] = 10; nextTable[6][5] = 11;
+    nextTable[7][1] = 8;  nextTable[7][2] = 9;  nextTable[7][3] = 10; nextTable[7][4] = 11; nextTable[7][5] = 12;
+    nextTable[8][1] = 9;  nextTable[8][2] = 10; nextTable[8][3] = 11; nextTable[8][4] = 12; nextTable[8][5] = 13;
+    nextTable[9][1] = 10; nextTable[9][2] = 11; nextTable[9][3] = 12; nextTable[9][4] = 13; nextTable[9][5] = 14;
 
     // 20점 칸(10번) 지름길 입구
-    next[10][1] = 28; next[10][2] = 27; next[10][3] = 23; next[10][4] = 29; next[10][5] = 30;
+    nextTable[10][1] = 28; nextTable[10][2] = 27; nextTable[10][3] = 23; nextTable[10][4] = 29; nextTable[10][5] = 30;
 
-    next[11][1] = 12; next[11][2] = 13; next[11][3] = 14; next[11][4] = 15; next[11][5] = 16;
-    next[12][1] = 13; next[12][2] = 14; next[12][3] = 15; next[12][4] = 16; next[12][5] = 17;
-    next[13][1] = 14; next[13][2] = 15; next[13][3] = 16; next[13][4] = 17; next[13][5] = 18;
-    next[14][1] = 15; next[14][2] = 16; next[14][3] = 17; next[14][4] = 18; next[14][5] = 19;
+    nextTable[11][1] = 12; nextTable[11][2] = 13; nextTable[11][3] = 14; nextTable[11][4] = 15; nextTable[11][5] = 16;
+    nextTable[12][1] = 13; nextTable[12][2] = 14; nextTable[12][3] = 15; nextTable[12][4] = 16; nextTable[12][5] = 17;
+    nextTable[13][1] = 14; nextTable[13][2] = 15; nextTable[13][3] = 16; nextTable[13][4] = 17; nextTable[13][5] = 18;
+    nextTable[14][1] = 15; nextTable[14][2] = 16; nextTable[14][3] = 17; nextTable[14][4] = 18; nextTable[14][5] = 19;
 
     // 30점 칸(15번) 지름길 입구
-    next[15][1] = 26; next[15][2] = 25; next[15][3] = 24; next[15][4] = 23; next[15][5] = 29;
+    nextTable[15][1] = 26; nextTable[15][2] = 25; nextTable[15][3] = 24; nextTable[15][4] = 23; nextTable[15][5] = 29;
 
     // 바깥 경로의 마지막 구간. 넘치면 그대로 도착점(32)에 멈춘다.
-    next[16][1] = 17; next[16][2] = 18; next[16][3] = 19; next[16][4] = 31; next[16][5] = 32;
-    next[17][1] = 18; next[17][2] = 19; next[17][3] = 31; next[17][4] = 32; next[17][5] = 32;
-    next[18][1] = 19; next[18][2] = 31; next[18][3] = 32; next[18][4] = 32; next[18][5] = 32;
-    next[19][1] = 31; next[19][2] = 32; next[19][3] = 32; next[19][4] = 32; next[19][5] = 32;
+    nextTable[16][1] = 17; nextTable[16][2] = 18; nextTable[16][3] = 19; nextTable[16][4] = 31; nextTable[16][5] = 32;
+    nextTable[17][1] = 18; nextTable[17][2] = 19; nextTable[17][3] = 31; nextTable[17][4] = 32; nextTable[17][5] = 32;
+    nextTable[18][1] = 19; nextTable[18][2] = 31; nextTable[18][3] = 32; nextTable[18][4] = 32; nextTable[18][5] = 32;
+    nextTable[19][1] = 31; nextTable[19][2] = 32; nextTable[19][3] = 32; nextTable[19][4] = 32; nextTable[19][5] = 32;
 
     // 10점 지름길 내부
-    next[20][1] = 21; next[20][2] = 22; next[20][3] = 23; next[20][4] = 29; next[20][5] = 30;
-    next[21][1] = 22; next[21][2] = 23; next[21][3] = 29; next[21][4] = 30; next[21][5] = 31;
-    next[22][1] = 23; next[22][2] = 29; next[22][3] = 30; next[22][4] = 31; next[22][5] = 32;
+    nextTable[20][1] = 21; nextTable[20][2] = 22; nextTable[20][3] = 23; nextTable[20][4] = 29; nextTable[20][5] = 30;
+    nextTable[21][1] = 22; nextTable[21][2] = 23; nextTable[21][3] = 29; nextTable[21][4] = 30; nextTable[21][5] = 31;
+    nextTable[22][1] = 23; nextTable[22][2] = 29; nextTable[22][3] = 30; nextTable[22][4] = 31; nextTable[22][5] = 32;
 
     // 가운데(25점) 이후 공통 경로
-    next[23][1] = 29; next[23][2] = 30; next[23][3] = 31; next[23][4] = 32; next[23][5] = 32;
+    nextTable[23][1] = 29; nextTable[23][2] = 30; nextTable[23][3] = 31; nextTable[23][4] = 32; nextTable[23][5] = 32;
 
     // 30점 지름길 내부
-    next[24][1] = 23; next[24][2] = 29; next[24][3] = 30; next[24][4] = 31; next[24][5] = 32;
-    next[25][1] = 24; next[25][2] = 23; next[25][3] = 29; next[25][4] = 30; next[25][5] = 31;
-    next[26][1] = 25; next[26][2] = 24; next[26][3] = 23; next[26][4] = 29; next[26][5] = 30;
+    nextTable[24][1] = 23; nextTable[24][2] = 29; nextTable[24][3] = 30; nextTable[24][4] = 31; nextTable[24][5] = 32;
+    nextTable[25][1] = 24; nextTable[25][2] = 23; nextTable[25][3] = 29; nextTable[25][4] = 30; nextTable[25][5] = 31;
+    nextTable[26][1] = 25; nextTable[26][2] = 24; nextTable[26][3] = 23; nextTable[26][4] = 29; nextTable[26][5] = 30;
 
     // 20점 지름길 내부
-    next[27][1] = 23; next[27][2] = 29; next[27][3] = 30; next[27][4] = 31; next[27][5] = 32;
-    next[28][1] = 27; next[28][2] = 23; next[28][3] = 29; next[28][4] = 30; next[28][5] = 31;
+    nextTable[27][1] = 23; nextTable[27][2] = 29; nextTable[27][3] = 30; nextTable[27][4] = 31; nextTable[27][5] = 32;
+    nextTable[28][1] = 27; nextTable[28][2] = 23; nextTable[28][3] = 29; nextTable[28][4] = 30; nextTable[28][5] = 31;
 
     // 도착 직전 공통 구간
-    next[29][1] = 30; next[29][2] = 31; next[29][3] = 32; next[29][4] = 32; next[29][5] = 32;
-    next[30][1] = 31; next[30][2] = 32; next[30][3] = 32; next[30][4] = 32; next[30][5] = 32;
-    next[31][1] = 32; next[31][2] = 32; next[31][3] = 32; next[31][4] = 32; next[31][5] = 32;
+    nextTable[29][1] = 30; nextTable[29][2] = 31; nextTable[29][3] = 32; nextTable[29][4] = 32; nextTable[29][5] = 32;
+    nextTable[30][1] = 31; nextTable[30][2] = 32; nextTable[30][3] = 32; nextTable[30][4] = 32; nextTable[30][5] = 32;
+    nextTable[31][1] = 32; nextTable[31][2] = 32; nextTable[31][3] = 32; nextTable[31][4] = 32; nextTable[31][5] = 32;
 }
 
 /*
@@ -206,12 +210,12 @@ int simulate()
     for (int i = 0; i < 10; i++)
     {
         int horseNumber = num_of_cases[i];   // 이번 턴에 고른 말
-        int moveCount = move[i];             // 이번 턴의 칸 수
+        int moveCount = moveList[i];             // 이번 턴의 칸 수
 
         int currentPos = horsePos[horseNumber];
 
         // 판의 모든 규칙이 이 한 줄에 들어 있다
-        int nextPos = next[currentPos][moveCount];
+        int nextPos = nextTable[currentPos][moveCount];
 
         // 도착점이 아닌 칸에 다른 말이 이미 있으면 이렇게 움직일 수 없다
         if (nextPos != DESTINATION && board[nextPos] == true)
@@ -262,7 +266,7 @@ void DFS(int depth)
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<int> moves)
+int solution(vector<int> moves)
 {
     input(moves);
 
@@ -279,7 +283,7 @@ int solution(std::vector<int> moves)
 #ifdef LOCAL_TEST
 int main()
 {
-    std::vector<int> moves(10);
+    vector<int> moves(10);
     for (int i = 0; i < 10; i++) scanf("%d", &moves[i]);   // 원본 scanf 순서 그대로
 
     int ans = solution(moves);

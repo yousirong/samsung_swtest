@@ -52,6 +52,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (20 + 5)
 
 // 방향 번호
@@ -74,7 +76,7 @@ int maxAnswer;          // 만들 수 있는 가장 큰 블록 값
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board)
+void input(const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf 대체 - 격자 크기는 배열 길이로 알 수 있다
 
@@ -366,7 +368,7 @@ void DFS(int depth)
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::vector<int>> board)
+int solution(vector<vector<int>> board)
 {
 	input(board);
 
@@ -388,7 +390,7 @@ int main()
 	int n;
 	scanf("%d", &n);                 // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);

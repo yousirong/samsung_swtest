@@ -61,6 +61,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (29+5)
 
 int T;
@@ -96,7 +98,7 @@ int dc[] = { 0,1,0,-1 };
 int harmony[MAX * MAX][MAX * MAX]; // harmony[A][B] = 그룹 A와 B가 맞닿은 변의 개수
 
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board)
+void input(const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf("%d", &N) 대체
 
@@ -322,7 +324,7 @@ int simulate()
 }
 
 // [수정] main() -> solution()
-int solution(std::vector<std::vector<int>> board)
+int solution(vector<vector<int>> board)
 {
 	input(board);
 
@@ -338,7 +340,7 @@ int main()
 	int n;
 	scanf("%d", &n);
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);

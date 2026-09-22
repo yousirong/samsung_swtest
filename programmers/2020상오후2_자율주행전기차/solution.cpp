@@ -63,6 +63,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (20 + 5)
 #define INF (0x7fff0000)
 
@@ -127,8 +129,8 @@ int dc[] = { 0, 1, 0,-1 };
 */
 // [수정] scanf 대신 인자로 받는다.
 //        carPos = {행, 열},  people[i] = {출발행, 출발열, 도착행, 도착열}
-void input(int c0, const std::vector<std::vector<int>>& board,
-           const std::vector<int>& carPos, const std::vector<std::vector<int>>& people_)
+void input(int c0, const vector<vector<int>>& board,
+           const vector<int>& carPos, const vector<vector<int>>& people_)
 {
     N = (int)board.size();      // [수정] scanf 대체
     M = (int)people_.size();    // [수정] scanf 대체
@@ -367,8 +369,8 @@ int simulate()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int c0, std::vector<std::vector<int>> board,
-             std::vector<int> carPos, std::vector<std::vector<int>> people_)
+int solution(int c0, vector<vector<int>> board,
+             vector<int> carPos, vector<vector<int>> people_)
 {
     input(c0, board, carPos, people_);
 
@@ -383,11 +385,11 @@ int main()
 {
     int n, m, c0;
     scanf("%d %d %d", &n, &m, &c0);   // 원본 scanf 순서 그대로
-    std::vector<std::vector<int>> board(n, std::vector<int>(n));
+    vector<vector<int>> board(n, vector<int>(n));
     for (int r = 0; r < n; r++) for (int c = 0; c < n; c++) scanf("%d", &board[r][c]);
-    std::vector<int> carPos(2);
+    vector<int> carPos(2);
     scanf("%d %d", &carPos[0], &carPos[1]);
-    std::vector<std::vector<int>> people(m, std::vector<int>(4));
+    vector<vector<int>> people(m, vector<int>(4));
     for (int i = 0; i < m; i++)
         scanf("%d %d %d %d", &people[i][0], &people[i][1], &people[i][2], &people[i][3]);
 

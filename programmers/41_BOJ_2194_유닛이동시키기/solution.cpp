@@ -43,6 +43,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (500 + 50)
 
 int N, M;              // 격자 크기 (행, 열)
@@ -72,7 +74,7 @@ int dc[] = {  0, 1, 0,-1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(int n, int m, int a, int b, const std::vector<std::vector<int>>& obstacles,
+void input(int n, int m, int a, int b, const vector<vector<int>>& obstacles,
 	int startR, int startC, int endR, int endC)
 {
 	N = n;   // [수정] scanf("%d %d %d %d %d", &N, &M, &A, &B, &K) 대체
@@ -197,7 +199,7 @@ int BFS(int r, int c)
 // 메인
 // ---------------------------
 // [수정] main() -> solution()
-int solution(int n, int m, int a, int b, std::vector<std::vector<int>> obstacles,
+int solution(int n, int m, int a, int b, vector<vector<int>> obstacles,
 	int startR, int startC, int endR, int endC)
 {
 	input(n, m, a, b, obstacles, startR, startC, endR, endC);
@@ -214,7 +216,7 @@ int main()
 	int n, m, a, b, k;
 	scanf("%d %d %d %d %d", &n, &m, &a, &b, &k);
 
-	std::vector<std::vector<int>> obstacles(k, std::vector<int>(2));
+	vector<vector<int>> obstacles(k, vector<int>(2));
 	for (int i = 0; i < k; i++) scanf("%d %d", &obstacles[i][0], &obstacles[i][1]);
 
 	int s1, s2, e1, e2;

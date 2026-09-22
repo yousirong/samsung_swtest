@@ -54,6 +54,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (4+3)
 #define MAX_DIR (8+2)
 
@@ -87,7 +89,7 @@ int dr8[] = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
 int dc8[] = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };
 
 // [수정] scanf 대신 인자로 받는다. 전역 초기화 루프는 원본 그대로 둔다.
-void input(int t, int pr, int pc, const std::vector<std::vector<int>>& monsters)
+void input(int t, int pr, int pc, const vector<vector<int>>& monsters)
 {
 	M = (int)monsters.size();   // [수정] scanf 대체 - 마리 수는 배열 길이로 알 수 있다
 	TURN = t;                   // [수정] scanf 대체
@@ -353,7 +355,7 @@ int getAnswer()
 
 // [수정] main() -> solution()
 //        원본 main의 T 루프 껍데기는 제거했다. 채점기가 케이스마다 한 번씩 부른다.
-int solution(int t, int r, int c, std::vector<std::vector<int>> monsters)
+int solution(int t, int r, int c, vector<vector<int>> monsters)
 {
 	pcnt = 0;    // [추가] 재호출 대비 - DFS가 position에 64개를 누적하므로 매번 0에서 시작해야 한다
 
@@ -379,7 +381,7 @@ int main()
 
 	scanf("%d %d %d %d", &m, &t, &pr, &pc);   // 원본 scanf 순서 그대로 (원본의 %D 오타는 %d로 정정)
 
-	std::vector<std::vector<int>> monsters(m, std::vector<int>(3));
+	vector<vector<int>> monsters(m, vector<int>(3));
 	for (int i = 0; i < m; i++)
 		scanf("%d %d %d", &monsters[i][0], &monsters[i][1], &monsters[i][2]);
 

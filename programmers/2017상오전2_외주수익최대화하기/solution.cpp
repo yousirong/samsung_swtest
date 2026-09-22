@@ -53,6 +53,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (15 + 5)
 
 int T;
@@ -69,7 +71,7 @@ int maxAnswer;         // 가능한 최대 수익
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. jobs[i] = {소요 기간, 수익}
-void input(const std::vector<std::vector<int>>& jobs)
+void input(const vector<vector<int>>& jobs)
 {
 	N = (int)jobs.size();   // [수정] scanf 대체
 
@@ -176,7 +178,7 @@ void DFS(int depth)
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::vector<int>> jobs)
+int solution(vector<vector<int>> jobs)
 {
 	input(jobs);
 
@@ -196,7 +198,7 @@ int main()
 {
 	int n;
 	scanf("%d", &n);                 // 원본 scanf 순서 그대로
-	std::vector<std::vector<int>> jobs(n, std::vector<int>(2));
+	vector<vector<int>> jobs(n, vector<int>(2));
 	for (int i = 0; i < n; i++) scanf("%d %d", &jobs[i][0], &jobs[i][1]);
 
 	int ans = solution(jobs);

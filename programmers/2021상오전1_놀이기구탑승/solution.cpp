@@ -62,6 +62,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (20 +5)
 #define INF (0x7fff0000)
 
@@ -90,7 +92,7 @@ struct SEAT
 
 // [수정] scanf 대신 인자로 받는다
 // students[i] = {학생 번호, 좋아하는 학생 4명} (앉는 순서대로)
-void input(const std::vector<std::vector<int>>& students)
+void input(const vector<vector<int>>& students)
 {
 	N = (int)1;                      // [수정] scanf("%d", &N) 대체
 	while (N * N < (int)students.size()) N++;   // 학생 수가 N x N 이므로 거꾸로 N을 구한다
@@ -258,7 +260,7 @@ int getAnswer()
 
 
 // [수정] main() -> solution()
-int solution(std::vector<std::vector<int>> students)
+int solution(vector<vector<int>> students)
 {
 	input(students);
 
@@ -276,7 +278,7 @@ int main()
 	int n;
 	scanf("%d", &n);
 
-	std::vector<std::vector<int>> students(n * n, std::vector<int>(5));
+	vector<vector<int>> students(n * n, vector<int>(5));
 	for (int i = 0; i < n * n; i++)
 		scanf("%d %d %d %d %d", &students[i][0], &students[i][1], &students[i][2], &students[i][3], &students[i][4]);
 

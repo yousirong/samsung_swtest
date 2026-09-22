@@ -40,6 +40,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (50 + 10)
 #define MAX_HOSPITAL (13 + 5)
 #define INF (0x7fff0000)
@@ -74,7 +76,7 @@ int minAnswer;                    // 도시의 병원 거리 최솟값
 // 입력 (읽으면서 좌표 목록도 함께 만든다)
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. M은 격자 크기가 아니라 "남길 병원 수"다.
-void input(int m, const std::vector<std::vector<int>>& board)
+void input(int m, const vector<vector<int>>& board)
 {
 	N = (int)board.size();   // [수정] scanf 대체
 	M = m;                   // [수정] scanf 대체
@@ -211,7 +213,7 @@ void DFS(int depth, int start)
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int m, std::vector<std::vector<int>> board)
+int solution(int m, vector<vector<int>> board)
 {
 	input(m, board);
 
@@ -233,7 +235,7 @@ int main()
 	int n, m;
 	scanf("%d %d", &n, &m);          // 원본 scanf 순서 그대로 (M은 격자 크기가 아니다)
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);

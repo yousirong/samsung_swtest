@@ -61,6 +61,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (10 + 5)
 #define MAX_VIRUS (100000)
 #define OFFSET (10000)
@@ -84,7 +86,7 @@ int dc[] = { 0,  1, 1, 1, 0,-1,-1, -1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. M(초기 바이러스 수)은 viruses 길이로 대신한다.
-void input(int k, const std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& viruses)
+void input(int k, const vector<vector<int>>& board, const vector<vector<int>>& viruses)
 {
 	N = (int)board.size();        // [수정] scanf 대체
 	M = (int)viruses.size();      // [수정] scanf 대체
@@ -279,7 +281,7 @@ int getAnswer()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int k, std::vector<std::vector<int>> board, std::vector<std::vector<int>> viruses)
+int solution(int k, vector<vector<int>> board, vector<vector<int>> viruses)
 {
 	input(k, board, viruses);
 
@@ -305,12 +307,12 @@ int main()
 	int n, m, k;
 	scanf("%d %d %d", &n, &m, &k);   // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);
 
-	std::vector<std::vector<int>> viruses(m, std::vector<int>(3));
+	vector<vector<int>> viruses(m, vector<int>(3));
 	for (int i = 0; i < m; i++)
 		scanf("%d %d %d", &viruses[i][0], &viruses[i][1], &viruses[i][2]);
 

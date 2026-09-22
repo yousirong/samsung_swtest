@@ -61,6 +61,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX_N (20 + 5)
 #define MAX_M (5 + 2)
 
@@ -110,7 +112,7 @@ int dr[] = { -1, 0, 1, 0 };
 int dc[] = { 0, 1, 0, -1 };
 
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board, int k)
+void input(const vector<vector<int>>& board, int k)
 {
 	N = (int)board.size();   // [수정] scanf("%d %d %d", &N, &M, &K) 대체
 	K = k;
@@ -449,7 +451,7 @@ int simulate()
 }
 
 // [수정] main() -> solution()
-int solution(std::vector<std::vector<int>> board, int k)
+int solution(vector<vector<int>> board, int k)
 {
 	input(board, k);
 
@@ -465,7 +467,7 @@ int main()
 	int n, m, k;
 	scanf("%d %d %d", &n, &m, &k);   // 원본과 같은 형식 (m은 solution에서 격자로부터 다시 구한다)
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);

@@ -60,6 +60,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (4 + 2)
 #define MAX_H (16 + 5)   // 말 번호 1 ~ 16
 
@@ -99,7 +101,7 @@ int dc[] = { 0, 0,-1,-1,-1,0,1,1,1 };
     판에는 번호를, 말 배열에는 위치와 방향을 저장한다.
 */
 // [수정] scanf 대신 인자로 받는다. fishes[i] = {말 번호, 방향} (격자 순서 16개)
-void input(const std::vector<std::vector<int>>& fishes)
+void input(const vector<vector<int>>& fishes)
 {
     for (int r = 0; r < 4; r++)
     {
@@ -280,7 +282,7 @@ void DFS(CHESS prevTagger, int prevMap[MAX][MAX], CHESS prevChess[MAX_H], int sc
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::vector<int>> fishes)
+int solution(vector<vector<int>> fishes)
 {
     input(fishes);
 
@@ -303,7 +305,7 @@ int solution(std::vector<std::vector<int>> fishes)
 #ifdef LOCAL_TEST
 int main()
 {
-    std::vector<std::vector<int>> fishes(16, std::vector<int>(2));
+    vector<vector<int>> fishes(16, vector<int>(2));
     for (int i = 0; i < 16; i++)
         scanf("%d %d", &fishes[i][0], &fishes[i][1]);   // 원본 scanf 순서 그대로 (격자 순서 16쌍)
 

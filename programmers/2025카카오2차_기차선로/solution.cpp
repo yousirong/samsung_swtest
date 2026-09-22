@@ -261,10 +261,12 @@ int solution(int** grid, size_t grid_rows, size_t grid_cols)
 #ifdef LOCAL_TEST
 #include <vector>
 
-static int run(std::vector<std::vector<int>> g)
+using namespace std;
+
+static int run(vector<vector<int>> g)
 {
 	int rows = (int)g.size(), cols = (int)g[0].size();
-	std::vector<int*> p(rows);
+	vector<int*> p(rows);
 	for (int i = 0; i < rows; i++) p[i] = &g[i][0];
 
 	return solution(&p[0], rows, cols);

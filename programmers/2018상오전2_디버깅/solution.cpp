@@ -57,6 +57,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX_H (30 + 5)
 #define MAX_N (10 + 5)
 
@@ -85,7 +87,7 @@ bool PASS;                  // 지금 시도 중인 개수로 성공한 경우�
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다. lines[i] = {가로줄 번호, 왼쪽 세로선 번호}
-void input(int c0, int r0, const std::vector<std::vector<int>>& lines)
+void input(int c0, int r0, const vector<vector<int>>& lines)
 {
 	C = c0;                    // [수정] scanf 대체
 	M = (int)lines.size();     // [수정] scanf 대체
@@ -282,7 +284,7 @@ void getEmptyLadder()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int c0, int r0, std::vector<std::vector<int>> lines)
+int solution(int c0, int r0, vector<vector<int>> lines)
 {
 	input(c0, r0, lines);
 
@@ -302,7 +304,7 @@ int main()
 {
 	int c0, m, r0;
 	scanf("%d %d %d", &c0, &m, &r0);   // 원본 scanf 순서 그대로 (세로선 수, 가로선 수, 가로 줄 수)
-	std::vector<std::vector<int>> lines(m, std::vector<int>(2));
+	vector<vector<int>> lines(m, vector<int>(2));
 	for (int i = 0; i < m; i++) scanf("%d %d", &lines[i][0], &lines[i][1]);
 
 	int ans = solution(c0, r0, lines);

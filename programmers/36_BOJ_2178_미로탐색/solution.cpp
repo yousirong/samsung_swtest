@@ -40,6 +40,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (100 + 10)
 
 int N, M;                // N: 행 수, M: 열 수
@@ -90,7 +92,7 @@ void printMap()
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board)
+void input(const vector<vector<int>>& board)
 {
 	N = (int)board.size();        // [수정] scanf("%d %d", &N, &M) 대체
 	M = (int)board[0].size();
@@ -156,7 +158,7 @@ void BFS(int r, int c)
 // 메인
 // ---------------------------
 // [수정] main() -> solution()
-int solution(std::vector<std::vector<int>> board)
+int solution(vector<vector<int>> board)
 {
 	input(board);
 
@@ -175,7 +177,7 @@ int main()
 	int n, m;
 	scanf("%d %d", &n, &m);
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(m));
+	vector<vector<int>> board(n, vector<int>(m));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < m; c++)
 			scanf("%1d", &board[r][c]);

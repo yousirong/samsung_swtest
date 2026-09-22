@@ -10,7 +10,7 @@
 ## 시그니처
 
 ```cpp
-std::vector<int> solution(int n, std::vector<std::vector<int>> board, std::vector<int> levels)
+vector<int> solution(int n, vector<vector<int>> board, vector<int> levels)
 ```
 
 ## stdin → 인자 대응
@@ -23,7 +23,7 @@ std::vector<int> solution(int n, std::vector<std::vector<int>> board, std::vecto
 
 > **격자 크기가 `n`이 아니라 `2^n`이다.** 하네스에서도 `int side = 1 << n;` 으로 읽는다. 이걸 `n × n`으로 읽으면 입력 파싱부터 어긋난다.
 
-## 답이 2개일 때 — `std::vector<int>`로 묶는다
+## 답이 2개일 때 — `vector<int>`로 묶는다
 
 원본은 두 값을 각각 다른 줄에 찍었다.
 
@@ -34,7 +34,7 @@ printf("%d\n%d\n", iceCount, groupCount);
 함수형에서는 반환값이 하나여야 하므로 `vector<int>`에 **원본 출력 순서 그대로** 담는다.
 
 ```cpp
-return std::vector<int>{ iceCount, groupCount };
+return vector<int>{ iceCount, groupCount };
 ```
 
 같은 규칙을 쓰는 문제 : 2017 하오후2 연산자배치(min, max), 2020 상오전1 2차원테트리스(점수, 남은 블록), 40 성곽(3개).

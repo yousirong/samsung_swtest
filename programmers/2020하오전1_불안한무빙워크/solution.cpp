@@ -54,6 +54,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (100 + 20)
 
 int T;
@@ -85,7 +87,7 @@ int lcnt;
     입력
 */
 // [수정] scanf 대신 인자로 받는다. N은 stability 길이의 절반이다.
-void input(int k, const std::vector<int>& stability)
+void input(int k, const vector<int>& stability)
 {
     N = (int)stability.size() / 2;   // [수정] scanf 대체
     K = k;                           // [수정] scanf 대체
@@ -238,7 +240,7 @@ int simulate()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(int k, std::vector<int> stability)
+int solution(int k, vector<int> stability)
 {
     input(k, stability);
 
@@ -253,7 +255,7 @@ int main()
 {
     int n, k;
     scanf("%d %d", &n, &k);          // 원본 scanf 순서 그대로
-    std::vector<int> stability(2 * n);
+    vector<int> stability(2 * n);
     for (int i = 0; i < 2 * n; i++) scanf("%d", &stability[i]);
 
     int ans = solution(k, stability);

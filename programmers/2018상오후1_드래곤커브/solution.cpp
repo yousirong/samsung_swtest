@@ -54,6 +54,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX (100 + 20)
 
 int T;
@@ -70,7 +72,7 @@ int dc[] = { 1,  0,-1, 0 };
 // 커브를 모두 만들어 MAP에 표시
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void makeDragonCurve(const std::vector<std::vector<int>>& curves)
+void makeDragonCurve(const vector<vector<int>>& curves)
 {
 	N = (int)curves.size();   // [수정] scanf 대체
 
@@ -149,7 +151,7 @@ int countSquare()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::vector<int>> curves)
+int solution(vector<vector<int>> curves)
 {
 	// [추가] 재호출 대비.
 	//        원본은 MAP 을 한 번도 비우지 않고 1만 찍어서, 두 번째 호출이면 이전 곡선이 그대로 남는다.
@@ -170,7 +172,7 @@ int main()
 {
 	int n;
 	scanf("%d", &n);                 // 원본 scanf 순서 그대로
-	std::vector<std::vector<int>> curves(n, std::vector<int>(4));
+	vector<vector<int>> curves(n, vector<int>(4));
 	for (int i = 0; i < n; i++)
 		scanf("%d %d %d %d", &curves[i][0], &curves[i][1], &curves[i][2], &curves[i][3]);
 

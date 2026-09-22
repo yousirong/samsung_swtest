@@ -65,6 +65,8 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <stdbool.h>
 
+using namespace std;
+
 #define MAX (50 + 5)
 
 // 회전 방향
@@ -104,7 +106,7 @@ int dc[] = { 0, 1, 0,-1 };
 // 입력
 // ---------------------------
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& queries)
+void input(const vector<vector<int>>& board, const vector<vector<int>>& queries)
 {
     N = (int)board.size();        // [수정] scanf 대체
     M = (int)board[0].size();     // [수정] scanf 대체
@@ -351,7 +353,7 @@ int getAnswer()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::vector<int>> board, std::vector<std::vector<int>> queries)
+int solution(vector<vector<int>> board, vector<vector<int>> queries)
 {
     input(board, queries);
 
@@ -371,12 +373,12 @@ int main()
     int n, m, q;
     scanf("%d %d %d", &n, &m, &q);   // 원본 scanf 순서 그대로
 
-    std::vector<std::vector<int>> board(n, std::vector<int>(m));
+    vector<vector<int>> board(n, vector<int>(m));
     for (int r = 0; r < n; r++)
         for (int c = 0; c < m; c++)
             scanf("%d", &board[r][c]);
 
-    std::vector<std::vector<int>> queries(q, std::vector<int>(3));
+    vector<vector<int>> queries(q, vector<int>(3));
     for (int i = 0; i < q; i++)
         scanf("%d %d %d", &queries[i][0], &queries[i][1], &queries[i][2]);
 

@@ -33,6 +33,8 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
+using namespace std;
+
 #define MAX_N (50 + 5)		// N <= 50, 격자 바깥 테두리(0행/0열, N+1행/N+1열)까지 여유
 #define MAX_M (100 + 10)	// M <= 100
 
@@ -63,7 +65,7 @@ int dr8[] = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };
 int dc8[] = { 0, 1, 1, 0, -1, -1, -1, 0, 1 };
 
 // [수정] scanf 대신 인자로 받는다
-void input(const std::vector<std::vector<int>>& board, const std::vector<std::vector<int>>& cycles)
+void input(const vector<vector<int>>& board, const vector<vector<int>>& cycles)
 {
 	N = (int)board.size();      // [수정] scanf 대체
 	M = (int)cycles.size();     // [수정] scanf 대체
@@ -242,7 +244,7 @@ int getAnswer()
 }
 
 // [수정] main() -> solution().  T 루프 껍데기는 제거했다.
-int solution(std::vector<std::vector<int>> board, std::vector<std::vector<int>> cycles)
+int solution(vector<vector<int>> board, vector<vector<int>> cycles)
 {
 	input(board, cycles);
 
@@ -262,12 +264,12 @@ int main()
 	int n, m;
 	scanf("%d %d", &n, &m);          // 원본 scanf 순서 그대로
 
-	std::vector<std::vector<int>> board(n, std::vector<int>(n));
+	vector<vector<int>> board(n, vector<int>(n));
 	for (int r = 0; r < n; r++)
 		for (int c = 0; c < n; c++)
 			scanf("%d", &board[r][c]);
 
-	std::vector<std::vector<int>> queries(m, std::vector<int>(2));
+	vector<vector<int>> queries(m, vector<int>(2));
 	for (int i = 0; i < m; i++)
 		scanf("%d %d", &queries[i][0], &queries[i][1]);
 
