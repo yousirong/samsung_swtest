@@ -1,5 +1,9 @@
 /*
 	[코드트리] 2021 상반기 오후 2번 - 미로 타워 디펜스
+	원본 : swtest/코드트리_2021_상반기오후2번_미로타워디펜스.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
 	https://www.codetree.ai/training-field/frequent-problems/problems/maze-tower-defense
 	(백준 21611 "마법사 상어와 블리자드"를 타워 디펜스로 바꿔 낸 문제다)
 

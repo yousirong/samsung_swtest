@@ -1,5 +1,9 @@
 /*
 	[코드트리] 2018 하반기 오전 2번 - 토스트 계란틀
+	원본 : swtest/코드트리_2018_하반기오전2번_토스트계란틀.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
 	https://www.codetree.ai/training-field/frequent-problems/problems/toast-eggmold
 
 	■ 문제 요약

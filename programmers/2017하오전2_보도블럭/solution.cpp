@@ -1,5 +1,9 @@
 /*
 	[코드트리] 2017 하반기 오전 2번 - 보도블럭
+	원본 : swtest/코드트리_2017_하반기오전2번_보도블럭.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
 	https://www.codetree.ai/training-field/frequent-problems/problems/crosswalk
 	(= 백준 14890 경사로  https://www.acmicpc.net/problem/14890)
 

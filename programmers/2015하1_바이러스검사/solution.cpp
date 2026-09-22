@@ -1,5 +1,9 @@
 /*
 	[코드트리] 2015 하반기 1번 - 바이러스 검사
+	원본 : swtest/코드트리_2015_하반기1번_바이러스검사.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
 	https://www.codetree.ai/training-field/frequent-problems/problems/virus-detector
 
 	■ 문제 요약

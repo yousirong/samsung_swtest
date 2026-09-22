@@ -1,5 +1,9 @@
 /*
 	[코드트리] 2019 상반기 오후 2번 - 바이러스 백신
+	원본 : swtest/코드트리_2019_상반기오후2번_바이러스백신.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
 	https://www.codetree.ai/training-field/frequent-problems/problems/vaccine-for-virus
 
 	■ 문제 요약

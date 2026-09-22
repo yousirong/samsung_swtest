@@ -1,19 +1,58 @@
 /*
-	[프로그래머스 함수형] 2021 하반기 오후 1번 - 팩맨
-	원본 : swtest/코드트리_2021_하반기오후1번_팩맨.cpp
-	복습 노트 : 없음 (docs/INDEX.md 미등록)
+	[코드트리] 2021 하반기 오후 1번 - 팩맨
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+	[버그수정] 원본에 있던 버그는 이 사본에서 고쳐 옮겼다. 고친 자리마다 // [버그수정] 표시가 있다.
 
-	원본은 stdin에서 scanf로 읽고 printf로 출력한다.
-	여기서는 채점기가 값을 인자로 넘겨주고 solution()의 반환값을 비교하는 형태로 바꿨다.
+	https://www.codetree.ai/training-field/frequent-problems/problems/pacman
+	(백준 23290 "마법사 상어와 복제"와 같은 문제다. 상어 -> 팩맨, 물고기 -> 몬스터)
 
-	바뀐 곳은 세 군데뿐이고 전부 // [수정] / // [추가] 표시를 달았다.
-	로직 함수(moveMonster, getMonster, movePackMan, disappear, simulate, getAnswer)는 한 줄도 건드리지 않았다.
+	■ 문제 요약
+	  4 x 4 격자에 몬스터 M마리(각자 8방향 중 하나)와 팩맨 1명이 있다.
+	  한 턴은 아래 순서로 진행되고 TURN턴 반복한다.
 
-	[주의] 원본에 버그가 3개 있고 그대로 옮겨 왔다. README.md의 "원본 버그" 절을 볼 것.
+	    1) 복제 시도 : 지금 몬스터들을 그대로 알(egg)로 복사해 둔다. 알은 움직이지 않는다.
+	    2) 몬스터 이동 : 각 몬스터가 자기 방향으로 1칸 간다.
+	                    격자 밖 / 팩맨 칸 / 시체 칸이면 반시계 45도씩 돌려 다시 본다.
+	                    8방향 모두 안 되면 제자리에 있는다.
+	    3) 팩맨 이동 : 상하좌우로 3칸 움직이는 64가지 경로 중 몬스터를 가장 많이 먹는 경로.
+	                  같으면 (상, 좌, 하, 우) 우선순위의 사전 순으로 앞선 것.
+	                  같은 칸을 두 번 지나면 두 번째에는 먹을 게 없다.
+	                  먹힌 몬스터가 있던 칸에는 시체가 생긴다.
+	    4) 시체 소멸 : 시체는 생기고 2턴 동안 남는다.
+	    5) 복제 완성 : 1)의 알이 부화해 몬스터가 된다 (방향도 그대로).
+
+	  TURN턴 뒤 살아 있는 몬스터 수를 출력한다.
+
+	■ 풀이 방침
+	  - 몬스터는 개체를 따로 관리하지 않고 monster[r][c][d] = "그 칸, 그 방향의 수"로 센다.
+	    같은 칸, 같은 방향 몬스터는 앞으로도 똑같이 움직이므로 묶어도 된다.
+	    몇 마리든 칸 16개 x 방향 8개 = 128개 값만 다루면 되어 마리 수가 커져도 빠르다.
+	  - 팩맨 경로 64가지는 DFS로 main 시작 때 한 번만 만들어 position[]에 담는다.
+	    (1, 1, 1) -> (1, 1, 2) -> ... 순서로 만들어지므로 이 순서가 곧 사전 순 우선순위다.
+	    그래서 "더 클 때만(>) 갱신"하면 동점일 때 앞의 경로가 자동으로 남는다.
+	  - 시체는 deadBody에 남은 수명을 적는다. 3을 넣고 같은 턴의 4)에서 곧바로 1 줄이므로
+	    실제로는 이후 2턴 동안 남는다.
+	  - grid[][]는 격자 바깥을 true(벽)로 두어 경계 검사를 대신한다.
+
+	■ 주의할 점 (아래 4곳은 원본 그대로 두고 [버그]로 표시했다)
+	  랜덤 입력 200개로 돌려 보면 원본은 153개에서 비정상 종료하고,
+	  4곳을 모두 고친 코드는 비정상 종료가 0개다. (두 코드의 답이 다른 경우는 196개)
+
+	  [버그 1] input()의 scanf 서식 "%d %d %D %d" : %D는 표준 서식이 아니다.
+	           -> "%d %d %d %d"
+	  [버그 2] input()의 벽 초기화가 r = 1부터 시작한다. 0행이 벽이 아니라서
+	           팩맨이 0행을 지나 격자 밖으로 나갈 수 있고, 배열 밖 접근으로 죽는다.
+	           -> for (int r = 0; r <= 5; r++)
+	  [버그 3] moveMonster()의 (nr == packMan.r && packMan.c) : 열 비교가 빠졌다.
+	           팩맨과 같은 행이기만 하면 전부 못 가는 칸이 된다.
+	           -> (nr == packMan.r && nc == packMan.c)
+	  [버그 4] simulate()의 step = maxMonster = 1 : 먹을 수 있는 최대가 0이나 1이면
+	           갱신이 안 되어 1번 경로(상, 상, 좌)를 강제로 탄다. 이 경로는 격자 밖일 수도 있다.
+	           -> step = maxMonster = -1 (불가능한 경로의 -1보다 커야 하므로 -1로 시작)
 */
-
 #include <stdio.h>
-#include <vector>              // [추가] 함수형 인자용
+#include <vector>              // [추가] 함수형 인자/반환용
 
 #define MAX (4+3)
 #define MAX_DIR (8+2)
@@ -22,8 +61,8 @@ int T;
 
 int M, TURN;
 
-bool grid[MAX][MAX];
-int deadBody[MAX][MAX];
+bool grid[MAX][MAX]; // true = 격자 바깥(벽)
+int deadBody[MAX][MAX]; // 시체의 남은 수명 (0 = 없음)
 
 struct PACKMAN
 {
@@ -35,15 +74,15 @@ PACKMAN packMan;
 
 int monster[MAX][MAX][MAX_DIR]; // (r,c)에 dir 방향의 몬스터 수
 
-int num_of_cases[10];
-int position[64 + 10][3];
+int num_of_cases[10]; // DFS로 만드는 중인 경로
+int position[64 + 10][3]; // 팩맨 경로 64가지 (사전 순)
 int pcnt;
 
-// -, ↑, ←, ↓, →
+// -, ↑, ←, ↓, →   (팩맨 우선순위 상, 좌, 하, 우 순서)
 int dr4[] = { 0, -1, 0, 1, 0 };
 int dc4[] = { 0, 0, -1, 0, 1 };
 
-// -, ↑, ↖, ←, ↙, ↓, ↘, →, ↗
+// -, ↑, ↖, ←, ↙, ↓, ↘, →, ↗   (번호가 1 늘면 반시계 45도)
 int dr8[] = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
 int dc8[] = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };
 
@@ -122,6 +161,7 @@ void copyMonster(int copy[MAX][MAX][MAX_DIR], int original[MAX][MAX][MAX_DIR])
 				copy[r][c][d] = original[r][c][d];
 }
 
+// 완성된 경로 하나를 position[]에 저장한다.
 void printCases()
 {
 	//for (int i = 0; i < 3; i++) printf("%d ", num_of_cases[i]);
@@ -132,6 +172,7 @@ void printCases()
 	position[pcnt++][2] = num_of_cases[2];
 }
 
+// 4방향 x 3번 = 64가지 경로를 사전 순으로 만든다 (중복 순열).
 void DFS(int depth)
 {
 	if (depth == 3)
@@ -147,8 +188,10 @@ void DFS(int depth)
 	}
 }
 
+// 2) 몬스터 이동
 void moveMonster()
 {
+	// 모두 "동시에" 움직이므로 결과는 새 배열에 모은다.
 	int tmpMonster[MAX][MAX][MAX_DIR] = { 0 };
 	for (int r = 1; r <= 4; r++)
 	{
@@ -162,22 +205,24 @@ void moveMonster()
 				{
 					int nr, nc, dir;
 
+					// d, d+1, ..., 8, 1, ... 순서로 1 ~ 8 범위를 돌게 한다.
 					dir = (d + i - 1 + 8) % 8 + 1;
 					nr = r + dr8[dir];
 					nc = c + dc8[dir];
 
-					// [버그수정] 원본은 nc == packMan.c 가 아니라 packMan.c 를 그대로 참이냐로 봤다.
-					//            packMan.c 는 1~4라 항상 참이 되어, 행만 같으면 막힌 것으로 오판한다.
-					if ((nr == packMan.r && nc == packMan.c)
+					// 팩맨 칸 / 시체 칸 / 격자 밖이면 다음 방향
+					// [버그 3] packMan.c -> nc == packMan.c
+					if ((nr == packMan.r && nc == packMan.c)   // [버그수정] 원본은 nc 비교가 빠져 행만 같으면 막힌 칸으로 봤다
 						|| deadBody[nr][nc] != 0
 						|| grid[nr][nc] == true) continue;
 					else
 					{
+						// 바뀐 방향(dir)을 그대로 가진 채 옮겨 간다.
 						tmpMonster[nr][nc][dir] += monster[r][c][d];
 						break;
 					}
 				}
-				//이동 불가
+				//이동 불가 : 방향도 원래대로 제자리
 				if (i == 8) tmpMonster[r][c][d] += monster[r][c][d];
 			}
 		}
@@ -187,8 +232,10 @@ void moveMonster()
 }
 
 
+// step번 경로로 갔을 때 먹는 몬스터 수. 격자 밖으로 나가면 -1.
 int getMonster(int step)
 {
+	// 실제 상태를 건드리지 않도록 팩맨과 몬스터를 복사해서 시뮬레이션한다.
 	PACKMAN tmpPackMan = packMan;
 	int tmpMonster[MAX][MAX][MAX_DIR] = { 0 };
 
@@ -204,6 +251,7 @@ int getMonster(int step)
 
 		if (grid[nr][nc] == true) return -1;
 
+		// 먹은 칸은 0으로 비워 같은 칸을 다시 지날 때 두 번 세지 않는다.
 		for (int d = 1; d <= 8; d++)
 		{
 			count += tmpMonster[nr][nc][d];
@@ -217,6 +265,7 @@ int getMonster(int step)
 	return count;
 }
 
+// 3) 고른 경로로 실제로 이동하며 먹고, 먹은 칸에 시체를 남긴다.
 void movePackMan(int step)
 {
 	for (int i = 0; i < 3; i++)
@@ -226,12 +275,13 @@ void movePackMan(int step)
 		nr = packMan.r + dr4[position[step][i]];
 		nc = packMan.c + dc4[position[step][i]];
 
+		// 몬스터가 실제로 있었던 칸에만 시체가 생긴다.
 		for (int d = 1; d <= 8; d++)
 		{
 			if (monster[nr][nc][d] == 0) continue;
 
 			monster[nr][nc][d] = 0;
-			deadBody[nr][nc] = 3;
+			deadBody[nr][nc] = 3; // 곧바로 disappear()에서 1 줄어 2턴 남는다.
 		}
 
 		packMan.r = nr;
@@ -240,6 +290,7 @@ void movePackMan(int step)
 }
 
 
+// 4) 시체 수명 1 감소
 void disappear()
 {
 	for (int r = 1; r <= 4; r++)
@@ -261,10 +312,10 @@ void simulate()
 
 		int step, maxMonster;
 
-		// [버그수정] 원본은 1로 시작해서 0마리/1마리만 먹는 경로를 절대 고르지 못했다.
-		//            (벽이면 getMonster가 -1을 주므로 -1에서 시작해야 한다)
-		step = maxMonster = -1;
+		// [버그 4] -1로 시작해야 0마리, 1마리 경로도 고를 수 있다.
+			step = maxMonster = -1;   // [버그수정] 원본은 1이라 0~1마리만 먹는 경로를 고르지 못한다
 
+		// 사전 순으로 보면서 "더 클 때만" 갱신 -> 동점이면 앞선 경로가 남는다.
 		for (int i = 0; i < 64; i++)
 		{
 			int tmp = getMonster(i);

@@ -1,5 +1,9 @@
 /*
 	[코드트리] 2018 상반기 오전 2번 - 디버깅
+	원본 : swtest/코드트리_2018_상반기오전2번_디버깅.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
 	https://www.codetree.ai/training-field/frequent-problems/problems/debugging
 	(= 백준 15684 사다리 조작, 이쪽이 테스트 케이스가 더 강하다)
 	https://www.acmicpc.net/problem/15684

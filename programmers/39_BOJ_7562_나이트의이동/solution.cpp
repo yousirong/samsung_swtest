@@ -1,0 +1,188 @@
+/*
+	[BOJ] 7562 - 나이트의 이동
+	원본 : swtest/39_BOJ_7562_나이트의이동.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	https://www.acmicpc.net/problem/7562
+
+	■ 문제 요약
+	  L x L 체스판에서 나이트가 시작 칸에서 목표 칸까지 가는 최소 이동 횟수를 구한다.
+	  테스트 케이스가 T개 주어진다.
+
+	■ 풀이 방침
+	  나이트는 한 칸씩 걷는 대신 8가지 형태로 점프하지만,
+	  "한 번 움직이는 비용이 모두 1"이라는 점은 미로 문제와 똑같다.
+	  따라서 방향 배열만 나이트의 8방향으로 바꾼 평범한 BFS로 최단 횟수를 구할 수 있다.
+
+	    dr/dc 8쌍 = (±1, ±2)와 (±2, ±1)의 모든 조합
+
+	■ 구현 포인트 : MAP 한 장으로 방문 여부와 거리를 함께 관리
+	    MAP[r][c] == 0 : 아직 방문 안 함
+	    MAP[r][c] == 1 : 시작 칸
+	    MAP[r][c] == k : 시작 칸에서 k-1번 움직여 도달한 칸
+
+	  0을 "미방문"으로 쓰기 때문에 거리를 0이 아니라 1부터 시작해야 하고,
+	  그래서 답을 낼 때 -1을 해 준다.
+
+	■ 주의할 점
+	  1) 좌표가 0-based다 (0 ~ L-1). 그래서 테두리를 막아 두는 방식 대신
+	     명시적으로 범위 검사를 한다.
+	  2) 테스트 케이스마다 MAP을 0으로 초기화해야 한다.
+	     이전 케이스의 거리 값이 남아 있으면 전부 방문한 칸으로 오인된다.
+	  3) 시작 칸과 목표 칸이 같으면 큐에서 꺼내자마자 MAP 값 1 - 1 = 0이 반환된다.
+	     별도 예외 처리 없이 맞는 답이 나온다.
+*/
+
+#include <stdio.h>
+#include <vector>              // [추가] 함수형 인자/반환용
+
+#define MAX (300 + 30)
+
+int T;                  // 테스트 케이스 수
+int L;                  // 체스판 한 변의 길이
+int sr, sc;             // 시작 좌표
+int er, ec;             // 목표 좌표
+int MAP[MAX][MAX];      // 방문 여부 + 이동 횟수(1부터) 저장
+
+// 좌표 한 쌍
+struct RC
+{
+	int r;   // row
+	int c;   // col
+};
+
+typedef struct RC RC;
+
+RC queue[MAX * MAX];    // BFS용 큐 (한 칸이 최대 한 번 들어간다)
+
+// 나이트의 8가지 점프 : (행, 열)이 (±1, ±2) 또는 (±2, ±1)
+int dr[] = { -2, -1, 1, 2, 2, 1, -1, -2 };
+int dc[] = { 1,  2, 2, 1, -1, -2, -2, -1 };
+
+// ---------------------------
+// 입력 (테스트 케이스 하나)
+// ---------------------------
+// [수정] scanf 대신 인자로 받는다
+void input(int l, int startR, int startC, int endR, int endC)
+{
+	L = l;        // [수정] scanf("%d %d %d %d %d", ...) 대체
+	sr = startR;
+	sc = startC;
+	er = endR;
+	ec = endC;
+
+	// 케이스마다 반드시 초기화. 0 = 아직 방문하지 않음.
+	for (int r = 0; r < L; r++)
+	{
+		for (int c = 0; c < L; c++)
+		{
+			MAP[r][c] = 0;
+		}
+	}
+}
+
+// ---------------------------
+// 디버그용 출력
+// ---------------------------
+void printMap()
+{
+	for (int r = 0; r < L; r++)
+	{
+		for (int c = 0; c < L; c++)
+			printf("%d ", MAP[r][c]);
+		putchar('\n');
+	}
+	putchar('\n');
+}
+
+// ---------------------------
+// BFS : (r, c)에서 (er, ec)까지의 최소 이동 횟수
+// ---------------------------
+int BFS(int r, int c)
+{
+	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
+
+	rp = wp = 0;
+
+	// 시작 칸을 큐에 넣는다
+	queue[wp].r = r;
+	queue[wp++].c = c;
+
+	// 시작 칸을 1로 표시 (0은 미방문을 뜻하므로 거리를 1부터 센다)
+	MAP[r][c] = 1;
+
+	while (rp < wp)
+	{
+		RC out = queue[rp++];
+
+		// BFS는 가까운 칸부터 꺼내므로, 처음 꺼낸 목표 칸이 최단이다
+		if (out.r == er && out.c == ec)
+			return MAP[out.r][out.c] - 1;   // 1부터 셌으니 하나 뺀다
+
+		// 나이트의 8방향 점프
+		for (int i = 0; i < 8; i++)
+		{
+			int nr, nc;
+
+			nr = out.r + dr[i];
+			nc = out.c + dc[i];
+
+			// 체스판 밖 (0-based라 0 ~ L-1이 유효 범위)
+			if (nr < 0 || nc < 0 || nr > L - 1 || nc > L - 1)
+				continue;
+
+			// 0이 아니면 이미 방문한 칸 = 더 짧은 경로로 이미 도달했다
+			if (MAP[nr][nc] != 0)
+				continue;
+
+			queue[wp].r = nr;
+			queue[wp++].c = nc;
+
+			// 값을 넣는 순간이 방문 표시이자 거리 기록
+			MAP[nr][nc] = MAP[out.r][out.c] + 1;
+		}
+	}
+
+	// 나이트는 체스판 어디든 갈 수 있어 실제로는 도달하지만, 방어적으로 -1
+	return -1;
+}
+
+// ---------------------------
+// 메인
+// ---------------------------
+// [수정] main() -> solution(). 원본의 T 루프는 하네스로 옮기고 한 케이스만 처리한다.
+int solution(int l, int startR, int startC, int endR, int endC)
+{
+	input(l, startR, startC, endR, endC);
+
+	return BFS(sr, sc);   // [수정] printf -> return
+}
+
+// ==========================================================
+// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
+// ==========================================================
+#ifdef LOCAL_TEST
+int main()
+{
+	int t;
+	scanf("%d", &t);
+
+	for (int tc = 0; tc < t; tc++)
+	{
+		int l, a, b, c, d;
+		scanf("%d %d %d %d %d", &l, &a, &b, &c, &d);
+
+		int ans = solution(l, a, b, c, d);
+
+#ifdef REPEAT_TEST
+		int ans2 = solution(l, a, b, c, d);
+		if (ans != ans2) { printf("!! NOT RE-ENTRANT: %d vs %d\n", ans, ans2); return 1; }
+#endif
+
+		printf("%d\n", ans);
+	}
+
+	return 0;
+}
+#endif

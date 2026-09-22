@@ -1,5 +1,46 @@
+/*
+	[코드트리] 2021 하반기 오전 1번 - 정육면체 한번 더 굴리기
+	원본 : swtest/코드트리_2021_하반기오전1번_정육면제한번더굴리기.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+	[버그수정] 원본에 있던 버그는 이 사본에서 고쳐 옮겼다. 고친 자리마다 // [버그수정] 표시가 있다.
+
+	https://www.codetree.ai/ko/frequent-problems/samsung-sw/problems/cube-rounding-again/description
+	(백준 23288 "주사위 굴리기 2"와 같은 문제다)
+
+	■ 문제 요약
+	  N x N 격자의 각 칸에 1 ~ 6 숫자가 있고, (1, 1)에 정육면체(주사위)가 놓여 있다.
+	  처음 상태는 윗면 1, 남쪽 면 2, 동쪽 면 3 (마주 보는 면의 합은 7)이고 오른쪽(동)을 향한다.
+	  M번 아래를 반복한다.
+
+	    1) 이동 : 보는 방향으로 한 칸 굴린다. 격자 밖이면 방향을 반대로 바꿔 굴린다.
+	    2) 점수 : 도착 칸과 같은 숫자로 상하좌우 연결된 칸 수 x 그 숫자를 얻는다.
+	    3) 회전 : 아랫면 > 칸 숫자면 시계 방향 90도, 작으면 반시계 90도, 같으면 그대로.
+
+	  M번 동안 얻은 점수의 합을 출력한다.
+
+	■ 풀이 방침
+	  - 점수판을 미리 만든다 : 격자는 바뀌지 않으므로 칸마다 "같은 숫자 덩어리 크기 x 숫자"를
+	    처음에 BFS로 한 번만 계산해 scoreBoard에 적어 둔다.
+	    BFS가 끝났을 때 큐에 들어간 원소 수(wp)가 곧 덩어리 크기다.
+	  - 주사위는 6면을 전개도 모양 그대로 이름 붙여 들고 굴릴 때마다 면을 옮긴다.
+
+	          up                (북쪽 면)
+	    left  top  right        (서쪽, 윗면, 동쪽)
+	          down              (남쪽 면)
+	          bottom            (아랫면)
+
+	  - 방향 전환은 표 3개(반대, 시계, 반시계)로 처리한다.
+
+	■ 주의할 점
+	  [버그] simulate()에서 서쪽으로 굴릴 때 moveWest()가 아니라 moveEast()를 부른다.
+	         -> else if (dir == WEST) moveWest();
+	         고친 코드와 랜덤 입력 200개를 비교하면 155개에서 답이 다르다.
+	  [주석 오류] dr/dc 위 주석이 "-, 동, 서, 남, 북"인데 실제 값은 3번이 북(-1), 4번이 남(+1)이다.
+	         #define(NORTH 3, SOUTH 4)과 값은 맞고 주석만 틀렸다.
+*/
 #include <stdio.h>
-#include <vector>              // [추가] 함수형 인자/반환용	
+#include <vector>              // [추가] 함수형 인자/반환용
 
 #define MAX (20 +5)
 
@@ -13,8 +54,9 @@ int N, M;
 int MAP[MAX][MAX];
 
 bool visit[MAX][MAX];
-int scoreBoard[MAX][MAX];
+int scoreBoard[MAX][MAX]; // 그 칸에 도착했을 때 얻는 점수
 
+// 전개도 모양으로 6면을 둔다.
 struct CUBE
 {
 	int up;
@@ -34,6 +76,7 @@ struct RC
 RC queue[MAX * MAX];
 
 // -, 동, 서, 남, 북
+// [주석 오류] 실제 순서는 -, 동, 서, 북, 남 이다. (#define NORTH 3, SOUTH 4와 일치)
 int dr[] = { 0,0,0,-1,1 };
 int dc[] = { 0,1,-1,0,0 };
 
@@ -67,6 +110,10 @@ void printCube() // for debug
 	printf("   %d\n", cube.bottom);
 }
 
+// 굴리기 4개 : tmp에 굴리기 전 값을 받아 두고 바뀌는 4면만 옮긴다.
+// tmp 인덱스 : 0 up, 1 left, 2 top, 3 right, 4 down, 5 bottom
+
+// 동쪽으로 굴림 : 윗면 -> 동, 동 -> 아래, 아래 -> 서, 서 -> 윗면 (up, down은 그대로)
 void moveEast()
 {
 	int tmp[6] = { cube.up, cube.left, cube.top, cube.right, cube.down, cube.bottom };
@@ -77,6 +124,7 @@ void moveEast()
 	cube.left = tmp[5];
 }
 
+// 서쪽으로 굴림 : 윗면 -> 서, 서 -> 아래, 아래 -> 동, 동 -> 윗면
 void moveWest()
 {
 	int tmp[6] = { cube.up, cube.left, cube.top, cube.right, cube.down, cube.bottom };
@@ -87,6 +135,7 @@ void moveWest()
 	cube.left = tmp[2];
 }
 
+// 북쪽으로 굴림 : 윗면 -> 북, 북 -> 아래, 아래 -> 남, 남 -> 윗면 (left, right는 그대로)
 void moveNorth()
 {
 	int tmp[6] = { cube.up, cube.left, cube.top, cube.right, cube.down, cube.bottom };
@@ -97,6 +146,7 @@ void moveNorth()
 	cube.bottom = tmp[0];
 }
 
+// 남쪽으로 굴림 : 윗면 -> 남, 남 -> 아래, 아래 -> 북, 북 -> 윗면
 void moveSouth()
 {
 	int tmp[6] = { cube.up, cube.left, cube.top, cube.right, cube.down, cube.bottom };
@@ -107,6 +157,7 @@ void moveSouth()
 	cube.bottom = tmp[4];
 }
 
+// (r, c)와 같은 숫자로 연결된 덩어리를 찾아 점수(숫자 x 크기)를 덩어리 전체에 적는다.
 void BFS(int r, int c)
 {
 	int number;
@@ -143,6 +194,7 @@ void BFS(int r, int c)
 		}
 	}
 
+	// 큐에 들어간 칸들이 곧 덩어리이고, wp가 그 크기다.
 	for (int i = 0; i < wp; i++)
 	{
 		int r, c;
@@ -154,6 +206,7 @@ void BFS(int r, int c)
 	}
 }
 
+// 모든 덩어리의 점수를 미리 계산한다. (격자는 변하지 않으므로 한 번이면 된다)
 void makeScoreBoard()
 {
 	for (int r = 1; r <= N; r++)
@@ -200,6 +253,7 @@ int simulate()
 	sr = sc = 1;
 	dir = EAST;
 
+	// 처음 상태 : 윗면 1, 남 2, 동 3 -> 나머지는 7에서 뺀 값
 	cube.up = 5;
 	cube.left = 4; cube.top = 1; cube.right = 3;
 	cube.down = 2;
@@ -214,6 +268,7 @@ int simulate()
 		nr = sr + dr[dir];
 		nc = sc + dc[dir];
 
+		// 격자 밖이면 반대 방향으로 굴린다. (바뀐 방향은 계속 유지)
 		if (nr<1 || nc<1 || nr>N || nc> N)
 		{
 			dir = changeDir[dir];
@@ -222,12 +277,14 @@ int simulate()
 		}
 
 		if (dir == EAST) moveEast();
-		else if (dir == WEST) moveEast();
+		// [버그] moveWest()를 불러야 한다.
+		else if (dir == WEST) moveWest();   // [버그수정] 원본은 moveEast()를 불렀다
 		else if (dir == NORTH) moveNorth();
 		else if (dir == SOUTH) moveSouth();
 
 		score += scoreBoard[nr][nc];
 
+		// 아랫면과 칸 숫자를 비교해 다음 방향을 정한다.
 		int A = cube.bottom;
 		int B = MAP[nr][nc];
 

@@ -1,0 +1,210 @@
+/*
+	[BOJ] 1260 - DFS와 BFS
+	원본 : swtest/26_BOJ_1260_DFS와BFS.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
+	https://www.acmicpc.net/problem/1260
+
+	■ 문제 요약
+	  정점 N개, 간선 M개인 무방향 그래프와 시작 정점 V가 주어진다.
+	  같은 그래프를 DFS로 한 번, BFS로 한 번 탐색하며 방문 순서를 각각 출력한다.
+	  방문할 수 있는 정점이 여러 개면 반드시 "번호가 작은 정점"부터 방문해야 한다.
+
+	■ 풀이 방침
+	  인접 행렬로 그래프를 담으면 이웃을 1번부터 N번까지 순서대로 훑게 되므로
+	  "작은 번호 우선"이라는 조건이 별도 정렬 없이 저절로 지켜진다.
+	  (인접 리스트로 풀 때는 입력 순서가 뒤죽박죽이라 정렬이 따로 필요하다.)
+
+	    DFS : 재귀. 들어가자마자 출력하고, 갈 수 있는 가장 작은 번호로 계속 파고든다.
+	    BFS : 큐.   꺼낼 때 출력하고, 이웃을 작은 번호부터 큐에 넣는다.
+
+	  두 탐색 모두 정점마다 행 하나를 훑으므로 O(N^2)이다. N <= 1000이라 충분하다.
+
+	■ 주의할 점
+	  1) DFS와 BFS가 visit 배열을 공유하므로, DFS가 끝난 뒤 반드시 초기화하고 BFS를 돌려야 한다.
+	     이 초기화를 빼먹으면 BFS는 시작 정점 하나만 출력하고 끝나 버린다.
+	  2) 출력 시점이 서로 다르다.
+	     DFS는 "함수에 들어간 순간", BFS는 "큐에서 꺼낸 순간"이 방문 시점이다.
+	  3) BFS의 방문 표시는 큐에 "넣을 때" 해야 중복 삽입이 생기지 않는다.
+	  4) 시작 정점과 연결되지 않은 정점은 아예 출력되지 않는다. 문제 조건상 그게 맞다.
+*/
+
+#include <stdio.h>
+#include <vector>              // [추가] 함수형 인자/반환용
+#include <stdbool.h>
+
+#define MAX (1000 + 50)
+
+int N, M, V;          // N: 정점 수, M: 간선 수, V: 탐색을 시작할 정점
+int MAP[MAX][MAX];    // 인접 행렬. MAP[a][b] == 1 이면 a-b 연결
+
+int queue[MAX * MAX]; // BFS용 큐 (실제로는 정점 수만큼만 있으면 충분하다)
+bool visit[MAX];      // 방문 여부
+std::vector<int> order;   // [추가] 방문 순서를 담는 목록 (원본의 printf 자리)
+
+// ---------------------------
+// 입력
+// ---------------------------
+// [수정] scanf 대신 인자로 받는다
+void input(int n, int v, const std::vector<std::vector<int>>& edges)
+{
+	N = n;                        // [수정] scanf("%d %d %d", &N, &M, &V) 대체
+	M = (int)edges.size();
+	V = v;
+
+	// [추가] 재호출 대비 : 인접 행렬과 방문 표시를 비운다
+	for (int a = 1; a <= N; a++)
+	{
+		visit[a] = false;
+		for (int b = 1; b <= N; b++) MAP[a][b] = 0;
+	}
+
+	// 간선 M개
+	for (int i = 0; i < M; i++)
+	{
+		int n1 = edges[i][0];   // [수정] scanf 대체
+		int n2 = edges[i][1];
+
+		// 무방향 그래프이므로 양방향 모두 표시
+		// (같은 간선이 중복 입력돼도 1로 덮어쓰므로 문제없다)
+		MAP[n1][n2] = 1;
+		MAP[n2][n1] = 1;
+	}
+}
+
+// ---------------------------
+// 디버그용: 인접 행렬 출력
+// ---------------------------
+void printMap()
+{
+	for (int r = 1; r <= N; r++)
+	{
+		for (int c = 1; c <= N; c++)
+			printf("%d ", MAP[r][c]);
+		putchar('\n');
+	}
+	putchar('\n');
+}
+
+// ---------------------------
+// DFS (깊이 우선 탐색)
+//
+// 갈 수 있는 가장 작은 번호로 끝까지 내려갔다가, 막히면 되돌아와 다음 가지를 본다.
+// ---------------------------
+void DFS(int node)
+{
+	// 재진입을 막기 위해 들어오자마자 방문 표시
+	visit[node] = true;
+
+	// DFS의 방문 시점 = 함수에 들어온 순간
+	order.push_back(node);   // [수정] printf -> 목록에 담기
+
+	// 1번부터 N번까지 순서대로 보므로 자연히 "작은 번호 우선"이 된다
+	for (int c = 1; c <= N; c++)
+	{
+		// 연결이 없거나 이미 방문했으면 건너뛴다
+		if (MAP[node][c] == 0 || visit[c] == true)
+			continue;
+
+		// 더 깊이 내려간다
+		DFS(c);
+	}
+}
+
+// ---------------------------
+// BFS (너비 우선 탐색)
+//
+// 시작 정점에서 가까운 정점부터 차례대로 방문한다.
+// ---------------------------
+void BFS(int node)
+{
+	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
+
+	rp = wp = 0;
+
+	// 시작 정점을 큐에 넣고 바로 방문 표시
+	queue[wp++] = node;
+	visit[node] = true;
+
+	// 처리할 원소가 남아 있는 동안
+	while (rp < wp)
+	{
+		int out = queue[rp++];
+
+		// BFS의 방문 시점 = 큐에서 꺼낸 순간
+		order.push_back(out);   // [수정] printf -> 목록에 담기
+
+		// 이웃을 작은 번호부터 확인해서 큐에 넣는다
+		for (int c = 1; c <= N; c++)
+		{
+			if (MAP[out][c] == 0 || visit[c] == true)
+				continue;
+
+			queue[wp++] = c;
+
+			// 넣는 즉시 표시해야 같은 정점이 두 번 들어가지 않는다
+			visit[c] = true;
+		}
+	}
+}
+
+// ---------------------------
+// 메인
+// ---------------------------
+// [수정] main() -> solution().
+// 원본은 DFS 순서와 BFS 순서를 두 줄로 출력했다. 두 줄을 그대로 2차원 배열로 반환한다.
+std::vector<std::vector<int>> solution(int n, int v, std::vector<std::vector<int>> edges)
+{
+	input(n, v, edges);
+
+	// 1) DFS 방문 순서
+	order.clear();   // [추가] 결과를 담을 목록 비우기
+	DFS(V);
+	std::vector<int> dfsOrder = order;
+
+	// 2) BFS를 돌리기 전에 visit을 반드시 초기화한다.
+	//    DFS가 이미 전부 true로 만들어 놨기 때문에, 빼먹으면 BFS 결과가 통째로 틀린다.
+	for (int i = 1; i <= N; i++)
+		visit[i] = false;
+
+	// 3) BFS 방문 순서
+	order.clear();
+	BFS(V);
+	std::vector<int> bfsOrder = order;
+
+	std::vector<std::vector<int>> answer;   // [수정] printf -> 두 줄을 그대로 반환
+	answer.push_back(dfsOrder);
+	answer.push_back(bfsOrder);
+
+	return answer;
+}
+
+// ==========================================================
+// [추가] 로컬 대조용 하네스. 제출할 때는 이 블록 전체를 지운다.
+// 원본 출력 형식("%d " 뒤에 줄바꿈)을 그대로 흉내 낸다.
+// ==========================================================
+#ifdef LOCAL_TEST
+int main()
+{
+	int n, m, v;
+	scanf("%d %d %d", &n, &m, &v);
+
+	std::vector<std::vector<int>> edges(m, std::vector<int>(2));
+	for (int i = 0; i < m; i++) scanf("%d %d", &edges[i][0], &edges[i][1]);
+
+	std::vector<std::vector<int>> ans = solution(n, v, edges);
+
+#ifdef REPEAT_TEST
+	if (solution(n, v, edges) != ans) { printf("!! NOT RE-ENTRANT\n"); return 1; }
+#endif
+
+	for (size_t i = 0; i < ans.size(); i++)
+	{
+		for (size_t k = 0; k < ans[i].size(); k++) printf("%d ", ans[i][k]);
+		putchar('\n');
+	}
+
+	return 0;
+}
+#endif

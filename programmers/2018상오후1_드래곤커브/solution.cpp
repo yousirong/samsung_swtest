@@ -1,5 +1,9 @@
 /*
 	[코드트리] 2018 상반기 오후 1번 - 드래곤 커브
+	원본 : swtest/코드트리_2018_상반기오후1번_드래곤커브.cpp
+	[프로그래머스 함수형 사본]  main() 대신 solution()이 값을 받고 돌려준다.
+	원본 : swtest/ 아래 같은 이름의 파일. 로직은 그대로 두고 입출력 껍데기만 바꿨다.
+
 	https://www.codetree.ai/training-field/frequent-problems/problems/dragon-curve
 
 	■ 문제 요약
