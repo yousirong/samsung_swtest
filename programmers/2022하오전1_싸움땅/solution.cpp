@@ -281,9 +281,7 @@ vector<int> solution(int k, vector<vector<int>> guns, vector<vector<int>> player
 
 	simulate();
 
-	vector<int> answer;   // [수정] printf -> 목록으로 반환
-	for (int m = 1; m <= M; m++)
-		answer.push_back(SCORE[m]);
+	// [수정] printf -> 반환. 점수는 이미 SCORE[1..M] 에 있다.
 
-	return answer;
+	return vector<int>(SCORE + 1, SCORE + 1 + M);
 }

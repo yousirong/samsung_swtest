@@ -48,7 +48,8 @@ int strcmp(const char* a, const char* b)
 // ---------------------------
 vector<int> solution(vector<string> commands)
 {
-	vector<int> answer;   // [추가] 원본이 printf 하던 값들을 모은다
+	int out[MAX];        // [추가] 원본이 printf 하던 값들을 담아 둔다
+	int ocnt = 0;        // [추가] out에 담긴 개수
 
 	// 배열 중앙에서 시작해야 앞/뒤 어느 쪽으로도 늘어날 수 있다
 	// (원본에서 main 첫 줄에 있던 초기화. 재호출 대비 역할도 겸한다)
@@ -92,10 +93,10 @@ vector<int> solution(vector<string> commands)
 		else if (strcmp(command, "pop_front") == 0)
 		{
 			if (back == front)
-				answer.push_back(-1);   // [수정] printf("-1\n") -> push_back
+				out[ocnt++] = -1;   // [수정] printf("-1\n") -> 결과 배열에 담기
 			else
 				// 현재 front를 출력하고 한 칸 전진
-				answer.push_back(deque[front++]);   // [수정] printf -> push_back
+				out[ocnt++] = deque[front++];   // [수정] printf -> 결과 배열에 담기
 		}
 
 		// ---------------------------
@@ -104,10 +105,10 @@ vector<int> solution(vector<string> commands)
 		else if (strcmp(command, "pop_back") == 0)
 		{
 			if (back == front)
-				answer.push_back(-1);   // [수정] printf -> push_back
+				out[ocnt++] = -1;   // [수정] printf -> 결과 배열에 담기
 			else
 				// 한 칸 물러난 자리가 곧 마지막 원소다
-				answer.push_back(deque[--back]);   // [수정] printf -> push_back
+				out[ocnt++] = deque[--back];   // [수정] printf -> 결과 배열에 담기
 		}
 
 		// ---------------------------
@@ -115,7 +116,7 @@ vector<int> solution(vector<string> commands)
 		// ---------------------------
 		else if (strcmp(command, "size") == 0)
 		{
-			answer.push_back(back - front);   // [수정] printf -> push_back
+			out[ocnt++] = back - front;   // [수정] printf -> 결과 배열에 담기
 		}
 
 		// ---------------------------
@@ -123,7 +124,7 @@ vector<int> solution(vector<string> commands)
 		// ---------------------------
 		else if (strcmp(command, "empty") == 0)
 		{
-			answer.push_back((back == front) ? 1 : 0);   // [수정] printf -> push_back
+			out[ocnt++] = (back == front) ? 1 : 0;   // [수정] printf -> 결과 배열에 담기
 		}
 
 		// ---------------------------
@@ -132,9 +133,9 @@ vector<int> solution(vector<string> commands)
 		else if (strcmp(command, "front") == 0)
 		{
 			if (back == front)
-				answer.push_back(-1);   // [수정] printf -> push_back
+				out[ocnt++] = -1;   // [수정] printf -> 결과 배열에 담기
 			else
-				answer.push_back(deque[front]);   // [수정] printf -> push_back
+				out[ocnt++] = deque[front];   // [수정] printf -> 결과 배열에 담기
 		}
 
 		// ---------------------------
@@ -143,11 +144,11 @@ vector<int> solution(vector<string> commands)
 		else if (strcmp(command, "back") == 0)
 		{
 			if (back == front)
-				answer.push_back(-1);   // [수정] printf -> push_back
+				out[ocnt++] = -1;   // [수정] printf -> 결과 배열에 담기
 			else
-				answer.push_back(deque[back - 1]);   // [수정] printf -> push_back
+				out[ocnt++] = deque[back - 1];   // [수정] printf -> 결과 배열에 담기
 		}
 	}
 
-	return answer;   // [수정] return 0 -> 결과 배열 반환
+	return vector<int>(out, out + ocnt);
 }

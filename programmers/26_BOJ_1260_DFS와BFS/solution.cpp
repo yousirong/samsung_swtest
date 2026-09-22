@@ -176,9 +176,9 @@ vector<vector<int>> solution(int n, int v, vector<vector<int>> edges)
 	BFS(V);
 	vector<int> bfsOrder(order, order + ocnt);
 
-	vector<vector<int>> answer;   // [수정] printf -> 두 줄을 그대로 반환
-	answer.push_back(dfsOrder);
-	answer.push_back(bfsOrder);
+	vector<vector<int>> answer(2);   // [수정] printf -> 두 줄을 그대로 반환
+	answer[0] = dfsOrder;
+	answer[1] = bfsOrder;
 
 	return answer;
 }

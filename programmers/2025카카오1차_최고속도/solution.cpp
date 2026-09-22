@@ -458,9 +458,7 @@ vector<int> solution(vector<vector<int>> city, vector<vector<int>> road)
 
 	solve();
 
-	vector<int> result;   // [수정] printf -> 목록으로 반환
-	for (int i = 1; i < N; i++)
-		result.push_back(answer[i]);
+	// [수정] printf -> 반환. 답은 이미 answer[1..N-1] 에 있다.
 
-	return result;
+	return vector<int>(answer + 1, answer + N);
 }

@@ -87,7 +87,8 @@ void printStack()
 // 출력이 있는 명령(pop, size, empty, top)의 결과만 순서대로 담아 반환한다.
 vector<int> solution(vector<string> commands)
 {
-	vector<int> answer;
+	int out[MAX];        // [추가] 원본이 printf 하던 값들을 담아 둔다
+	int ocnt = 0;        // [추가] out에 담긴 개수
 
 	sp = 0;   // [추가] 재호출 대비 : 빈 스택으로 시작
 	N = (int)commands.size();   // [수정] scanf("%d", &N) 대체
@@ -117,9 +118,9 @@ vector<int> solution(vector<string> commands)
 		{
 			if (sp != 0)
 				// --sp로 먼저 내려간 자리가 곧 기존의 맨 위 원소다
-				answer.push_back(stack[--sp]);   // [수정] printf -> 결과 목록에 담기
+				out[ocnt++] = stack[--sp];   // [수정] printf -> 결과 목록에 담기
 			else
-				answer.push_back(-1);            // 비어 있으면 -1
+				out[ocnt++] = -1;            // 비어 있으면 -1
 		}
 
 		// ---------------------------
@@ -127,7 +128,7 @@ vector<int> solution(vector<string> commands)
 		// ---------------------------
 		else if (strCompare(command, "size") == 0)
 		{
-			answer.push_back(sp);
+			out[ocnt++] = sp;
 		}
 
 		// ---------------------------
@@ -135,7 +136,7 @@ vector<int> solution(vector<string> commands)
 		// ---------------------------
 		else if (strCompare(command, "empty") == 0)
 		{
-			answer.push_back(sp != 0 ? 0 : 1);
+			out[ocnt++] = sp != 0 ? 0 : 1;
 		}
 
 		// ---------------------------
@@ -145,11 +146,11 @@ vector<int> solution(vector<string> commands)
 		{
 			if (sp != 0)
 				// sp는 "다음 자리"이므로 맨 위는 sp-1
-				answer.push_back(stack[sp - 1]);
+				out[ocnt++] = stack[sp - 1];
 			else
-				answer.push_back(-1);
+				out[ocnt++] = -1;
 		}
 	}
 
-	return answer;
+	return vector<int>(out, out + ocnt);
 }

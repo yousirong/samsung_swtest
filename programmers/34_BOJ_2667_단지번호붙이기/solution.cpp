@@ -183,10 +183,7 @@ vector<int> solution(vector<vector<int>> board)
 		}
 	}
 
-	// [수정] printf -> 목록으로 반환 (단지 수 = answer.size())
-	vector<int> answer;
-	for (int i = 0; i < ansCount; i++)
-		answer.push_back(answers[i]);
+	// [수정] printf -> 반환 (단지 수 = 목록 길이). 값은 이미 answers[] 배열에 있다.
 
-	return answer;
+	return vector<int>(answers, answers + ansCount);
 }

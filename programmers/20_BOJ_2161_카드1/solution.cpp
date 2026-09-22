@@ -48,7 +48,8 @@ int rp, wp;           // rp: 맨 위 카드 위치, wp: 다음에 넣을 위치
 // 여기서는 버린 순서 + 마지막 카드를 한 목록에 담아 반환한다. (길이 N)
 vector<int> solution(int n)
 {
-	vector<int> answer;
+	int out[MAX];        // [추가] 원본이 printf 하던 값들을 담아 둔다
+	int ocnt = 0;        // [추가] out에 담긴 개수
 
 	N = n;   // [수정] scanf("%d", &N) 대체
 
@@ -62,7 +63,7 @@ vector<int> solution(int n)
 	for (int i = 0; i < N - 1; i++)
 	{
 		// 1) 맨 위 카드를 버린다 (버리는 순서가 곧 정답)
-		answer.push_back(queue[rp++]);   // [수정] printf -> 목록에 담기
+		out[ocnt++] = queue[rp++];   // [수정] printf -> 목록에 담기
 
 		// 2) 그다음 카드를 빼서(rp++) 제일 아래에 넣는다(wp++)
 		queue[wp++] = queue[rp++];
@@ -71,7 +72,7 @@ vector<int> solution(int n)
 	// 마지막에 남은 카드.
 	// 마지막으로 쓰인 자리가 wp-1이고 그 자리에 남은 한 장이 있다.
 	// (N == 1이면 반복이 없으므로 처음 넣은 카드 1이 그대로 들어간다)
-	answer.push_back(queue[wp - 1]);
+	out[ocnt++] = queue[wp - 1];
 
-	return answer;
+	return vector<int>(out, out + ocnt);
 }

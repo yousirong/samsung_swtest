@@ -96,7 +96,8 @@ void printQueue()
 // 출력이 있는 명령(pop, size, empty, front, back)의 결과만 순서대로 담아 반환한다.
 vector<int> solution(vector<string> commands)
 {
-	vector<int> answer;
+	int out[MAX];        // [추가] 원본이 printf 하던 값들을 담아 둔다
+	int ocnt = 0;        // [추가] out에 담긴 개수
 
 	// 빈 큐로 시작 (rp == wp 이면 비어 있음)
 	rp = wp = 0;   // [추가] 재호출 대비 초기화이기도 하다
@@ -127,10 +128,10 @@ vector<int> solution(vector<string> commands)
 		else if (strCompare(command, "pop") == 0)
 		{
 			if (wp == rp)
-				answer.push_back(-1);            // 비어 있음
+				out[ocnt++] = -1;            // 비어 있음
 			else
 				// queue[rp]를 담은 뒤 rp를 한 칸 앞으로 민다
-				answer.push_back(queue[rp++]);   // [수정] printf -> 결과 목록에 담기
+				out[ocnt++] = queue[rp++];   // [수정] printf -> 결과 목록에 담기
 		}
 
 		// ---------------------------
@@ -138,7 +139,7 @@ vector<int> solution(vector<string> commands)
 		// ---------------------------
 		else if (strCompare(command, "size") == 0)
 		{
-			answer.push_back(wp - rp);
+			out[ocnt++] = wp - rp;
 		}
 
 		// ---------------------------
@@ -146,7 +147,7 @@ vector<int> solution(vector<string> commands)
 		// ---------------------------
 		else if (strCompare(command, "empty") == 0)
 		{
-			answer.push_back((wp == rp) ? 1 : 0);
+			out[ocnt++] = (wp == rp) ? 1 : 0;
 		}
 
 		// ---------------------------
@@ -155,9 +156,9 @@ vector<int> solution(vector<string> commands)
 		else if (strCompare(command, "front") == 0)
 		{
 			if (wp == rp)
-				answer.push_back(-1);
+				out[ocnt++] = -1;
 			else
-				answer.push_back(queue[rp]);
+				out[ocnt++] = queue[rp];
 		}
 
 		// ---------------------------
@@ -167,11 +168,11 @@ vector<int> solution(vector<string> commands)
 		else if (strCompare(command, "back") == 0)
 		{
 			if (wp == rp)
-				answer.push_back(-1);
+				out[ocnt++] = -1;
 			else
-				answer.push_back(queue[wp - 1]);
+				out[ocnt++] = queue[wp - 1];
 		}
 	}
 
-	return answer;
+	return vector<int>(out, out + ocnt);
 }

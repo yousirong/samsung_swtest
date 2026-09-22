@@ -298,10 +298,10 @@ vector<int> solution(vector<vector<int>> castle)
 	}
 
 	// [수정] printf("%d\n%d\n%d\n", ...) -> 같은 순서로 목록 반환
-	vector<int> answer;
-	answer.push_back(answerCount - 1);   // 1) 방의 개수
-	answer.push_back(maxAnswer);         // 2) 가장 넓은 방
-	answer.push_back(maxAreaSum);        // 3) 벽 하나 없앤 뒤 가장 넓은 방
+	int out[3];
+	out[0] = answerCount - 1;   // 1) 방의 개수
+	out[1] = maxAnswer;         // 2) 가장 넓은 방
+	out[2] = maxAreaSum;        // 3) 벽 하나 없앤 뒤 가장 넓은 방
 
-	return answer;
+	return vector<int>(out, out + 3);
 }
