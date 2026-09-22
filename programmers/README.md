@@ -237,5 +237,7 @@ cmp a.out b.out          # diff 대신 cmp — 줄 끝 공백/마지막 개행 �
 
 ## 참고
 
+- STL을 처음 만나는 사람을 위한 정리는 [vector-정리.md](vector-정리.md) 에 있다 (개념 + 관용구 + 퀴즈).
+
 - 이 폴더는 `swtest.vcxproj`에 등록하지 않는다. Visual Studio 빌드 대상은 지금처럼 `swtest/` 한 개만 유지한다. 여기서는 `g++` 커맨드라인으로만 다룬다.
 - 복습 내용은 여기 쓰지 않는다. 각 문제 README에서 [docs/review](../docs/) 노트로 링크만 건다.
