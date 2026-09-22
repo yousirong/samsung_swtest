@@ -2,6 +2,12 @@
 	[프로그래머스] 2025 카카오 하반기 1차 - 최고 속도 (Lv. 3)
 	https://school.programmers.co.kr/learn/courses/30/lessons/468376
 
+	[제출하지 말 것] 이 파일은 stdin으로 읽고 printf로 출력하는 연습용이다.
+	main()만 있고 solution()이 없어서 프로그래머스에 그대로 내면 링크가 실패한다.
+	    undefined reference to `solution(vector<vector<int>>, vector<vector<int>>)`
+	제출용은 programmers/2025카카오1차_최고속도/solution.cpp 를 통째로 붙여 넣는다.
+	(그 파일의 #ifdef LOCAL_TEST 블록은 채점기에서 컴파일되지 않으니 지우지 않아도 된다)
+
 	■ 문제 요약
 	  2차원 평면에 도시 n개(점)와 도로 m개(x축 또는 y축에 평행한 선분)가 있다.
 	  도로끼리 만나는 지점에서는 서로 갈아탈 수 있고, 모든 도시는 도로 위에 있다.
