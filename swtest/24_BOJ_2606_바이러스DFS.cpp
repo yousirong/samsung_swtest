@@ -30,7 +30,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (100 + 10)  // 최대 정점 수 (문제 조건 100 + 여유)
 

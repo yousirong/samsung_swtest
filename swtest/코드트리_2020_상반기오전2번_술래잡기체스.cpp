@@ -53,7 +53,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (4 + 2)
 #define MAX_H (16 + 5)   // 말 번호 1 ~ 16

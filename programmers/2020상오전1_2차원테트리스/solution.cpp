@@ -79,7 +79,6 @@
 #include <vector>              // [추가] 함수형 인자/반환용
 
 int ansScore, ansBlockCount;   // [추가] simulate가 printf 하던 두 값을 담아 둔다
-#include <stdbool.h>
 
 using namespace std;
 

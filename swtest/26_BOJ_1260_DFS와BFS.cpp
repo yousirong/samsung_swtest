@@ -27,7 +27,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (1000 + 50)
 

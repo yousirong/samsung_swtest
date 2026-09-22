@@ -50,7 +50,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX_H (30 + 5)
 #define MAX_N (10 + 5)

@@ -33,7 +33,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (50 + 10)
 #define MAX_HOSPITAL (13 + 5)

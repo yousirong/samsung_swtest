@@ -42,7 +42,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (100 + 10)
 

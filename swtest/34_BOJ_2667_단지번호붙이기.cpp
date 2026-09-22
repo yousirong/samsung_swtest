@@ -28,7 +28,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (25 + 5)   // 문제의 최대 N은 25, 경계 여유를 위해 +5
 

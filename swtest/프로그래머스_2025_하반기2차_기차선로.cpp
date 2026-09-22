@@ -71,7 +71,6 @@
 	         들어올 수 없는 방향이면 pass()의 conn 검사에서 먼저 걸러진다.
 */
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 
 #define MAX (8+2)

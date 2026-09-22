@@ -73,7 +73,6 @@
 	    도로마다 도시 100개와 끝점/중점이 더해져도 60만 개 안쪽이다.
 */
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX_CITY (100 + 5)
 #define MAX_ROAD (1000 + 5)

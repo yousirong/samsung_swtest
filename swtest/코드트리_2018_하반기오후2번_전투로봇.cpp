@@ -52,7 +52,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (20 + 5)
 #define INF (0x7fff0000)

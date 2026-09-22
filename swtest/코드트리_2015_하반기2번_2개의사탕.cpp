@@ -53,7 +53,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (10 + 5)
 #define INF (0x7fff0000)

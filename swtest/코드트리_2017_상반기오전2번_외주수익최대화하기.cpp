@@ -46,7 +46,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (15 + 5)
 

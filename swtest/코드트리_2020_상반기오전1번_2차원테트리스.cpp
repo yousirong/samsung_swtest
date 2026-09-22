@@ -71,7 +71,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (10 + 3)
 #define MAX_K (10000 + 500)

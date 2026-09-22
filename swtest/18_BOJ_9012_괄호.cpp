@@ -28,7 +28,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 int T;   // 테스트 케이스 수
 

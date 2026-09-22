@@ -35,7 +35,6 @@
 #include <stdio.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 #include <string>              // [추가] 문자열 인자용
-#include <stdbool.h>
 
 using namespace std;
 

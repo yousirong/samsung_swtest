@@ -50,7 +50,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (20 + 5)
 #define WALL (-1)

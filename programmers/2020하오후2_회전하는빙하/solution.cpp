@@ -73,7 +73,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 #include <vector>              // [추가] 함수형 인자/반환용
 
 using namespace std;

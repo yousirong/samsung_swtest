@@ -58,7 +58,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 // 이동 횟수는 10번
 #define MAX (10 + 3)

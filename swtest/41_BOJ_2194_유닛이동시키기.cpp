@@ -36,7 +36,6 @@
 */
 
 #include <stdio.h>
-#include <stdbool.h>
 
 #define MAX (500 + 50)
 
