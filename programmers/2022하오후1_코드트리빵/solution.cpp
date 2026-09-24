@@ -1,5 +1,9 @@
 /*
 	[코드트리] 2022 하반기 오후 1번 - 코드트리 빵
+
+	[프로그래머스 제출용]  원본 : swtest/코드트리_2022_하반기오후1번_코드트리빵.cpp
+	swtest 판과 같은 코드다. input()이 인자를 받고 main()이 solution()으로 바뀐 것만 다르다.
+	로컬 대조는 같은 폴더의 local_test.cpp 로 한다 (제출에는 쓰지 않는다).
 	https://www.codetree.ai/training-field/frequent-problems/problems/codetree-mon-bread
 
 	■ 문제 요약
@@ -53,6 +57,9 @@
 	              (문제에서 항상 도달 가능하다고 보고 따로 처리하지 않았다)
 */
 #include <stdio.h>
+#include <vector>              // [추가] 함수형 인자/반환용
+
+using namespace std;
 
 #define MAX_N (15+5)
 #define MAX_M (30+5)
@@ -82,9 +89,12 @@ RC queue[MAX_N * MAX_N];
 int dr[] = { -1, 0, 0, 1 };
 int dc[] = { 0,-1,1,0 };
 
-void input()
+// [수정] scanf 대신 인자로 받는다
+// board[r][c] = 0 빈칸 / 1 베이스캠프 / 2 벽,  stores[i] = {행, 열} (i+1번 사람의 편의점)
+void input(const vector<vector<int>>& board, const vector<vector<int>>& stores)
 {
-	scanf("%d %d\n", &N, &M);
+	N = (int)board.size();        // [수정] scanf("%d %d", &N, &M) 대체
+	M = (int)stores.size();
 
 	for (int r = 0; r <= N + 1; r++)
 		for (int c = 0; c <= N + 1; c++)
@@ -92,25 +102,18 @@ void input()
 
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
+			MAP[r][c] = board[r - 1][c - 1];   // [수정] scanf 대체
 
-	// [버그] 여기서 MAP의 벽(2)을 BLOCK에 옮겨야 한다.
-	//       BLOCK에는 도착한 편의점과 사용된 베이스캠프만 적히고 벽은 한 번도 적히지 않아,
-	//       두 BFS 모두 벽을 그냥 통과한다.
-	//       -> for (int r = 1; r <= N; r++)
-	//              for (int c = 1; c <= N; c++)
-	//                  if (MAP[r][c] == WALL) BLOCK[r][c] = WALL;
-	//       (아래 입력에서 원본은 3, 벽을 막은 판은 5를 낸다.
-	//        3 1 / 1 2 0 / 0 0 0 / 0 0 0 / 1 3)
+	// [버그수정] 원본은 벽을 BLOCK에 옮기지 않아 두 BFS가 벽을 그냥 통과했다.
+	//            (3 1 / 1 2 0 / 0 0 0 / 0 0 0 / 1 3 에서 원본 3, 이 사본 5)
+	for (int r = 1; r <= N; r++)
+		for (int c = 1; c <= N; c++)
+			if (MAP[r][c] == WALL) BLOCK[r][c] = WALL;
 
 	for (int m = 1; m <= M; m++)
 	{
-		int r, c;
-
-		scanf("%d %d", &r, &c);
-
-		STORE[m].r = r;
-		STORE[m].c = c;
+		STORE[m].r = stores[m - 1][0];   // [수정] scanf 대체
+		STORE[m].c = stores[m - 1][1];
 	}
 }
 
@@ -393,16 +396,10 @@ int simulate()
 
 }
 
-int main()
+// [수정] main() -> solution()
+int solution(vector<vector<int>> board, vector<vector<int>> stores)
 {
-	// scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
-	{
-		input();
+	input(board, stores);
 
-		printf("%d\n", simulate());
-	}
-
-	return 0;
+	return simulate();   // [수정] printf -> return
 }
