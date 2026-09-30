@@ -276,6 +276,15 @@
     <ClCompile Include="코드트리_2024_하반기오전1번_미지의공간탈출.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="코드트리_2024_하반기오후1번_메두사와전사들.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2025_상반기오전1번_민트초코우유.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2025_상반기오후1번_미생물연구.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
