@@ -93,16 +93,7 @@ void input()
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= N; c++)
 			scanf("%d", &MAP[r][c]);
-
-	// [버그] 여기서 MAP의 벽(2)을 BLOCK에 옮겨야 한다.
-	//       BLOCK에는 도착한 편의점과 사용된 베이스캠프만 적히고 벽은 한 번도 적히지 않아,
-	//       두 BFS 모두 벽을 그냥 통과한다.
-	//       -> for (int r = 1; r <= N; r++)
-	//              for (int c = 1; c <= N; c++)
-	//                  if (MAP[r][c] == WALL) BLOCK[r][c] = WALL;
-	//       (아래 입력에서 원본은 3, 벽을 막은 판은 5를 낸다.
-	//        3 1 / 1 2 0 / 0 0 0 / 0 0 0 / 1 3)
-
+			
 	for (int m = 1; m <= M; m++)
 	{
 		int r, c;
@@ -217,6 +208,8 @@ RC getNextStep(int index) // BFS
 
 			ret.r = tr;
 			ret.c = tc;
+
+			return ret;
 		}
 
 		for (int i = 0; i < 4; i++)
@@ -240,7 +233,7 @@ RC getNextStep(int index) // BFS
 
 	}
 
-	//ret.r = ret.c = -1;
+	ret.r = ret.c = -1;
 
 	return ret;
 }
@@ -390,7 +383,6 @@ int simulate()
 
 	return -1; // for debug
 			   // 모든 사람이 도착하므로 여기까지 오지 않는다.
-
 }
 
 int main()

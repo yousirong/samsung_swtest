@@ -231,7 +231,7 @@
     <ClCompile Include="코드트리_2021_하반기오전2번_냉방시스템.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="프로그래머스_2025_하반기2차_기차선로.cpp">
+    <ClCompile Include="프로그래머스_2025_카카오하반기2차_기차선로.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="코드트리_2021_하반기오후2번_Sam의피자학교.cpp">
@@ -283,6 +283,45 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="코드트리_2025_상반기오후1번_미생물연구.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2025_하반기오전1번_택배하차.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2025_하반기오후1번_ai로봇청소기.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2026_상반기오전1번_아기바다거북의대모험해저화산지대.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2026_상반기오후1번_아기고래의첫항해.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="1949_모의SW역량테스트_등산로조성.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="1953_모의SW역량테스트_탈주범검거.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="2105_모의SW역량테스트_디저트카페.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="2112_모의SW역량테스트_보호필름.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="2117_모의SW역량테스트_홈방범서비스.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="프로그래머스_2025_카카오하반기1차_리프노드수최대화.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2022_하반기오전1번_싸움땅_연습.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="2382_모의SW역량테스트_미생물격리.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="2383_모의SW역량테스트_점심식사시간.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
