@@ -324,6 +324,9 @@
     <ClCompile Include="2383_모의SW역량테스트_점심식사시간.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="4013_모의SW역량테스트_특이한자석.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">

@@ -170,7 +170,9 @@
     <ClCompile Include="2382_모의SW역량테스트_미생물격리.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="2383_모의SW역량테스트_점심식사시간.cpp" />
+    <ClCompile Include="2383_모의SW역량테스트_점심식사시간.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="26_BOJ_1260_DFS와BFS.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -210,6 +212,7 @@
     <ClCompile Include="36_BOJ_2178_미로탐색.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="4013_모의SW역량테스트_특이한자석.cpp" />
     <ClCompile Include="41_BOJ_2194_유닛이동시키기.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
