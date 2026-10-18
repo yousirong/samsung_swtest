@@ -135,4 +135,4 @@ int main()
 		printf("#%d %d\n", tc, simulate());
 	}
 	return 0;
-}
+}

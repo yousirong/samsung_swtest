@@ -269,8 +269,7 @@ int simulate()
 		}
 
 		if (dir == EAST) moveEast();
-		// [버그] moveWest()를 불러야 한다.
-		else if (dir == WEST) moveEast();
+		else if (dir == WEST) moveWest();
 		else if (dir == NORTH) moveNorth();
 		else if (dir == SOUTH) moveSouth();
 

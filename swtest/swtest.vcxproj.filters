@@ -342,6 +342,24 @@
     <ClCompile Include="5648_모의SW역량테스트_원자소멸시뮬레이션.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="5650_모의SW역량테스트_핀볼게임.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="5653_모의SW역량테스트_줄기세포배양.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="5656_모의SW역량테스트_벽돌깨기.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="5658_모의SW역량테스트_보물상자비밀번호.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2026_하반기오전1번_수하물컨베이어벨트.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="코드트리_2026_하반기오전1번_수하물컨베이어벨트_연습.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">

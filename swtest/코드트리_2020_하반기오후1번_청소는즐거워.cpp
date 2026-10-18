@@ -211,10 +211,10 @@ void makeSnail()
 	track[tcnt - 1].dir = 0;   // 마지막 칸에서는 더 나가지 않으므로 아무 값이나 무방
 
 	// 아래는 경로를 눈으로 확인할 때만 쓰는 디버그 코드다 (return으로 막아 둠)
-	return;
-	printMap(snail);
-	for (int i = 0; i < tcnt; i++)
-		printf("%d] (%d, %d) / %d\n", i, track[i].r, track[i].c, track[i].dir);
+	//return;
+	//printMap(snail);
+	//for (int i = 0; i < tcnt; i++)
+	//	printf("%d] (%d, %d) / %d\n", i, track[i].r, track[i].c, track[i].dir);
 }
 
 /*

@@ -98,4 +98,4 @@ int main()
 		printf("#%d %d\n", tc, uniqueList[K - 1]);   // K번째로 큰 수
 	}
 	return 0;
-}
+}
