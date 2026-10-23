@@ -360,6 +360,9 @@
     <ClCompile Include="코드트리_2026_하반기오전1번_수하물컨베이어벨트_연습.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="코드트리_2026_하반기오후1번_호수의물결.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="input.txt">
