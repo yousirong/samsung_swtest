@@ -25,59 +25,59 @@
 	  - number 버퍼는 N + N/4 + 1(끝 문자) = 최대 36칸이 필요하다. MAX = 38이라 충분하다.
 	  - 같은 수는 한 번만 센다. 그래서 정렬 뒤 중복을 빼고 K번째를 고른다.
 */
-#include <stdio.h>
+#include <stdio.h>           // scanf, printf 사용
 
-#define MAX (28+10)
+#define MAX (28+10)          // N 최대 28 + 여유
 
-int T;
+int T;               // 테스트 케이스 수
 int N, K;            // 숫자 개수, 몇 번째로 큰 수
 int decimal[MAX];    // 만들 수 있는 수들 (10진수)
-int dcnt;
+int dcnt;            // 만든 수의 개수
 
 
 // ptr에서 size자리를 16진수로 읽어 10진수로 바꾼다
 int makeDecimal(char* ptr, int size)
 {
-	int sum, mul;
+	int sum, mul;                        // 결과, 자릿값
 
-	sum = 0; mul = 1;
+	sum = 0; mul = 1;                    // 결과 0, 맨 끝자리 자릿값 1
 
 	// 맨 끝자리부터 16^0, 16^1, ...
 	for (int i = size - 1; i >= 0; i--)
 	{
-		if (ptr[i] >= 'A') sum += (ptr[i] - 'A' + 10) * mul;
-		else sum += (ptr[i] - '0') * mul;
+		if (ptr[i] >= 'A') sum += (ptr[i] - 'A' + 10) * mul;   // 'A' ~ 'F' -> 10 ~ 15
+		else sum += (ptr[i] - '0') * mul;                       // '0' ~ '9' -> 0 ~ 9
 
-		mul *= 16;
+		mul *= 16;                       // 다음 자릿값
 	}
-	return sum;
+	return sum;                          // 10진수 값 반환
 }
 int main()
 {
-	scanf("%d", &T);
-	for (int tc = 1; tc <= T; tc++)
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		dcnt = 0;
+		dcnt = 0;                        // 만든 수 개수 초기화
 
-		char number[MAX];
+		char number[MAX];                // 16진수 문자열
 
-		scanf("%d %d %s", &N, &K, number);
+		scanf("%d %d %s", &N, &K, number);   // 숫자 개수, K, 16진수 문자열 입력
 
 		// 원형 처리 : 앞쪽 N/4자리를 뒤에 한 번 더 붙인다
 		for (int i = 0; i < N / 4; i++) number[N + i] = number[i];
-		number[N + N / 4] = 0;
+		number[N + N / 4] = 0;           // 문자열 끝 표시
 
 		// 모든 시작점에서 N/4자리 수
 		for (int i = 0; i < N; i++) decimal[dcnt++] = makeDecimal(number + i, N / 4);
 
 		// 내림차순 정렬
-		for (int i = 0; i < dcnt - 1; i++)
+		for (int i = 0; i < dcnt - 1; i++)       // 기준 위치
 		{
-			for (int k = i + 1; k < dcnt; k++)
+			for (int k = i + 1; k < dcnt; k++)   // 기준 뒤의 모든 위치
 			{
-				if (decimal[i] < decimal[k])
+				if (decimal[i] < decimal[k])     // 뒤쪽이 더 크면
 				{
-					int tmp = decimal[i];
+					int tmp = decimal[i];        // 두 값을 맞바꾼다
 					decimal[i] = decimal[k];
 					decimal[k] = tmp;
 				}
@@ -85,17 +85,17 @@ int main()
 		}
 
 		// 중복 제거 (정렬돼 있으므로 바로 앞과 같은지만 본다)
-		int uniqueList[MAX] = { 0 };
-		int ucnt = 0;
+		int uniqueList[MAX] = { 0 };     // 중복 없는 목록
+		int ucnt = 0;                    // 중복 없는 목록 개수
 
-		uniqueList[ucnt++] = decimal[0];
+		uniqueList[ucnt++] = decimal[0]; // 가장 큰 수부터
 
-		for (int i = 1; i < dcnt; i++)
+		for (int i = 1; i < dcnt; i++)   // 나머지 수
 		{
-			if (decimal[i] == uniqueList[ucnt - 1])continue;
-			uniqueList[ucnt++] = decimal[i];
+			if (decimal[i] == uniqueList[ucnt - 1])continue;   // 바로 앞과 같으면 건너뜀
+			uniqueList[ucnt++] = decimal[i];                   // 새로운 수만 추가
 		}
 		printf("#%d %d\n", tc, uniqueList[K - 1]);   // K번째로 큰 수
 	}
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

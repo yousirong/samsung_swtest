@@ -53,9 +53,9 @@
 //   crash = 1 : 이미 한 번 부순 상태 (이제 벽은 통과 불가)
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>                // scanf, printf, putchar 사용
 
-#define MAX (1000 + 10)
+#define MAX (1000 + 10)           // N, M 최대 1000 + 여유
 
 int N, M;                       // N: 행 수, M: 열 수
 int MAP[MAX][MAX];              // 지도 (0: 빈칸, 1: 벽)
@@ -69,26 +69,26 @@ struct RC
 	int crash;   // 지금까지 벽을 부순 횟수 (0 또는 1)
 };
 
-typedef struct RC RC;
+typedef struct RC RC;             // struct RC를 RC로 줄여 쓰기
 
 // 상태 수가 좌표 수의 2배이므로 큐도 2배로 잡는다
 RC queue[MAX * MAX * 2];
 
 // 4방향: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };       // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };        // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 행 수와 열 수 입력
 
 	// "0101"처럼 붙어 있는 입력이라 %1d로 한 자리씩 읽는다
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= M; c++)
-			scanf("%1d", &MAP[r][c]);
+			scanf("%1d", &MAP[r][c]);    // 한 자리(0: 빈칸, 1: 벽) 입력
 }
 
 // ---------------------------
@@ -96,26 +96,26 @@ void input()
 // ---------------------------
 void printMap(int map[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%d ", map[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // 지도와 두 층의 거리 배열을 한꺼번에 출력
 void printMapAll()
 {
-	printf("MAP\n");
-	printMap(MAP);
+	printf("MAP\n");                     // 지도 제목
+	printMap(MAP);                       // 지도 출력
 
-	printf("visit[0]\n");
-	printMap(visit[0]);
+	printf("visit[0]\n");                // 0층 제목
+	printMap(visit[0]);                  // 벽을 안 부순 층의 거리 출력
 
-	printf("visit[1]\n");
-	printMap(visit[1]);
+	printf("visit[1]\n");                // 1층 제목
+	printMap(visit[1]);                  // 벽을 한 번 부순 층의 거리 출력
 }
 
 // ---------------------------
@@ -126,27 +126,27 @@ int BFS(int r, int c)
 {
 	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;  // 빈 큐
 
 	// 시작은 벽을 한 번도 안 부순 상태. 거리는 1부터 (0은 미방문을 뜻하므로)
 	visit[0][r][c] = 1;
 
-	queue[wp].r = r;
-	queue[wp].c = c;
-	queue[wp++].crash = 0;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp].c = c;                     // 시작 열
+	queue[wp++].crash = 0;               // 부순 횟수 0, 삽입 위치 증가
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 상태가 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 상태 하나를 꺼낸다
 
 		// 처음 꺼낸 도착 상태가 최단이다
 		if (out.r == N && out.c == M)
 			return visit[out.crash][out.r][out.c];
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 상하좌우 네 방향
 		{
-			int nr = out.r + dr[i];
-			int nc = out.c + dc[i];
+			int nr = out.r + dr[i];      // 이웃 행
+			int nc = out.c + dc[i];      // 이웃 열
 
 			// 지도 바깥은 명시적으로 걸러야 한다 (바깥값 0이 빈칸으로 오해되기 때문)
 			if (nr < 1 || nc < 1 || nr > N || nc > M)
@@ -160,11 +160,11 @@ int BFS(int r, int c)
 				// (a) 빈칸으로 그냥 이동 -> 같은 층(crash = 0)에 머문다
 				if (MAP[nr][nc] == 0 && visit[0][nr][nc] == 0)
 				{
-					queue[wp].r = nr;
-					queue[wp].c = nc;
-					queue[wp++].crash = 0;
+					queue[wp].r = nr;            // 다음 상태의 행
+					queue[wp].c = nc;            // 다음 상태의 열
+					queue[wp++].crash = 0;       // 부순 횟수 그대로 0
 
-					visit[0][nr][nc] = visit[0][out.r][out.c] + 1;
+					visit[0][nr][nc] = visit[0][out.r][out.c] + 1;   // 같은 층 거리 + 1
 				}
 				else
 				{
@@ -172,9 +172,9 @@ int BFS(int r, int c)
 					//     단, 그 층에서 아직 방문한 적 없는 칸이어야 한다
 					if (MAP[nr][nc] == 1 && visit[1][nr][nc] == 0)
 					{
-						queue[wp].r = nr;
-						queue[wp].c = nc;
-						queue[wp++].crash = 1;
+						queue[wp].r = nr;        // 다음 상태의 행
+						queue[wp].c = nc;        // 다음 상태의 열
+						queue[wp++].crash = 1;   // 벽을 부쉈으므로 1
 
 						// 거리는 "현재 층의 거리 + 1"에서 이어진다
 						visit[1][nr][nc] = visit[0][out.r][out.c] + 1;
@@ -186,13 +186,13 @@ int BFS(int r, int c)
 			// ---------------------------
 			else
 			{
-				if (MAP[nr][nc] == 0 && visit[1][nr][nc] == 0)
+				if (MAP[nr][nc] == 0 && visit[1][nr][nc] == 0)   // 빈칸이고 1층에서 미방문이면
 				{
-					queue[wp].r = nr;
-					queue[wp].c = nc;
-					queue[wp++].crash = 1;
+					queue[wp].r = nr;            // 다음 상태의 행
+					queue[wp].c = nc;            // 다음 상태의 열
+					queue[wp++].crash = 1;       // 부순 횟수 그대로 1
 
-					visit[1][nr][nc] = visit[1][out.r][out.c] + 1;
+					visit[1][nr][nc] = visit[1][out.r][out.c] + 1;   // 1층 거리 + 1
 				}
 			}
 		}
@@ -207,13 +207,13 @@ int BFS(int r, int c)
 // ---------------------------
 int main()
 {
-	input();
+	input();                             // 지도 입력
 
-	printf("%d\n", BFS(1, 1));
+	printf("%d\n", BFS(1, 1));           // (1,1)에서 출발한 최단 거리 출력
 
 	// printMapAll(); // 디버그용
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }
 
 
@@ -229,9 +229,9 @@ int main()
 //     다음 상태           : crash 고정 -> out.crash / out.crash + 1
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>                // scanf, printf, putchar 사용
 
-#define MAX (1000 + 10)
+#define MAX (1000 + 10)           // N, M 최대 1000 + 여유
 
 int N, M, K;                    // N: 행 수, M: 열 수, K: 부술 수 있는 벽의 최대 개수
 int MAP[MAX][MAX];              // 지도 (0: 빈칸, 1: 벽)
@@ -245,26 +245,26 @@ struct RC
 	int crash;   // 지금까지 부순 벽 개수 (0 ~ K)
 };
 
-typedef struct RC RC;
+typedef struct RC RC;             // struct RC를 RC로 줄여 쓰기
 
 // 상태 수가 (K+1) * N * M 이고 각 상태는 큐에 한 번만 들어가므로 이 크기면 충분하다.
 // (다만 메모리를 꽤 먹는 편이라, 빠듯하면 좌표를 정수 하나로 인코딩해 줄일 수 있다)
 RC queue[MAX * MAX * 11];
 
 // 4방향: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };       // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };        // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d", &N, &M, &K);
+	scanf("%d %d %d", &N, &M, &K);       // 행 수, 열 수, 부술 수 있는 횟수 입력
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= M; c++)
-			scanf("%1d", &MAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
+		for (int c = 1; c <= M; c++)     // 1열부터 M열까지
+			scanf("%1d", &MAP[r][c]);    // 한 자리(0: 빈칸, 1: 벽) 입력
 }
 
 // ---------------------------
@@ -272,26 +272,26 @@ void input()
 // ---------------------------
 void printMap(int map[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%d ", map[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // 앞쪽 두 층만 확인용으로 출력
 void printMapAll()
 {
-	printf("MAP\n");
-	printMap(MAP);
+	printf("MAP\n");                     // 지도 제목
+	printMap(MAP);                       // 지도 출력
 
-	printf("visit[0]\n");
-	printMap(visit[0]);
+	printf("visit[0]\n");                // 0층 제목
+	printMap(visit[0]);                  // 0번 부순 층의 거리 출력
 
-	printf("visit[1]\n");
-	printMap(visit[1]);
+	printf("visit[1]\n");                // 1층 제목
+	printMap(visit[1]);                  // 1번 부순 층의 거리 출력
 }
 
 // ---------------------------
@@ -300,29 +300,29 @@ void printMapAll()
 // ---------------------------
 int BFS(int r, int c)
 {
-	int rp, wp;
+	int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 빈 큐
 
 	// 시작은 0번 부순 상태, 거리 1
 	visit[0][r][c] = 1;
 
-	queue[wp].r = r;
-	queue[wp].c = c;
-	queue[wp++].crash = 0;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp].c = c;                     // 시작 열
+	queue[wp++].crash = 0;               // 부순 횟수 0, 삽입 위치 증가
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 상태가 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 상태 하나를 꺼낸다
 
 		// 처음 꺼낸 도착 상태가 최단
 		if (out.r == N && out.c == M)
 			return visit[out.crash][out.r][out.c];
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 상하좌우 네 방향
 		{
-			int nr = out.r + dr[i];
-			int nc = out.c + dc[i];
+			int nr = out.r + dr[i];      // 이웃 행
+			int nc = out.c + dc[i];      // 이웃 열
 
 			// 지도 바깥 제외
 			if (nr < 1 || nc < 1 || nr > N || nc > M)
@@ -336,21 +336,21 @@ int BFS(int r, int c)
 				// (a) 빈칸이면 같은 층 유지
 				if (MAP[nr][nc] == 0 && visit[out.crash][nr][nc] == 0)
 				{
-					queue[wp].r = nr;
-					queue[wp].c = nc;
-					queue[wp++].crash = out.crash;
+					queue[wp].r = nr;                 // 다음 상태의 행
+					queue[wp].c = nc;                 // 다음 상태의 열
+					queue[wp++].crash = out.crash;    // 부순 횟수 유지
 
-					visit[out.crash][nr][nc] =
-						visit[out.crash][out.r][out.c] + 1;
+					visit[out.crash][nr][nc] =            // 같은 층 거리
+						visit[out.crash][out.r][out.c] + 1;   // = 현재 거리 + 1
 				}
 				else
 				{
 					// (b) 벽이면 하나 부수고 한 층 위로
 					if (MAP[nr][nc] == 1 && visit[out.crash + 1][nr][nc] == 0)
 					{
-						queue[wp].r = nr;
-						queue[wp].c = nc;
-						queue[wp++].crash = out.crash + 1;
+						queue[wp].r = nr;                     // 다음 상태의 행
+						queue[wp].c = nc;                     // 다음 상태의 열
+						queue[wp++].crash = out.crash + 1;    // 부순 횟수 + 1
 
 						// 거리는 현재 층의 거리에서 이어 붙인다
 						visit[out.crash + 1][nr][nc] =
@@ -363,20 +363,20 @@ int BFS(int r, int c)
 			// ---------------------------
 			else
 			{
-				if (MAP[nr][nc] == 0 && visit[out.crash][nr][nc] == 0)
+				if (MAP[nr][nc] == 0 && visit[out.crash][nr][nc] == 0)   // 빈칸이고 이 층에서 미방문이면
 				{
-					queue[wp].r = nr;
-					queue[wp].c = nc;
-					queue[wp++].crash = out.crash;
+					queue[wp].r = nr;                 // 다음 상태의 행
+					queue[wp].c = nc;                 // 다음 상태의 열
+					queue[wp++].crash = out.crash;    // 부순 횟수 유지
 
-					visit[out.crash][nr][nc] =
-						visit[out.crash][out.r][out.c] + 1;
+					visit[out.crash][nr][nc] =            // 같은 층 거리
+						visit[out.crash][out.r][out.c] + 1;   // = 현재 거리 + 1
 				}
 			}
 		}
 	}
 
-	return -1;
+	return -1;                           // 도착하지 못하면 -1
 }
 
 // ---------------------------
@@ -384,11 +384,11 @@ int BFS(int r, int c)
 // ---------------------------
 int main()
 {
-	input();
+	input();                             // 지도 입력
 
-	printf("%d\n", BFS(1, 1));
+	printf("%d\n", BFS(1, 1));           // (1,1)에서 출발한 최단 거리 출력
 
 	// printMapAll(); // 디버그용
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

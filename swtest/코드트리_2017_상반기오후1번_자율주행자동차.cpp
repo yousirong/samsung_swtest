@@ -43,35 +43,35 @@
 	  자동차가 격자 밖으로 나갈 일이 없어 좌표 범위 검사를 하지 않는다.
 */
 
-#include <stdio.h>
+#include <stdio.h>           // scanf, printf, putchar 사용
 
-#define MAX (50 + 5)
+#define MAX (50 + 5)         // N, M 최대 50 + 여유
 
 // 칸의 상태
 #define ROAD   (0)   // 아직 청소하지 않은 도로
 #define STREET (1)   // 인도, 이동 불가
 #define MARK   (2)   // 이미 청소한 도로
 
-int T;
+int T;        // 테스트 케이스 수
 int N, M;     // 격자 크기
 int R, C;     // 자동차의 현재 위치
 int D;        // 자동차가 바라보는 방향
-int MAP[MAX][MAX];
+int MAP[MAX][MAX];   // 격자
 
 // 방향 배열: 북(0), 동(1), 남(2), 서(3) - 시계 방향 순서
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d %d %d", &N, &M, &R, &C, &D);
+	scanf("%d %d %d %d %d", &N, &M, &R, &C, &D);   // 격자 크기, 위치, 방향 입력
 
-	for (int r = 0; r < N; r++)
-		for (int c = 0; c < M; c++)
-			scanf("%d", &MAP[r][c]);
+	for (int r = 0; r < N; r++)          // 모든 행
+		for (int c = 0; c < M; c++)      // 모든 열
+			scanf("%d", &MAP[r][c]);     // 칸 상태 입력
 }
 
 // ---------------------------
@@ -79,13 +79,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 0; r < N; r++)
+	for (int r = 0; r < N; r++)          // 모든 행
 	{
-		for (int c = 0; c < M; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 0; c < M; c++)      // 모든 열
+			printf("%d ", MAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -97,42 +97,42 @@ void simulate()
 	//   북(0) -> 서(3), 동(1) -> 북(0), 남(2) -> 동(1), 서(3) -> 남(2)
 	int changeDir[] = { 3, 0, 1, 2 };
 
-	while (1)
+	while (1)                            // 멈출 때까지
 	{
 		// 1) 현재 칸 청소
 		MAP[R][C] = MARK;
 
 		// 왼쪽 방향과 그쪽 칸
-		int nDir = changeDir[D];
-		int nr = R + dr[nDir];
-		int nc = C + dc[nDir];
+		int nDir = changeDir[D];         // 왼쪽 방향
+		int nr = R + dr[nDir];           // 왼쪽 칸 행
+		int nc = C + dc[nDir];           // 왼쪽 칸 열
 
 		// 2) 왼쪽에 아직 청소하지 않은 도로가 있으면 그쪽으로 회전 + 전진
 		if (MAP[nr][nc] == ROAD)
 		{
-			D = nDir;
-			R = nr;
-			C = nc;
+			D = nDir;                    // 왼쪽으로 회전
+			R = nr;                      // 전진 (행)
+			C = nc;                      // 전진 (열)
 		}
 		// 3) 왼쪽이 막혔으면 방향만 계속 왼쪽으로 틀며 네 방향을 확인
 		else
 		{
-			int i;
+			int i;                       // 확인한 방향 수
 
-			for (i = 0; i < 4; i++)
+			for (i = 0; i < 4; i++)      // 최대 네 방향
 			{
 				// 회전만 먼저 반영한다 (전진 여부는 그다음에 판단)
 				D = nDir;
 
-				int nr = R + dr[D];
-				int nc = C + dc[D];
+				int nr = R + dr[D];      // 이 방향 앞 칸 행
+				int nc = C + dc[D];      // 이 방향 앞 칸 열
 
 				// 청소할 도로를 찾았으면 그쪽으로 전진하고 탈출
 				if (MAP[nr][nc] == ROAD)
 				{
-					R = nr;
-					C = nc;
-					break;
+					R = nr;              // 전진 (행)
+					C = nc;              // 전진 (열)
+					break;               // 확인 끝
 				}
 
 				// 아니면 한 번 더 왼쪽으로 틀 준비
@@ -147,8 +147,8 @@ void simulate()
 				nr = R - dr[D];
 				nc = C - dc[D];
 
-				R = nr;
-				C = nc;
+				R = nr;                  // 후진 (행)
+				C = nc;                  // 후진 (열)
 
 				// 5) 뒤가 인도였다면 후진조차 못 하는 상황이므로 종료
 				//    (이미 청소한 칸이면 계속 진행한다)
@@ -164,14 +164,14 @@ void simulate()
 // ---------------------------
 int getAnswer()
 {
-	int sum = 0;
+	int sum = 0;                         // 청소한 칸 수
 
-	for (int r = 0; r < N; r++)
-		for (int c = 0; c < M; c++)
-			if (MAP[r][c] == MARK)
-				sum++;
+	for (int r = 0; r < N; r++)          // 모든 행
+		for (int c = 0; c < M; c++)      // 모든 열
+			if (MAP[r][c] == MARK)       // 청소한 칸이면
+				sum++;                   // 센다
 
-	return sum;
+	return sum;                          // 개수 반환
 }
 
 int main()
@@ -180,14 +180,14 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // 시뮬레이션
 
-		printf("%d\n", getAnswer());
+		printf("%d\n", getAnswer());     // 청소한 칸 수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

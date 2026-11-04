@@ -28,62 +28,62 @@
 	    visit 검사는 사실상 걸리지 않지만 안전장치로 남아 있다.
 	  - flag는 매개변수(지역 변수)라서 1로 바꿨다가 0으로 되돌리는 것이 자기 호출에만 영향을 준다.
 */
-#include <stdio.h>
+#include <stdio.h>              // scanf, printf 사용
 
-#define MAX (10+5)
+#define MAX (10+5)              // N 최대 8 + 테두리 여유
 
-int T;
+int T;                  // 테스트 케이스 수
 
 int N, K;               // 지도 크기, 최대 공사 깊이
 int MAP[MAX][MAX];      // 높이. 테두리는 -1
 int visit[MAX][MAX];    // 지금 등산로에 포함된 칸
 
-struct RC
+struct RC               // 좌표 한 쌍
 {
-	int r;
-	int c;
+	int r;              // 행
+	int c;              // 열
 };
 
 RC start[MAX * MAX];    // 가장 높은 봉우리 좌표들
-int scnt;
+int scnt;               // 시작점 개수
 
 // 왼쪽, 위, 오른쪽, 아래
-int dr[] = { 0,-1,0,1 };
-int dc[] = { -1,0,1,0 };
+int dr[] = { 0,-1,0,1 };        // 방향별 행 변화량
+int dc[] = { -1,0,1,0 };        // 방향별 열 변화량
 
 int MAXANS;             // 가장 긴 등산로 길이
 
 void input()
 {
-	int max;
+	int max;                             // 가장 높은 봉우리 높이
 
-	scanf("%d %d", &N, &K);
+	scanf("%d %d", &N, &K);              // 지도 크기, 최대 공사 깊이 입력
 
 	// 테두리까지 -1로 채워 두고 안쪽만 입력으로 덮는다
 	for (int r = 0; r <= N + 1; r++)
 		for (int c = 0; c <= N + 1; c++)
-			MAP[r][c] = -1;
+			MAP[r][c] = -1;              // 지도 밖 표시
 
-	max = 0;
-	for (int r = 1; r <= N; r++)
+	max = 0;                             // 최댓값 초기화
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 1열부터 N열까지
 		{
-			scanf("%d", &MAP[r][c]);
-			if (max < MAP[r][c])max = MAP[r][c];
+			scanf("%d", &MAP[r][c]);     // 높이 입력
+			if (max < MAP[r][c])max = MAP[r][c];   // 최댓값 갱신
 		}
 	}
 
 	// 가장 높은 봉우리를 전부 시작점으로 모은다
-	scnt = 0;
+	scnt = 0;                            // 시작점 개수 초기화
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (MAP[r][c] == max)
+			if (MAP[r][c] == max)        // 가장 높은 봉우리면
 			{
-				start[scnt].r = r;
-				start[scnt++].c = c;
+				start[scnt].r = r;       // 시작점 행 기록
+				start[scnt++].c = c;     // 시작점 열 기록, 개수 증가
 			}
 		}
 	}
@@ -92,14 +92,14 @@ void input()
 // L : 지금까지 등산로 길이, (sr, sc) : 현재 칸, flag : 이미 한 번 깎았으면 1
 void DFS(int L, int sr,int sc, int flag)
 {
-	if (MAXANS < L) MAXANS = L;
+	if (MAXANS < L) MAXANS = L;          // 지금 길이로 최댓값 갱신
 
-	for (int dir = 0; dir < 4; dir++)
+	for (int dir = 0; dir < 4; dir++)    // 4방향 시도
 	{
-		int nr, nc;
+		int nr, nc;                      // 다음 칸 좌표
 
-		nr = sr + dr[dir];
-		nc = sc + dc[dir];
+		nr = sr + dr[dir];               // 다음 행
+		nc = sc + dc[dir];               // 다음 열
 
 		if (MAP[nr][nc] == -1) continue;                 // 지도 밖
 		if (MAP[sr][sc] <= MAP[nr][nc] - K) continue;    // K만큼 깎아도 현재보다 낮아지지 않는다
@@ -107,9 +107,9 @@ void DFS(int L, int sr,int sc, int flag)
 		// 다음칸이 더 작은 경우
 		if (MAP[sr][sc] > MAP[nr][nc] && visit[nr][nc] == 0)
 		{
-			visit[sr][sc] = 1;
-			DFS(L + 1, nr, nc, flag);
-			visit[sr][sc] = 0;
+			visit[sr][sc] = 1;           // 현재 칸을 등산로에 포함
+			DFS(L + 1, nr, nc, flag);    // 다음 칸으로 진행
+			visit[sr][sc] = 0;           // 되돌아오면 표시 해제
 		}
 		// 다음칸을 깎아서 더 작은 경우
 		// (바로 위 continue를 통과했으므로 MAP[sr][sc] > MAP[nr][nc] - K 는 이미 참이다)
@@ -117,31 +117,31 @@ void DFS(int L, int sr,int sc, int flag)
 		{
 			int tmp = MAP[nr][nc];   // 되돌릴 원래 높이
 
-			visit[sr][sc] = 1;
-			flag = 1;
+			visit[sr][sc] = 1;       // 현재 칸을 등산로에 포함
+			flag = 1;                // 깎기 사용
 			// 2칸이상 (sr, sc) 보다 작을 필요가 없다.
 			MAP[nr][nc] = MAP[sr][sc] - 1;
 
-			DFS(L + 1, nr, nc, flag);
+			DFS(L + 1, nr, nc, flag);    // 깎은 칸으로 진행
 
 			// 원상복구 : 높이, 깎은 표시, 방문 표시
-			MAP[nr][nc] = tmp;
-			flag = 0;
-			visit[sr][sc] = 0;
+			MAP[nr][nc] = tmp;       // 높이 복구
+			flag = 0;                // 깎기 미사용으로 복구
+			visit[sr][sc] = 0;       // 방문 표시 해제
 		}
 	}
 }
 
 int main()
 {
-	scanf("%d", &T);
-	for (int tc = 1; tc <= T; tc++)
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 지도 입력 + 시작점 수집
 
-		MAXANS = 0;
-		for (int i = 0; i < scnt; i++)
+		MAXANS = 0;                      // 최댓값 초기화
+		for (int i = 0; i < scnt; i++)   // 모든 시작점에서
 			DFS(1, start[i].r, start[i].c, 0);   // 시작 칸 자체가 길이 1
-		printf("#%d %d\n", tc, MAXANS);
+		printf("#%d %d\n", tc, MAXANS);  // 결과 출력
 	}
-}
+}

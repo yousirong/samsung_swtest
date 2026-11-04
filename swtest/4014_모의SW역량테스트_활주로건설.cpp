@@ -36,24 +36,24 @@
 	           처음 케이스는 지도 밖이 0이고 높이는 1 이상이라 우연히 맞는다.
 	  - abs(a, b)는 두 수의 차이를 돌려주는 직접 만든 함수다 (표준 abs(x)와 인자 수가 달라 겹치지 않는다).
 */
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf 사용
 
-#define MAX (100+20)
+#define MAX (100+20)           // N 최대 20, 넉넉하게
 
-int T;
+int T;                 // 테스트 케이스 수
 int N, L;              // 지도 크기, 경사로 길이
 int MAP[MAX][MAX];     // 가로줄 = MAP의 행
 int TMAP[MAX][MAX];    // 세로줄 = TMAP의 행 (전치 행렬)
 
 void input()
 {
-	scanf("%d %d", &N, &L);
+	scanf("%d %d", &N, &L);              // 지도 크기, 경사로 길이 입력
 
-	for (int r = 0; r < N; r++)
+	for (int r = 0; r < N; r++)          // 0행부터 N-1행까지
 	{
-		for (int c = 0; c < N; c++)
+		for (int c = 0; c < N; c++)      // 0열부터 N-1열까지
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 높이 입력
 			TMAP[c][r] = MAP[r][c];   // 뒤집어 두면 세로줄도 한 행으로 볼 수 있다
 		}
 	}
@@ -62,17 +62,17 @@ void input()
 // 두 수의 차이
 int abs(int a, int b)
 {
-	return (a > b) ? a - b : b - a;
+	return (a > b) ? a - b : b - a;      // 큰 쪽에서 작은 쪽을 뺀다
 }
 
 // arr[start] ~ arr[end]가 모두 같은 높이인가
 int isFlat(int* arr, int start, int end)
 {
-	int value = arr[start];
-	for (int i = start + 1; i <= end; i++)
-		if (value != arr[i]) return 0;
+	int value = arr[start];              // 기준 높이
+	for (int i = start + 1; i <= end; i++)   // 구간의 나머지 칸
+		if (value != arr[i]) return 0;   // 다른 높이가 있으면 평평하지 않다
 
-	return 1;
+	return 1;                            // 모두 같은 높이
 }
 
 // 한 줄(arr[0] ~ arr[N-1])에 활주로를 놓을 수 있으면 1
@@ -82,60 +82,60 @@ int check(int* arr)
 	int visit[MAX] = { 0 };           // 정방향에서 경사로를 놓은 자리
 	int visit_inverse[MAX] = { 0 };   // visit를 뒤집은 것 (역방향 좌표로 맞춤)
 
-	for (int i = 0; i < N; i++) inverse[i] = arr[N - i - 1];
+	for (int i = 0; i < N; i++) inverse[i] = arr[N - i - 1];   // 줄을 뒤집는다
 
 	// 1) 정방향 : 내리막에 경사로
 	for (int i = 0; i < N - 1; i++)
 	{
-		if (arr[i] == arr[i + 1]) continue;
+		if (arr[i] == arr[i + 1]) continue;          // 평평하면 넘어간다
 		if (abs(arr[i], arr[i + 1]) > 1) return 0;   // 높이 차 2 이상
 
-		if (arr[i] > arr[i + 1])
+		if (arr[i] > arr[i + 1])                     // 한 칸 내려가면
 		{
 			if (i + L == N) return 0;                  // 경사로가 지도 밖 ([버그] i + L > N 도 막아야 한다)
-			if (isFlat(arr, i + 1, i + L) == 0) return 0;
+			if (isFlat(arr, i + 1, i + L) == 0) return 0;   // 경사로 밑이 평평하지 않으면 실패
 
-			for (int k = i + 1; k <= i + L; k++) visit[k] = 1;
+			for (int k = i + 1; k <= i + L; k++) visit[k] = 1;   // 경사로 자리 표시
 		}
 	}
 
-	for (int i = 0; i < N; i++) visit_inverse[i] = visit[N - i - 1];
+	for (int i = 0; i < N; i++) visit_inverse[i] = visit[N - i - 1];   // 표시도 뒤집어 둔다
 
 	// 2) 역방향 : 뒤집은 배열의 내리막 = 원래 배열의 오르막
 	for (int i = 0; i < N - 1; i++)
 	{
-		if (inverse[i] == inverse[i + 1]) continue;
-		if (abs(inverse[i], inverse[i + 1]) > 1) return 0;
-		if (inverse[i] > inverse[i + 1])
+		if (inverse[i] == inverse[i + 1]) continue;          // 평평하면 넘어간다
+		if (abs(inverse[i], inverse[i + 1]) > 1) return 0;   // 높이 차 2 이상
+		if (inverse[i] > inverse[i + 1])                     // 한 칸 내려가면
 		{
-			if (i + L == N) return 0;
-			if (isFlat(inverse, i + 1, i + L) == 0) return 0;
+			if (i + L == N) return 0;                        // 경사로가 지도 밖
+			if (isFlat(inverse, i + 1, i + L) == 0) return 0;   // 경사로 밑이 평평하지 않으면 실패
 			for (int k = i + 1; k <= i + L; k++)
 				if (visit_inverse[k]) return 0;        // 정방향 경사로와 겹침
 		}
 	}
-	return 1;
+	return 1;                                        // 활주로 가능
 }
 
 int main()
 {
-	scanf("%d", &T);
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		int sum;
+		int sum;                         // 가능한 줄 수
 
-		input();
+		input();                         // 지형 입력
 
-		sum = 0;
-		for (int i = 0; i < N; i++)
+		sum = 0;                         // 초기화
+		for (int i = 0; i < N; i++)      // 각 줄 번호
 		{
 			sum += check(MAP[i]);    // i번 가로줄
 			sum += check(TMAP[i]);   // i번 세로줄
 
 		}
 
-		printf("#%d %d\n", tc, sum);
+		printf("#%d %d\n", tc, sum);     // 결과 출력
 	}
-	return 0;
-}
+	return 0;                            // 프로그램 정상 종료
+}

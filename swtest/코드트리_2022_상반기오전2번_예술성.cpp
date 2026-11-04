@@ -54,16 +54,16 @@
 	  - harmony는 (N*N) x (N*N) 짜리라 매 라운드 지우는 데 N^4 번 대입이 든다.
 	    N = 29면 라운드마다 약 70만 번이라 괜찮지만, 그룹 수(gcnt)까지만 지워도 충분하다.
 */
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (29+5)
+#define MAX (29+5)             // N 최대 29 + 여유
 
-int T;
+int T;                         // 테스트 케이스 수
 
-int N;
+int N;                         // 격자 크기
 int halfN; // 가운데 행/열 번호 (N이 홀수라서 딱 떨어진다)
-int MAP[MAX][MAX];
-int tmpMAP[MAX][MAX];
+int MAP[MAX][MAX];             // 그림 숫자
+int tmpMAP[MAX][MAX];          // 회전용 복사본
 int visit[MAX][MAX]; // 0이면 아직 안 봄, 아니면 그 칸이 속한 그룹 번호
 
 struct GROUP
@@ -73,100 +73,100 @@ struct GROUP
 	int groupNumber; // 그룹 번호 (harmony의 인덱스)
 };
 
-GROUP group[MAX * MAX];
-int gcnt;
+GROUP group[MAX * MAX];        // 그룹 목록
+int gcnt;                      // 그룹 수
 
-struct RC
+struct RC                      // 좌표 한 쌍
 {
-	int r;
-	int c;
+	int r;                     // 행
+	int c;                     // 열
 };
 
-RC queue[MAX * MAX];
+RC queue[MAX * MAX];           // BFS용 큐
 
 // 상, 우, 하, 좌
-int dr[] = { -1, 0,1,0 };
-int dc[] = { 0,1,0,-1 };
+int dr[] = { -1, 0,1,0 };      // 방향별 행 변화량
+int dc[] = { 0,1,0,-1 };       // 방향별 열 변화량
 
 int harmony[MAX * MAX][MAX * MAX]; // harmony[A][B] = 그룹 A와 B가 맞닿은 변의 개수
 
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 격자 크기 입력
 
-	halfN = (N + 1) / 2;
+	halfN = (N + 1) / 2;                 // 가운데 번호
 
 	// 테두리까지 0으로 비워 둔다.
 	for (int r = 0; r <= N + 1; r++)
 		for (int c = 0; c <= N + 1; c++)
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 0으로 초기화
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 실제 격자
 		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 숫자 입력
 }
 
 void printMap(int map[MAX][MAX]) // for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%2d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%2d ", map[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			copy[r][c] = original[r][c];
+	for (int r = 1; r <= N; r++)         // 모든 행
+		for (int c = 1; c <= N; c++)     // 모든 열
+			copy[r][c] = original[r][c]; // 한 칸씩 복사
 }
 
 // (r, c)에서 시작하는 그룹을 mark 번으로 칠하고 그 그룹의 정보를 돌려준다.
 GROUP BFS(int r, int c, int mark)
 {
-	GROUP ret = { 0 };
-	int value;
-	int rp, wp;
+	GROUP ret = { 0 };                   // 그룹 정보
+	int value;                           // 그룹의 숫자
+	int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
-	value = MAP[r][c];
+	rp = wp = 0;                         // 빈 큐
+	value = MAP[r][c];                   // 시작 칸 숫자
 
-	queue[wp].r = r;
-	queue[wp++].c = c;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp++].c = c;                   // 시작 열, 삽입 위치 증가
 
-	visit[r][c] = mark;
+	visit[r][c] = mark;                  // 그룹 번호 칠하기
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 한 칸 꺼낸다
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
-			if (nr<1 || nc<1 || nr> N || nc>N) continue;
+			if (nr<1 || nc<1 || nr> N || nc>N) continue;   // 격자 밖
 
 			// 숫자가 다르거나 이미 다른(또는 같은) 그룹으로 칠해졌으면 넘어간다.
 			if (MAP[nr][nc] != value || visit[nr][nc] != 0) continue;
 
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣는다
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = mark;
+			visit[nr][nc] = mark;        // 그룹 번호 칠하기
 		}
 	}
 
-	ret.value = value;
+	ret.value = value;                   // 숫자
 	ret.count = wp; // 큐에 들어간 칸 수 = 그룹 크기
-	ret.groupNumber = mark;
+	ret.groupNumber = mark;              // 그룹 번호
 
-	return ret;
+	return ret;                          // 그룹 정보 반환
 }
 
 // 가운데 십자를 반시계 방향 90도 돌린다.
@@ -187,7 +187,7 @@ void rotateCenter()
 // (sr, sc)를 왼쪽 위로 하는 size x size 정사각형을 시계 방향 90도 돌린다.
 void rotate(int sr, int sc)
 {
-	int size = N / 2;
+	int size = N / 2;                    // 정사각형 한 변 길이
 
 	// 이 정사각형만 0-based로 tmpMAP에 떠 놓고
 	for (int r = 0; r < size; r++)
@@ -203,18 +203,18 @@ void rotate(int sr, int sc)
 // 그룹끼리 맞닿은 변의 개수를 센다.
 void makeharmony()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)  // 4방향
 			{
-				int nr, nc;
+				int nr, nc;              // 이웃 칸
 
-				nr = r + dr[i];
-				nc = c + dc[i];
+				nr = r + dr[i];          // 이웃 행
+				nc = c + dc[i];          // 이웃 열
 
-				if (nr <1 || nc<1 || nr>N || nc>N) continue;
+				if (nr <1 || nc<1 || nr>N || nc>N) continue;   // 격자 밖
 
 				// 같은 그룹이면 맞닿은 변이 아니다.
 				if (visit[r][c] == visit[nr][nc]) continue;
@@ -229,8 +229,8 @@ void makeharmony()
 	// 실제 개수의 2배가 쌓여 있다.
 	for (int r = 1; r <= N * N; r++)
 		for (int c = 1; c <= N * N; c++)
-			harmony[r][c] /= 2;
-	return;
+			harmony[r][c] /= 2;          // 2로 나눠 실제 개수로
+	return;                              // 끝 (아래는 디버그 코드)
 	//// for debug
 	//for (int r = 1; r <= N * N; r++)
 	//{
@@ -244,45 +244,45 @@ void makeharmony()
 // 모든 그룹 쌍을 한 번씩 보며 예술 점수를 더한다.
 int getScore()
 {
-	int score = 0;
-	for (int i = 0; i < gcnt - 1; i++)
+	int score = 0;                       // 예술 점수
+	for (int i = 0; i < gcnt - 1; i++)   // 그룹 A
 	{
-		for (int k = i + 1; k < gcnt; k++)
+		for (int k = i + 1; k < gcnt; k++)   // A 뒤의 그룹 B
 		{
-			GROUP a = group[i];
-			GROUP b = group[k];
+			GROUP a = group[i];          // 그룹 A
+			GROUP b = group[k];          // 그룹 B
 
 			// 맞닿지 않은 쌍은 harmony가 0이라 자동으로 0점이 된다.
 			score += ((a.count + b.count) * a.value * b.value * harmony[a.groupNumber][b.groupNumber]);
 		}
 	}
 
-	return score;
+	return score;                        // 점수 반환
 }
 
 int simulate()
 {
-	int score = 0;
+	int score = 0;                       // 총점
 	// 처음 상태 + 회전 3번 = 점수를 네 번 구한다.
 	for (int round = 0; round < 4; round++)
 	{
 		// 회전으로 그룹이 통째로 달라지므로 라운드마다 처음부터 다시 만든다.
 		for (int r = 1; r <= N; r++)
 			for (int c = 1; c <= N; c++)
-				visit[r][c] = 0;
+				visit[r][c] = 0;         // 그룹 번호 지우기
 
-		gcnt = 0;
+		gcnt = 0;                        // 그룹 수 초기화
 
 		int groupNumber = 1; // 0은 "아직 안 봄"이라 1번부터 쓴다.
-		for (int r = 1; r <= N; r++)
+		for (int r = 1; r <= N; r++)     // 모든 행
 		{
-			for (int c = 1; c <= N; c++)
+			for (int c = 1; c <= N; c++) // 모든 열
 			{
-				if (visit[r][c] != 0) continue;
+				if (visit[r][c] != 0) continue;   // 이미 그룹에 속한 칸
 
-				GROUP ret = BFS(r, c, groupNumber);
-				group[gcnt++] = ret;
-				groupNumber++;
+				GROUP ret = BFS(r, c, groupNumber);   // 새 그룹 만들기
+				group[gcnt++] = ret;              // 목록에 추가
+				groupNumber++;                    // 다음 그룹 번호
 			}
 		}
 
@@ -298,33 +298,33 @@ int simulate()
 		// 지난 라운드의 값이 남지 않도록 지운다. (그룹 번호는 최대 N*N까지 나온다)
 		for (int r = 1; r <= N * N; r++)
 			for (int c = 1; c <= N * N; c++)
-				harmony[r][c] = 0;
+				harmony[r][c] = 0;       // 맞닿은 변 수 초기화
 
-		makeharmony();
+		makeharmony();                   // 맞닿은 변 세기
 
-		score += getScore();
+		score += getScore();             // 이번 라운드 점수 더하기
 
 		// 십자를 먼저 돌리고, 십자와 겹치지 않는 네 정사각형을 돌린다.
-		rotateCenter();
+		rotateCenter();                  // 십자 반시계 회전
 
-		rotate(1, 1);
-		rotate(halfN + 1, 1);
-		rotate(1, halfN + 1);
-		rotate(halfN + 1, halfN + 1);
+		rotate(1, 1);                    // 왼쪽 위 정사각형
+		rotate(halfN + 1, 1);            // 왼쪽 아래 정사각형
+		rotate(1, halfN + 1);            // 오른쪽 위 정사각형
+		rotate(halfN + 1, halfN + 1);    // 오른쪽 아래 정사각형
 	}
-	return score;
+	return score;                        // 총점 반환
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

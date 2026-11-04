@@ -37,12 +37,12 @@
 	    호출된 DFS가 dir == 4 검사로 바로 끝나 그 값을 쓰지는 않으므로 결과는 맞지만,
 	    엄밀히는 정의되지 않은 동작이다. dr/dc 끝에 0을 하나 더 두면 깔끔해진다.
 */
-#include <stdio.h>
+#include <stdio.h>                // scanf, printf 사용
 
-#define MAX (25+5)
+#define MAX (25+5)                // N 최대 20 + 여유
 
-int T;
-int N;
+int T;                    // 테스트 케이스 수
+int N;                    // 지역 크기
 
 int MAP[MAX][MAX];        // 칸마다 디저트 종류
 
@@ -50,16 +50,16 @@ int dessert[100 + 20];    // dessert[종류] == 1 : 이번 투어에서 이미 �
 int MAXANS;               // 먹은 디저트 수의 최댓값 (투어가 없으면 -1)
 
 // 순서대로 오른쪽 아래, 왼쪽 아래, 왼쪽 위, 오른쪽 위
-int dr[] = { 1,1,-1,-1 };
-int dc[] = { 1,-1,-1,1 };
+int dr[] = { 1,1,-1,-1 };         // 방향별 행 변화량
+int dc[] = { 1,-1,-1,1 };         // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 지역 크기 입력
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
+		for (int c = 1; c <= N; c++)     // 1열부터 N열까지
+			scanf("%d", &MAP[r][c]);     // 디저트 종류 입력
 }
 
 // L : 지금까지 먹은 수, (R, C) : 지금 칸, (sr, sc) : 출발점, dir : 지금 진행 방향
@@ -70,16 +70,16 @@ void DFS(int L, int R, int C, int sr, int sc, int dir)
 	// 출발점으로 돌아왔다 -> 한 바퀴 완성
 	if (R == sr && C == sc)
 	{
-		if (MAXANS < L) MAXANS = L;
-		return;
+		if (MAXANS < L) MAXANS = L;      // 최댓값 갱신
+		return;                          // 투어 종료
 	}
 
 	// MAP의 범위를 벗어나는 경우
 	if (R<1 || C<1 || R>N || C>N) return;
 
-	if (dessert[MAP[R][C]] == 0)
+	if (dessert[MAP[R][C]] == 0)         // 아직 안 먹은 디저트면
 	{
-		dessert[MAP[R][C]] = 1;
+		dessert[MAP[R][C]] = 1;          // 먹었다고 표시
 
 		// 현재 방향으로 진행
 		DFS(L + 1, R + dr[dir], C + dc[dir], sr, sc, dir);
@@ -96,24 +96,24 @@ void DFS(int L, int R, int C, int sr, int sc, int dir)
 
 int main()
 {
-	scanf("%d", &T);
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 지역 입력
 
-		MAXANS = -1;
+		MAXANS = -1;                     // 투어가 없으면 -1
 		// 출발점 = 사각형의 맨 위 꼭짓점
-		for (int r = 1; r <= N - 2; r++)
+		for (int r = 1; r <= N - 2; r++)         // 아래로 2칸 이상 내려갈 수 있는 행
 		{
-			for (int c = 2; c <= N - 1; c++)
+			for (int c = 2; c <= N - 1; c++)     // 좌우로 1칸 이상 여유 있는 열
 			{
 				dessert[MAP[r][c]] = 1;            // 출발점 디저트를 먹고
 				DFS(1, r + 1, c + 1, r, c, 0);     // 첫 칸은 무조건 ↘
-				dessert[MAP[r][c]] = 0;
+				dessert[MAP[r][c]] = 0;            // 출발점 디저트 표시 해제
 			}
 		}
-		printf("#%d %d\n", tc, MAXANS);
+		printf("#%d %d\n", tc, MAXANS);  // 결과 출력
 	}
-	return 0;
-}
+	return 0;                            // 프로그램 정상 종료
+}

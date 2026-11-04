@@ -30,12 +30,12 @@
 	  - 답은 K를 넘지 않는다 (아무 K개 막에 같은 약품을 넣으면 반드시 통과한다).
 	    cnt >= K 가지치기를 더하면 더 빨라지지만, 지금 코드도 MINANS 가지치기로 충분하다.
 */
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf 사용
 
-#define MAX (25+5)
+#define MAX (25+5)                 // D, W 최대 + 여유
 int MINANS = 0x7fff0000;   // 최소 투입 횟수
 
-int T;
+int T;                     // 테스트 케이스 수
 int D, W, K;               // 두께(막 수), 가로 크기, 합격 기준
 int MAP[3][MAX][MAX];      // [0] 원본, [1] 전부 A(0), [2] 전부 B(1)
 
@@ -44,11 +44,11 @@ int list[MAX];             // list[r] : r번 막을 MAP의 몇 번 판에서 읽
 
 void input()
 {
-	scanf("%d %d %d", &D, &W, &K);
+	scanf("%d %d %d", &D, &W, &K);       // 두께, 가로, 합격 기준 입력
 
-	for (int r = 1; r <= D; r++)
-		for (int c = 1; c <= W; c++)
-			scanf("%d", &MAP[0][r][c]);
+	for (int r = 1; r <= D; r++)         // 1번 막부터 D번 막까지
+		for (int c = 1; c <= W; c++)     // 1열부터 W열까지
+			scanf("%d", &MAP[0][r][c]);  // 원본 판에 특성 입력
 }
 
 // col 열에 같은 특성이 K개 이상 연속인가
@@ -56,28 +56,28 @@ int check(int col)
 {
 	int cnt, tmp;   // cnt : 지금 연속 길이, tmp : 지금 이어지는 특성
 
-	cnt = 1;
-	tmp = MAP[list[1]][1][col];
-	for (int r = 2; r <= D; r++)
+	cnt = 1;                             // 첫 막부터 길이 1
+	tmp = MAP[list[1]][1][col];          // 첫 막의 특성 (고른 판에서 읽음)
+	for (int r = 2; r <= D; r++)         // 2번 막부터 아래로
 	{
-		if (cnt == K) return 1;
-		if (tmp == MAP[list[r]][r][col]) cnt++;
-		else
+		if (cnt == K) return 1;          // 이미 K개 연속이면 통과
+		if (tmp == MAP[list[r]][r][col]) cnt++;   // 같은 특성이면 연속 길이 증가
+		else                             // 특성이 바뀌면
 		{
-			tmp = MAP[list[r]][r][col];
-			cnt = 1;
+			tmp = MAP[list[r]][r][col];  // 새 특성으로
+			cnt = 1;                     // 연속 길이 다시 1
 		}
 	}
 	if (cnt == K) return 1;   // 마지막 막까지 와서 K에 닿은 경우
-	return 0;
+	return 0;                 // K개 연속이 없으면 불합격
 }
 
 // 모든 열이 통과하는가
 int allCheck()
 {
-	for (int c = 1; c <= W; c++)
-		if (check(c) == 0) return 0;
-	return 1;
+	for (int c = 1; c <= W; c++)         // 모든 열에 대해
+		if (check(c) == 0) return 0;     // 하나라도 불합격이면 실패
+	return 1;                            // 전부 통과
 }
 
 // L : 이번에 정할 막 번호, cnt : 지금까지 약품 투입 횟수
@@ -88,39 +88,39 @@ void DFS(int L, int cnt)
 	// 모든 막을 정했다 -> 검사
 	if (L > D)
 	{
-		if (allCheck())
+		if (allCheck())                  // 성능검사를 통과하면
 		{
-			if (cnt < MINANS) MINANS = cnt;
+			if (cnt < MINANS) MINANS = cnt;   // 최솟값 갱신
 		}
-		return;
+		return;                          // 되돌아간다
 	}
 
 	list[L] = 0;               // 투입 안 함
-	DFS(L + 1, cnt);
+	DFS(L + 1, cnt);           // 다음 막으로
 
 	list[L] = 1;               // A 투입
-	DFS(L + 1, cnt+1);
+	DFS(L + 1, cnt+1);         // 투입 횟수 + 1
 
 	list[L] = 2;               // B 투입
-	DFS(L + 1, cnt+1);
+	DFS(L + 1, cnt+1);         // 투입 횟수 + 1
 }
 
 int main()
 {
 	// MAP[2]를 전부 B(1)로 채운다. MAP[1]은 전역 0 그대로 = 전부 A
 	for (int r = 1; r <= MAX - 1; r++)
-		for (int c = 1; c <= MAX - 1; c++) MAP[2][r][c] = 1;
+		for (int c = 1; c <= MAX - 1; c++) MAP[2][r][c] = 1;   // 전부 B 판 만들기
 
-	scanf("%d", &T);
-	for (int tc = 1; tc <= T; tc++)
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 필름 입력
 
 		MINANS = 0x7fff000;   // 케이스마다 초기화 (전역 초기값과 자릿수가 다르지만 둘 다 충분히 크다)
 
-		DFS(1, 0);
+		DFS(1, 0);                       // 1번 막부터, 투입 0회로 시작
 
-		printf("#%d %d\n", tc, MINANS);
+		printf("#%d %d\n", tc, MINANS);  // 결과 출력
 	}
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

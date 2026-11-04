@@ -37,17 +37,17 @@
 	     결과가 음수일 수 있어서 maxAnswer를 0으로 두면 안 된다.
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (11 + 5)
-#define INF (0x7fff0000)
+#define MAX (11 + 5)           // N 최대 11 + 여유
+#define INF (0x7fff0000)       // 아주 큰 값
 
 // 연산자 번호
-#define PLUS     (0)
-#define MINUS    (1)
-#define MULTIPLY (2)
+#define PLUS     (0)           // +
+#define MINUS    (1)           // -
+#define MULTIPLY (2)           // *
 
-int T;
+int T;                  // 테스트 케이스 수
 
 int N;                  // 숫자 개수
 int num_of_cases[MAX];  // 자리별로 고른 연산자 번호 (길이 N-1)
@@ -55,21 +55,21 @@ int visit[MAX];         // visit[i] : i번 연산자를 지금까지 쓴 횟수
 int possible[3];        // 쓸 수 있는 최대 개수 [+, -, *]
 int number[MAX];        // 입력 숫자들
 
-int minAnswer, maxAnswer;
+int minAnswer, maxAnswer;   // 결과의 최솟값, 최댓값
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 숫자 개수 입력
 
-	for (int i = 0; i < N; i++)
-		scanf("%d", &number[i]);
+	for (int i = 0; i < N; i++)          // 숫자 N개
+		scanf("%d", &number[i]);         // 입력
 
 	// possible[0] = '+' 개수, possible[1] = '-' 개수, possible[2] = '*' 개수
 	for (int i = 0; i < 3; i++)
-		scanf("%d", &possible[i]);
+		scanf("%d", &possible[i]);       // 연산자별 개수 입력
 }
 
 // ---------------------------
@@ -77,9 +77,9 @@ void input()
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < N - 1; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < N - 1; i++)      // 연산자 자리마다
+		printf("%d ", num_of_cases[i]);  // 고른 연산자 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -89,19 +89,19 @@ void printCases()
 // ---------------------------
 int calculate()
 {
-	int sum = number[0];
+	int sum = number[0];                 // 첫 숫자부터 시작
 
-	for (int i = 0; i < N - 1; i++)
+	for (int i = 0; i < N - 1; i++)      // 연산자 자리마다
 	{
-		if (num_of_cases[i] == PLUS)
-			sum += number[i + 1];
-		else if (num_of_cases[i] == MINUS)
-			sum -= number[i + 1];
-		else if (num_of_cases[i] == MULTIPLY)
-			sum *= number[i + 1];
+		if (num_of_cases[i] == PLUS)             // +면
+			sum += number[i + 1];                // 더한다
+		else if (num_of_cases[i] == MINUS)       // -면
+			sum -= number[i + 1];                // 뺀다
+		else if (num_of_cases[i] == MULTIPLY)    // *면
+			sum *= number[i + 1];                // 곱한다
 	}
 
-	return sum;
+	return sum;                          // 식의 값 반환
 }
 
 // ---------------------------
@@ -116,15 +116,15 @@ void DFS(int depth)
 	{
 		// printCases();
 
-		int tmp = calculate();
+		int tmp = calculate();           // 식의 값
 
-		if (maxAnswer < tmp)
-			maxAnswer = tmp;
+		if (maxAnswer < tmp)             // 더 크면
+			maxAnswer = tmp;             // 최댓값 갱신
 
-		if (minAnswer > tmp)
-			minAnswer = tmp;
+		if (minAnswer > tmp)             // 더 작으면
+			minAnswer = tmp;             // 최솟값 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
 	// 세 종류를 모두 시도하되, 남은 개수가 있는 것만
@@ -134,11 +134,11 @@ void DFS(int depth)
 		if (visit[i] == possible[i])
 			continue;
 
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // 이 자리에 i번 연산자
 
 		visit[i]++;        // 하나 소비
 
-		DFS(depth + 1);
+		DFS(depth + 1);    // 다음 자리
 
 		visit[i]--;        // 반납 (백트래킹)
 	}
@@ -150,18 +150,18 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		// 결과가 음수일 수 있으므로 양쪽 끝에서 시작한다
 		minAnswer = INF;
 		maxAnswer = -INF;
 
-		DFS(0);
+		DFS(0);                          // 배치 탐색 시작
 
-		printf("%d %d\n", minAnswer, maxAnswer);
+		printf("%d %d\n", minAnswer, maxAnswer);   // 최솟값, 최댓값 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

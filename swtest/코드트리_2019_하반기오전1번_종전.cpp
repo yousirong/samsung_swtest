@@ -57,14 +57,14 @@
 	  sum[0]에 모여 최대/최소 계산(1~5만 확인)에는 끼지 않는다.
 */
 
-#include <stdio.h>
+#include <stdio.h>           // scanf, printf, putchar 사용
 
-#define MAX (20 + 5)
-#define INF (0x7fff0000)
+#define MAX (20 + 5)         // N 최대 20 + 여유
+#define INF (0x7fff0000)     // 아주 큰 값
 
-int T;
+int T;               // 테스트 케이스 수
 
-int N;
+int N;               // 격자 크기
 int MAP[MAX][MAX];   // 인구 수 (격자 바깥은 -1)
 int minAnswer;       // (최대 구역 - 최소 구역)의 최솟값
 
@@ -73,7 +73,7 @@ int minAnswer;       // (최대 구역 - 최소 구역)의 최솟값
 // ---------------------------
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 격자 크기 입력
 
 	// 격자 바깥을 -1로 채운다.
 	// 마름모 꼭짓점이 격자를 벗어났는지 판정할 때
@@ -82,15 +82,15 @@ void input()
 	{
 		for (int c = 0; c <= N + 1; c++)
 		{
-			MAP[r][c] = -1;
+			MAP[r][c] = -1;              // 바깥 표시
 		}
 	}
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 실제 격자
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 인구 수 입력
 		}
 	}
 }
@@ -100,13 +100,13 @@ void input()
 // ---------------------------
 void printMap(int map[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", map[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // --------------------------------------------------
@@ -118,8 +118,8 @@ void calculate(int sr, int sc, int d1, int d2)
 {
 	int area[MAX][MAX] = { 0 };  // 호출할 때마다 0으로 새로 시작
 	int sum[6] = { 0 };          // 구역별 인구 합 (1~5만 쓴다)
-	int min, max;
-	int start, end, left, right;
+	int min, max;                // 구역 합의 최솟값, 최댓값
+	int start, end, left, right; // 마름모 행 구간과 경계 이동량
 
 	// ----------------------------------------
 	// 1) 마름모(경계선 + 내부)를 1번 구역으로 칠한다
@@ -128,17 +128,17 @@ void calculate(int sr, int sc, int d1, int d2)
 	// 아래로 내려가며 왼쪽 경계는 -1씩(왼쪽으로), 오른쪽 경계는 +1씩(오른쪽으로) 벌어지다가
 	// 각각 꼭짓점 열에 닿으면 방향을 뒤집어 다시 좁혀진다.
 	// ----------------------------------------
-	start = end = sc;
+	start = end = sc;            // 첫 행은 한 칸
 	left = -1;   // 왼쪽 경계의 이동량
 	right = 1;   // 오른쪽 경계의 이동량
 
-	for (int r = sr; r <= sr + d1 + d2; r++)
+	for (int r = sr; r <= sr + d1 + d2; r++)   // 마름모의 모든 행
 	{
-		for (int c = start; c <= end; c++)
-			area[r][c] = 1;
+		for (int c = start; c <= end; c++)     // 이 행의 마름모 구간
+			area[r][c] = 1;                    // 1번 구역
 
-		start += left;
-		end += right;
+		start += left;           // 왼쪽 경계 이동
+		end += right;            // 오른쪽 경계 이동
 
 		// 왼쪽 꼭짓점 열에 닿았으면 이제부터 안쪽으로 좁힌다
 		if (start == sc - d1)
@@ -158,13 +158,13 @@ void calculate(int sr, int sc, int d1, int d2)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (area[r][c] == 1)
-				break;
+			if (area[r][c] == 1)         // 마름모를 만나면
+				break;                   // 이 행은 끝
 
 			if ((1 <= r && r <= sr + d1 - 1) &&
-				(1 <= c && c <= sc))
+				(1 <= c && c <= sc))     // 좌상 조건
 			{
-				area[r][c] = 2;
+				area[r][c] = 2;          // 2번 구역
 			}
 		}
 	}
@@ -178,13 +178,13 @@ void calculate(int sr, int sc, int d1, int d2)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (area[r][c] == 1)
-				continue;
+			if (area[r][c] == 1)         // 마름모 칸은
+				continue;                // 건너뛴다
 
 			if ((1 <= r && r <= sr + d2) &&
-				(sc + 1 <= c && c <= N))
+				(sc + 1 <= c && c <= N)) // 우상 조건
 			{
-				area[r][c] = 3;
+				area[r][c] = 3;          // 3번 구역
 			}
 		}
 	}
@@ -198,13 +198,13 @@ void calculate(int sr, int sc, int d1, int d2)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (area[r][c] == 1)
-				break;
+			if (area[r][c] == 1)         // 마름모를 만나면
+				break;                   // 이 행은 끝
 
 			if ((sr + d1 <= r && r <= N) &&
-				(1 <= c && c <= sc - d1 + d2 - 1))
+				(1 <= c && c <= sc - d1 + d2 - 1))   // 좌하 조건
 			{
-				area[r][c] = 4;
+				area[r][c] = 4;          // 4번 구역
 			}
 		}
 	}
@@ -218,13 +218,13 @@ void calculate(int sr, int sc, int d1, int d2)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (area[r][c] == 1)
-				continue;
+			if (area[r][c] == 1)         // 마름모 칸은
+				continue;                // 건너뛴다
 
 			if ((sr + d2 + 1 <= r && r <= N) &&
-				(sc - d1 + d2 <= c && c <= N))
+				(sc - d1 + d2 <= c && c <= N))   // 우하 조건
 			{
-				area[r][c] = 5;
+				area[r][c] = 5;          // 5번 구역
 			}
 		}
 	}
@@ -237,21 +237,21 @@ void calculate(int sr, int sc, int d1, int d2)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			sum[area[r][c]] += MAP[r][c];
+			sum[area[r][c]] += MAP[r][c];   // 그 칸의 구역 합에 더한다
 		}
 	}
 
-	min = INF;
-	max = -INF;
+	min = INF;                           // 최솟값 초기화
+	max = -INF;                          // 최댓값 초기화
 
-	for (int i = 1; i <= 5; i++)
+	for (int i = 1; i <= 5; i++)         // 5개 구역
 	{
-		if (sum[i] < min) min = sum[i];
-		if (sum[i] > max) max = sum[i];
+		if (sum[i] < min) min = sum[i];  // 최솟값 갱신
+		if (sum[i] > max) max = sum[i];  // 최댓값 갱신
 	}
 
-	if ((max - min) < minAnswer)
-		minAnswer = max - min;
+	if ((max - min) < minAnswer)         // 차이가 더 작으면
+		minAnswer = max - min;           // 답 갱신
 }
 
 // --------------------------------------------------
@@ -262,33 +262,33 @@ void calculate(int sr, int sc, int d1, int d2)
 // --------------------------------------------------
 void simulate()
 {
-	for (int r = 1; r <= N - 2; r++)
+	for (int r = 1; r <= N - 2; r++)     // 기준점 행
 	{
-		for (int c = 2; c <= N - 1; c++)
+		for (int c = 2; c <= N - 1; c++) // 기준점 열
 		{
-			int d1 = 1;
+			int d1 = 1;                  // 왼쪽 아래 길이
 
-			while (1)
+			while (1)                    // d1을 늘려 가며
 			{
 				// 왼쪽 아래 꼭짓점이 격자를 벗어나면 d1을 더 늘릴 수 없다
 				if (MAP[r + d1][c - d1] == -1)
 					break;
 
-				int d2 = 1;
+				int d2 = 1;              // 오른쪽 아래 길이
 
-				while (1)
+				while (1)                // d2를 늘려 가며
 				{
 					// 오른쪽 아래 꼭짓점 또는 맨 아래 꼭짓점이 격자를 벗어나면 중단
 					if (MAP[r + d2][c + d2] == -1 ||
 						MAP[r + d1 + d2][c + d2 - d1] == -1)
 						break;
 
-					calculate(r, c, d1, d2);
+					calculate(r, c, d1, d2);   // 이 마름모로 계산
 
-					d2++;
+					d2++;                // d2 늘리기
 				}
 
-				d1++;
+				d1++;                    // d1 늘리기
 			}
 		}
 	}
@@ -300,16 +300,16 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		minAnswer = INF;
+		minAnswer = INF;                 // 최솟값 초기화
 
-		simulate();
+		simulate();                      // 모든 마름모 시도
 
-		printf("%d\n", minAnswer);
+		printf("%d\n", minAnswer);       // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

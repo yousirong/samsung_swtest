@@ -48,19 +48,19 @@
 	  - MAP은 죽은 세포 자리도 0이 아니므로 번식 후보에서 자동으로 빠진다.
 	  - output()은 디버그 출력용이다.
 */
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (500)
-#define OFFSET (250)
+#define MAX (500)              // 퍼져 나갈 공간까지 포함한 격자 크기
+#define OFFSET (250)           // 초기 용기를 격자 가운데에 놓기 위한 값
 
-int T;
+int T;                 // 테스트 케이스 수
 int N, M, K;           // 초기 세로, 가로, 배양 시간
 int MAP[MAX][MAX];     // 세포가 차지한 칸 (값 = 생명력). 죽은 세포도 남는다
 
 struct CELL
 {
-	int r;
-	int c;
+	int r;             // 행
+	int c;             // 열
 	int life;          // 생명력 X (활성 목록에서는 남은 활성 시간)
 	int time;          // 남은 비활성 시간
 };
@@ -69,36 +69,36 @@ CELL cell[MAX * MAX];          // 비활성 세포
 CELL liveCell[MAX * MAX];      // 다음 시간의 비활성 세포 (임시)
 CELL spreadCell[MAX * MAX];    // 이번 시간 번식 후보
 CELL deadCell[MAX * MAX];      // 활성 세포 (곧 죽는다)
-int ccnt, lcnt, scnt, dcnt;
+int ccnt, lcnt, scnt, dcnt;    // 각 목록의 개수
 
 // 왼쪽, 위, 오른쪽, 아래
-int dr[] = { 0,-1,0,1 };
-int dc[] = { -1,0,1,0 };
+int dr[] = { 0,-1,0,1 };       // 방향별 행 변화량
+int dc[] = { -1,0,1,0 };       // 방향별 열 변화량
 
 
 void input()
 {
-	scanf("%d %d %d", &N, &M, &K);
+	scanf("%d %d %d", &N, &M, &K);       // 초기 세로, 가로, 배양 시간 입력
 
-	for (int r = 0; r < MAX; r++)
+	for (int r = 0; r < MAX; r++)        // 격자 전체
 		for (int c = 0; c < MAX; c++)
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 빈 칸으로 초기화
 
 	ccnt = 0;   // ([버그] dcnt도 여기서 0으로 비워야 한다)
-	for (int r = 0; r < N; r++)
+	for (int r = 0; r < N; r++)          // 초기 용기의 행
 	{
-		for (int c = 0; c < M; c++)
+		for (int c = 0; c < M; c++)      // 초기 용기의 열
 		{
-			int life;
+			int life;                    // 생명력
 
-			scanf("%d", &life);
+			scanf("%d", &life);          // 생명력 입력 (0이면 빈 칸)
 			MAP[r + OFFSET][c + OFFSET] = life;   // 가운데쯤에 놓는다 (사방으로 퍼질 자리)
 
-			if (life)
+			if (life)                    // 세포가 있으면
 			{
-				cell[ccnt].r = r + OFFSET;
-				cell[ccnt].c = c + OFFSET;
-				cell[ccnt].life = life;
+				cell[ccnt].r = r + OFFSET;       // 행
+				cell[ccnt].c = c + OFFSET;       // 열
+				cell[ccnt].life = life;          // 생명력
 				cell[ccnt++].time = life;   // 처음엔 X시간 비활성
 			}
 		}
@@ -107,102 +107,102 @@ void input()
 
 void output()   // for debug
 {
-	for (int r = OFFSET - 5; r < OFFSET + N + 5; r++)
+	for (int r = OFFSET - 5; r < OFFSET + N + 5; r++)        // 초기 용기 주변 행
 	{
-		for (int c = OFFSET - 5; c < OFFSET + M + 5; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = OFFSET - 5; c < OFFSET + M + 5; c++)    // 초기 용기 주변 열
+			printf("%d ", MAP[r][c]);                        // 값 출력
+		putchar('\n');                                       // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                                           // 빈 줄
 }
 
 int main()
 {
-	scanf("%d", &T);
-	for (int tc = 1; tc <= T; tc++)
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		for (int time = 0; time < K; time++)
+		for (int time = 0; time < K; time++)   // K시간 반복
 		{
-			lcnt = scnt = 0;
+			lcnt = scnt = 0;             // 이번 시간 목록 초기화
 			int indexMAP[MAX][MAX] = { 0 };   // 이번 시간에 그 칸을 차지한 번식 후보 번호 ([확인 필요] 약 1MB 지역 배열)
-			for (int i = 0; i < ccnt; i++)
+			for (int i = 0; i < ccnt; i++)    // 비활성 세포마다
 			{
 				if (cell[i].time)
 				{
 					// 1-1 cell을 보고 time이 0이 아닌경우, liveCell에 cell 추가
-					cell[i].time--;
-					liveCell[lcnt++] = cell[i];
+					cell[i].time--;              // 비활성 시간 1 감소
+					liveCell[lcnt++] = cell[i];  // 계속 비활성
 				}
 				else
 				{
 					// 1-2 time이 0인 경우는 deadCell에 추가
-					deadCell[dcnt] = cell[i];
-					dcnt++;
+					deadCell[dcnt] = cell[i];    // 활성 목록에 추가
+					dcnt++;                      // 활성 세포 수 증가
 
 					// 1-3 time이 0인경우, 4방향 탐색해서, MAP에 빈칸인 경우
 					// spreadCell에 추가
 					for (int dir = 0; dir < 4; dir++)
 					{
-						int nr, nc;
+						int nr, nc;              // 번식할 칸
 
-						nr = cell[i].r + dr[dir];
-						nc = cell[i].c + dc[dir];
+						nr = cell[i].r + dr[dir];   // 번식할 행
+						nc = cell[i].c + dc[dir];   // 번식할 열
 
 						if (MAP[nr][nc])continue;   // 이미 누가 차지한 칸 (죽은 세포 포함)
 
-						spreadCell[scnt].r = nr;
-						spreadCell[scnt].c = nc;
-						spreadCell[scnt].life = cell[i].life;
-						spreadCell[scnt++].time = cell[i].life;
+						spreadCell[scnt].r = nr;                 // 후보 행
+						spreadCell[scnt].c = nc;                 // 후보 열
+						spreadCell[scnt].life = cell[i].life;    // 생명력 물려받음
+						spreadCell[scnt++].time = cell[i].life;  // 비활성부터 시작
 					}
 				}
 			}
 			// 2 deadCell의 life 감소, life가 남아있으면 다시 deadCell에 추가
-			int ddcnt = 0;
-			for (int i = 0; i < dcnt; i++)
+			int ddcnt = 0;                       // 살아남은 활성 세포 수
+			for (int i = 0; i < dcnt; i++)       // 활성 세포마다
 			{
-				deadCell[i].life--;
-				if (deadCell[i].life)
-					deadCell[ddcnt++] = deadCell[i];
+				deadCell[i].life--;              // 남은 활성 시간 1 감소
+				if (deadCell[i].life)            // 아직 남았으면
+					deadCell[ddcnt++] = deadCell[i];   // 목록에 남긴다
 			}
 
-			dcnt = ddcnt;
+			dcnt = ddcnt;                        // 활성 세포 수 갱신
 
-			for (int i = 0; i < scnt; i++)
+			for (int i = 0; i < scnt; i++)       // 번식 후보마다
 			{
-				int nr, nc;
+				int nr, nc;                      // 후보 칸
 
-				nr = spreadCell[i].r;
-				nc = spreadCell[i].c;
+				nr = spreadCell[i].r;            // 후보 행
+				nc = spreadCell[i].c;            // 후보 열
 
 				// 3-1 MAP이 빈칸이라면, spreadCell의 life를 MAP에 표시
 				if (MAP[nr][nc] == 0)
 				{
-					MAP[nr][nc] = spreadCell[i].life;
-					indexMAP[nr][nc] = i;
+					MAP[nr][nc] = spreadCell[i].life;    // 칸 차지
+					indexMAP[nr][nc] = i;                // 차지한 후보 번호 기억
 				}
 				// 3-2 MAP이 빈칸이 아니고, 자신의 life가 더 크다면 MAP 갱신
 				else if (MAP[nr][nc] < spreadCell[i].life)
 				{
 					spreadCell[indexMAP[nr][nc]].time = 0;   // 먼저 차지했던 후보는 진 것으로 표시
 
-					MAP[nr][nc] = spreadCell[i].life;
-					indexMAP[nr][nc] = i;
+					MAP[nr][nc] = spreadCell[i].life;    // 더 큰 생명력으로 차지
+					indexMAP[nr][nc] = i;                // 차지한 후보 번호 갱신
 				}
 				else
 					spreadCell[i].time = 0;                  // 내가 진 것 (같으면 먼저 온 쪽이 남는다)
 			}
 			// 4) 3) 과정 종료 후, spreadCell이 0이 아닌 경우만 liveCell에 추가
 			for (int i = 0; i < scnt; i++)
-				if (spreadCell[i].time) liveCell[lcnt++] = spreadCell[i];
+				if (spreadCell[i].time) liveCell[lcnt++] = spreadCell[i];   // 이긴 후보만 새 세포
 
 			// 5) 다음 1) 과정을 다시 하기 위해 liveCell을 cell에 추가
 			for (int i = 0; i < lcnt; i++) cell[i] = liveCell[i];
-			ccnt = lcnt;
+			ccnt = lcnt;                         // 비활성 세포 수 갱신
 		}
 		printf("#%d %d\n", tc, lcnt + dcnt);   // 비활성 + 활성
 	}
-	return 0;
-}
+	return 0;                            // 프로그램 정상 종료
+}

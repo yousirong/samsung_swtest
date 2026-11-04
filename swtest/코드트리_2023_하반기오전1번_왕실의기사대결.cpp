@@ -42,67 +42,67 @@
 	  - 사라진 기사는 좌표를 그대로 들고 있지만 setKnight에서 빠지므로 다른 기사를 막지 않는다.
 	  - 함정은 여러 번 밟을 수 있다. 밀릴 때마다 새 영역의 함정 수만큼 다시 깎인다.
 */
-#include <stdio.h>
+#include <stdio.h>                       // scanf, printf, putchar 사용
 
-#define MAX_L (40+5)
-#define MAX_N (30+5)
+#define MAX_L (40+5)                     // L 최대 40 + 여유
+#define MAX_N (30+5)                     // N 최대 30 + 여유
 
-#define EMPTY (0)	
-#define TRAP (-1)
-#define	WALL (-2)
+#define EMPTY (0)	                     // 빈칸
+#define TRAP (-1)                        // 함정
+#define	WALL (-2)                        // 벽
 
-int T;
+int T;                                   // 테스트 케이스 수
 
-int L, N, Q;
-int MAP[MAX_L][MAX_L];
-int tmpMAP[MAX_L][MAX_L];
+int L, N, Q;                             // 판 크기, 기사 수, 명령 수
+int MAP[MAX_L][MAX_L];                   // 지형 (빈칸 / 함정 / 벽)
+int tmpMAP[MAX_L][MAX_L];                // 기사 번호 지도
 
-struct COMMAND
+struct COMMAND                           // 명령
 {
-	int index;
-	int direction;
+	int index;                           // 기사 번호
+	int direction;                       // 방향
 };
 
-COMMAND command[100 + 10];
+COMMAND command[100 + 10];               // 명령 목록
 
-struct RCI
+struct RCI                               // 큐 원소 : 좌표 + 기사 번호
 {
-	int r;
-	int c;
-	int index;
+	int r;                               // 행
+	int c;                               // 열
+	int index;                           // 그 칸의 기사 번호
 };
 
-RCI queue[MAX_L * MAX_L];
+RCI queue[MAX_L * MAX_L];                // BFS 큐
 
-struct KNIGHT
+struct KNIGHT                            // 기사 정보
 {
-	int r;
-	int c;
-	int h;
-	int w;
+	int r;                               // 좌상단 행
+	int c;                               // 좌상단 열
+	int h;                               // 높이
+	int w;                               // 너비
 	int k; // 기사의 체력
 	int init_k; // 기사의 원래 체력
 };
 
-KNIGHT knight[MAX_N];
+KNIGHT knight[MAX_N];                    // 기사 배열 (1번부터)
 
 // ↑, →, ↓, ←
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0, -1 };
+int dr[] = { -1, 0, 1, 0 };              // 방향별 행 변화량
+int dc[] = { 0, 1, 0, -1 };              // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d %d", &L, &N, &Q);
+	scanf("%d %d %d", &L, &N, &Q);       // 판 크기, 기사 수, 명령 수 입력
 
-	for (int r = 0; r <= L+1; r++)
+	for (int r = 0; r <= L+1; r++)       // 테두리 포함 전체를
 		for (int c = 0; c <= L+1; c++)
-			MAP[r][c] = WALL;
+			MAP[r][c] = WALL;            // 벽으로 채움
 
-	for (int r = 1; r <= L; r++)
+	for (int r = 1; r <= L; r++)         // 판 안쪽
 	{
 		for (int c = 1; c <= L; c++)
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 지형 입력
 
 			if (MAP[r][c] == 1) MAP[r][c] = TRAP;
 			// 입력의 1, 2를 음수로 바꿔 두면 기사 번호(양수)와 섞이지 않는다.
@@ -110,30 +110,30 @@ void input()
 		}
 	}
 
-	for (int n = 1; n <= N; n++)
+	for (int n = 1; n <= N; n++)         // 기사별
 	{
-		scanf("%d %d %d %d %d", &knight[n].r, &knight[n].c, &knight[n].h, &knight[n].w, &knight[n].k);
-		
+		scanf("%d %d %d %d %d", &knight[n].r, &knight[n].c, &knight[n].h, &knight[n].w, &knight[n].k);   // 기사 정보 입력
+
 		// 최초 체력 저장
 		knight[n].init_k = knight[n].k;
 	}
 
-	for (int q = 0; q < Q; q++)
+	for (int q = 0; q < Q; q++)          // 명령 입력
 		scanf("%d %d", &command[q].index, &command[q].direction);
 }
 
 void printMap(int map[MAX_L][MAX_L]) // for debug
 {
-	for (int r = 1; r <= L; r++)
+	for (int r = 1; r <= L; r++)         // 모든 행
 	{
-		for (int c = 1; c <= L; c++)
-			printf("%2d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= L; c++)     // 모든 열
+			printf("%2d ", map[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
-void printStatus()
+void printStatus()                       // for debug : 기사 상태 출력
 {
 	for (int n = 1; n <= N; n++)
 	{
@@ -143,45 +143,45 @@ void printStatus()
 	putchar('\n');
 }
 
-void setKnight()
+void setKnight()                         // tmpMAP에 살아 있는 기사 번호 찍기
 {
-	for (int r = 1; r <= L; r++)
+	for (int r = 1; r <= L; r++)         // 지도 초기화
 		for (int c = 1; c <= L; c++)
 			tmpMAP[r][c] = 0;
 
-	for (int n = 1; n <= N; n++)
+	for (int n = 1; n <= N; n++)         // 기사별
 	{
 		if (knight[n].k <= 0) continue;
 		// 사라진 기사는 찍지 않는다. 그래서 다른 기사를 막지도 않는다.
 
-		int kr, kc, kh, kw;
+		int kr, kc, kh, kw;              // 기사 영역
 		kr = knight[n].r;
 		kc = knight[n].c;
 		kh = knight[n].h;
 		kw = knight[n].w;
 
-		for (int r = kr; r < (kr + kh); r++)
+		for (int r = kr; r < (kr + kh); r++)      // 영역 전체에
 			for (int c = kc; c < (kc + kw); c++)
-				tmpMAP[r][c] = n;	
+				tmpMAP[r][c] = n;	                // 기사 번호 찍기
 	}
 }
 
-void BFS(int index, int direction)
+void BFS(int index, int direction)       // index번 기사를 direction으로 밀기
 {
-	if (knight[index].k <= 0) return;
+	if (knight[index].k <= 0) return;    // 사라진 기사면 무시
 
-	int rp, wp;
-	bool visit[MAX_L][MAX_L] = { 0 };
-	int kr, kc, kh, kw;
+	int rp, wp;                          // 큐 읽기/쓰기 위치
+	bool visit[MAX_L][MAX_L] = { 0 };    // 큐에 담은 칸
+	int kr, kc, kh, kw;                  // 기사 영역
 
 	kr = knight[index].r;
 	kc = knight[index].c;
 	kh = knight[index].h;
 	kw = knight[index].w;
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 큐 초기화
 
-	for (int r = kr; r < (kr + kh); r++)
+	for (int r = kr; r < (kr + kh); r++) // 명령 받은 기사의 모든 칸을 큐에
 	{
 		for (int c = kc; c < (kc + kw); c++)
 		{
@@ -189,15 +189,15 @@ void BFS(int index, int direction)
 			queue[wp].c = c;
 			queue[wp++].index = index;
 
-			visit[r][c] = true;
+			visit[r][c] = true;          // 담음 표시
 		}
 	}
 
-	while (rp < wp)
+	while (rp < wp)                      // 큐가 빌 때까지
 	{
-		RCI out = queue[rp++];
+		RCI out = queue[rp++];           // 하나 꺼내기
 
-		int nr, nc;
+		int nr, nc;                      // 밀려갈 칸
 
 		nr = out.r + dr[direction];
 		nc = out.c + dc[direction];
@@ -208,15 +208,15 @@ void BFS(int index, int direction)
 		if (visit[nr][nc] == true || tmpMAP[nr][nc] == EMPTY) continue;
 		// 빈칸이면 더 밀 대상이 없고, 이미 담은 칸은 건너뛴다.
 
-		int another = tmpMAP[nr][nc];
-		int kr, kc, kh, kw;
+		int another = tmpMAP[nr][nc];    // 밀리는 다른 기사
+		int kr, kc, kh, kw;              // 그 기사의 영역
 
 		kr = knight[another].r;
 		kc = knight[another].c;
 		kh = knight[another].h;
 		kw = knight[another].w;
 
-		for (int r = kr; r < (kr + kh); r++)
+		for (int r = kr; r < (kr + kh); r++)   // 그 기사의 모든 칸을 큐에
 		{
 			for (int c = kc; c < (kc + kw); c++)
 			{
@@ -224,30 +224,30 @@ void BFS(int index, int direction)
 				queue[wp].c = c;
 				queue[wp++].index = another;
 
-				visit[r][c] = true;
+				visit[r][c] = true;      // 담음 표시
 			}
 		}
 	}
 
-	bool check[MAX_N] = { 0 };
-	for (int i = 0; i < wp; i++)
+	bool check[MAX_N] = { 0 };           // 밀리는 기사 표시
+	for (int i = 0; i < wp; i++)         // 큐에 담긴 칸들의
 	{
-		int knightIndex = queue[i].index;
+		int knightIndex = queue[i].index;   // 기사 번호
 
-		check[knightIndex] = true;
+		check[knightIndex] = true;       // 밀림 표시
 	}
 
-	for (int n = 1; n <= N; n++)
+	for (int n = 1; n <= N; n++)         // 기사별
 	{
-		if (check[n] == false) continue;
+		if (check[n] == false) continue; // 안 밀린 기사 제외
 
-		knight[n].r = knight[n].r + dr[direction];
+		knight[n].r = knight[n].r + dr[direction];   // 한 칸 이동
 		knight[n].c = knight[n].c + dc[direction];
 
 		if (n == index) continue;
 		// 명령을 받은 기사는 함정 피해를 입지 않는다.
 
-		int kr, kc, kh, kw;
+		int kr, kc, kh, kw;              // 이동 후 영역
 
 		kr = knight[n].r;
 		kc = knight[n].c;
@@ -256,7 +256,7 @@ void BFS(int index, int direction)
 
 		for (int r = kr; r < (kr + kh); r++)
 			for (int c = kc; c < (kc + kw); c++)
-				if (MAP[r][c] == TRAP) knight[n].k--;
+				if (MAP[r][c] == TRAP) knight[n].k--;   // 함정마다 체력 1 감소
 	}
 	//printMap(tmpMAP);
 
@@ -265,37 +265,37 @@ void BFS(int index, int direction)
 
 void simulate()
 {
-	for (int q = 0; q < Q; q++)
+	for (int q = 0; q < Q; q++)          // 명령별
 	{
-		setKnight();
-		BFS(command[q].index, command[q].direction);
+		setKnight();                     // 기사 지도 갱신
+		BFS(command[q].index, command[q].direction);   // 밀기
 		//printMap(MAP);
 		//printStatus();
 	}
 
 }
 
-int getAnswer()
+int getAnswer()                          // 살아 있는 기사의 피해 합
 {
-	int sum = 0;
+	int sum = 0;                         // 합
 	for (int n = 1; n <= N; n++)
 	{
-		if (knight[n].k > 0)sum += (knight[n].init_k - knight[n].k);
+		if (knight[n].k > 0)sum += (knight[n].init_k - knight[n].k);   // 살아 있으면 피해량 더하기
 	}
-	return sum;
+	return sum;                          // 반환
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // 시뮬레이션
 
-		printf("%d\n", getAnswer());
+		printf("%d\n", getAnswer());     // 결과 출력
 	}
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

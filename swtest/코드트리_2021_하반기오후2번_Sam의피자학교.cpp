@@ -52,62 +52,62 @@
 	  문제 본문은 "k 이하가 되기 위한 최소 반복 횟수"라고만 해서 이 경우 0인지 1인지 명시하지 않는다.
 	  예제 두 개는 둘 다 처음에 조건을 만족하지 않는 입력이라 이 부분은 판단할 수 없다.
 */
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (100+10)
-#define INF (0x7fff0000)
+#define MAX (100+10)           // N 최대 100 + 여유
+#define INF (0x7fff0000)       // 아주 큰 값
 
-int T;
+int T;                         // 테스트 케이스 수
 
-int N, K;
+int N, K;                      // 도우 수, 목표 차이
 int pizza[MAX][MAX]; // 바닥이 N행, 위로 쌓일수록 행 번호가 작아진다 (0 = 도우 없음)
 
-struct RC
+struct RC                      // 좌표 한 쌍
 {
-	int r;
-	int c;
+	int r;                     // 행
+	int c;                     // 열
 };
 
 // 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0, -1 };
+int dr[] = { -1, 0, 1, 0 };    // 방향별 행 변화량
+int dc[] = { 0, 1, 0, -1 };    // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d", &N, &K);
+	scanf("%d %d", &N, &K);              // 도우 수, 목표 차이 입력
 
 	// 테두리(0행, N+1행/열)까지 0으로 비워 둔다.
 	// press()에서 이웃 칸을 경계 검사 없이 읽기 때문에 테두리가 0이어야 한다.
 	for (int r = 0; r <= N + 1; r++)
 		for (int c = 0; c <= N + 1; c++)
-			pizza[r][c] = 0;
+			pizza[r][c] = 0;             // 도우 없음
 
 	// 처음에는 전부 바닥 줄(N행)에 놓인다.
 	for (int c = 1; c <= N; c++)
-		scanf("%d", &pizza[N][c]);
+		scanf("%d", &pizza[N][c]);       // 밀가루 양 입력
 }
 
 void printMap() // for debug
 {
-	for(int r = 1; r <= N; r++)
+	for(int r = 1; r <= N; r++)          // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%2d", pizza[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%2d", pizza[r][c]);  // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 
 }
 
 // 1) 밀가루가 가장 적은 도우 "전부"에 1씩 넣는다.
 void addFlour()
 {
-	int min = INF;
-	for (int c = 1; c <= N; c++)
-		if (pizza[N][c] < min) min = pizza[N][c];
+	int min = INF;                       // 최솟값
+	for (int c = 1; c <= N; c++)         // 바닥 줄에서
+		if (pizza[N][c] < min) min = pizza[N][c];   // 최솟값 찾기
 
-	for (int c = 1; c <= N; c++)
-		if (pizza[N][c] == min) pizza[N][c]++;
+	for (int c = 1; c <= N; c++)         // 바닥 줄에서
+		if (pizza[N][c] == min) pizza[N][c]++;      // 최솟값인 곳에 1 추가
 }
 
 // 2) 도우 말기
@@ -121,11 +121,11 @@ void roll()
 	// 7, 3 x 3
 	// 10, 4 x 3
 
-	int start, height, width;
-	start = height = width = 1;
+	int start, height, width;            // 묶음 시작 열, 높이, 너비
+	start = height = width = 1;          // 처음엔 1칸짜리
 
-	int count = 0;
-	while (1)
+	int count = 0;                       // 말기 횟수
+	while (1)                            // 더 못 말 때까지
 	{
 		// 묶음을 돌려 올리면 오른쪽 끝이 start + width + height - 1 열이 된다.
 		// 그게 N을 넘으면 바닥에 올릴 자리가 없으므로 멈춘다.
@@ -136,19 +136,19 @@ void roll()
 		// 바로 오른쪽(start + width 열부터) 바닥 위에 올린다.
 		//   c가 오른쪽으로 갈수록 -> 올라간 뒤 아래쪽 행 (nr 증가)
 		//   r이 위로 갈수록      -> 올라간 뒤 오른쪽 열 (nc 증가)
-		for (int c = start; c < start + width; c++)
+		for (int c = start; c < start + width; c++)      // 묶음의 열
 		{
-			for (int r = N; r > N - height; r--)
+			for (int r = N; r > N - height; r--)         // 묶음의 행 (아래부터)
 			{
-				int nr, nc;
-				nr = N - width + (c - start);
-				nc = start + width + (N - r);
+				int nr, nc;                              // 옮겨 갈 칸
+				nr = N - width + (c - start);            // 새 행
+				nc = start + width + (N - r);            // 새 열
 
 				// for debug
 				// printf("%d %d -> %d %d\n", r, c, nr, nc);
 
-				pizza[nr][nc] = pizza[r][c];
-				pizza[r][c] = 0;
+				pizza[nr][nc] = pizza[r][c];             // 옮기고
+				pizza[r][c] = 0;                         // 원래 칸 비우기
 			}
 		}
 
@@ -159,7 +159,7 @@ void roll()
 		// 방금 옮긴 묶음의 너비만큼 시작 열이 밀린다. (1, 1, 2, 2, 3, 3, ...)
 		start += (count / 2 + 1) ;
 
-		count++;
+		count++;                         // 말기 횟수 증가
 	}
 }
 
@@ -169,19 +169,19 @@ void press()
 	// "동시에" 옮겨야 하므로 결과는 tmpPizza에 모은다.
 	// pizza를 바로 고치면 앞에서 옮긴 값이 뒤 칸 계산에 섞인다.
 	int tmpPizza[MAX][MAX] = { 0 };
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			if (pizza[r][c] == 0) continue;
-			int flour = pizza[r][c];
+			if (pizza[r][c] == 0) continue;   // 도우 없으면 건너뜀
+			int flour = pizza[r][c];     // 이 칸에 남을 양
 
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)  // 4방향
 			{
-				int nr, nc;
+				int nr, nc;              // 이웃 칸
 
-				nr = r + dr[i];
-				nc = c + dc[i];
+				nr = r + dr[i];          // 이웃 행
+				nc = c + dc[i];          // 이웃 열
 
 				// 도우가 없는 칸(테두리 포함)과는 주고받지 않는다.
 				if (pizza[nr][nc] == 0) continue;
@@ -190,36 +190,36 @@ void press()
 				// "많은 쪽이 줄 때"만 처리하면 중복 없이 한 번만 옮겨진다.
 				if (pizza[r][c] > pizza[nr][nc])
 				{
-					int diff = (pizza[r][c] - pizza[nr][nc]) / 5;
+					int diff = (pizza[r][c] - pizza[nr][nc]) / 5;   // 옮길 양
 
-					flour -= diff;
-					tmpPizza[nr][nc] += diff;
+					flour -= diff;           // 나는 줄고
+					tmpPizza[nr][nc] += diff;   // 이웃은 받는다
 				}
 			}
-			tmpPizza[r][c] += flour;
+			tmpPizza[r][c] += flour;     // 남은 양 반영
 		}
 	}
 
 	// 한 줄로 펴기 : 왼쪽 열부터, 같은 열은 바닥(N행)에서 위로.
 	// 바닥 줄 index는 항상 1 이상 c 이하이므로, 같은 N행에 덮어써도
 	// 아직 읽지 않은 tmpPizza를 망가뜨리지 않는다 (읽는 쪽이 tmpPizza라 애초에 안전).
-	int index = 1;
-	for (int c = 1; c <= N; c++)
+	int index = 1;                       // 바닥 줄에 쓸 위치
+	for (int c = 1; c <= N; c++)         // 왼쪽 열부터
 	{
-		if (tmpPizza[N][c] == 0) continue;
+		if (tmpPizza[N][c] == 0) continue;   // 도우 없는 열은 건너뜀
 
-		int sr = N;
-		while (1)
+		int sr = N;                      // 바닥부터
+		while (1)                        // 위로 올라가며
 		{
 			if (tmpPizza[sr][c] == 0) break; // 이 열의 위쪽 끝
-			pizza[N][index++] = tmpPizza[sr][c];
-			sr--;
+			pizza[N][index++] = tmpPizza[sr][c];   // 바닥 줄에 차례로 깔기
+			sr--;                        // 한 칸 위
 		}
 	}
 	// 바닥 줄을 뺀 나머지는 비운다.
 	for (int r = 1; r <= N - 1; r++)
 		for (int c = 1; c <= N; c++)
-			pizza[r][c] = 0;
+			pizza[r][c] = 0;             // 비우기
 }
 
 // 4) 반 접기 두 번
@@ -228,11 +228,11 @@ void fold()
 	// 한 번 접기
 	// 왼쪽 절반(1 ~ N/2)을 180도 돌려 오른쪽 절반 위(N-1행)에 올린다.
 	// 180도 회전이므로 N/2열 -> N/2+1열, 1열 -> N열로 좌우가 뒤집힌다.
-	int sc = (N / 2) + 1;
-	for (int c = N / 2; c >= 1; c--)
+	int sc = (N / 2) + 1;                // 올라갈 시작 열
+	for (int c = N / 2; c >= 1; c--)     // 왼쪽 절반을 오른쪽 끝부터
 	{
-		pizza[N - 1][sc++] = pizza[N][c];
-		pizza[N][c] = 0;
+		pizza[N - 1][sc++] = pizza[N][c];   // 위 줄로 올린다
+		pizza[N][c] = 0;                    // 원래 칸 비우기
 	}
 
 	// 두 번 접기
@@ -240,69 +240,69 @@ void fold()
 	// 그중 왼쪽 절반(N/2+1 ~ 3N/4)을 180도 돌려 오른쪽 절반(3N/4+1 ~ N) 위에 올린다.
 	//   N-1행 -> N-2행, N행 -> N-3행 (위아래 뒤집힘)
 	//   왼쪽 열일수록 -> 오른쪽 열 (nc = N부터 감소, 좌우 뒤집힘)
-	int nr = N - 2;
-	for (int r = N - 1; r <= N; r++)
+	int nr = N - 2;                      // 올라갈 행
+	for (int r = N - 1; r <= N; r++)     // 2줄
 	{
-		int ec = (N / 4) * 3;
-		int nc = N;
+		int ec = (N / 4) * 3;            // 접을 부분의 끝 열
+		int nc = N;                      // 올라갈 열 (오른쪽 끝부터)
 		for (int c = (N / 2) + 1; c <= ec; c++)
 		{
 			// for debug
 			// printf("%d %d -> %d %d\n", r, c, nr, nc);
 
-			pizza[nr][nc] = pizza[r][c];
-			pizza[r][c] = 0;
-			nc--;
+			pizza[nr][nc] = pizza[r][c]; // 옮기고
+			pizza[r][c] = 0;             // 원래 칸 비우기
+			nc--;                        // 한 칸 왼쪽
 		}
-		nr--;
+		nr--;                            // 한 줄 위
 	}
 }
 
 // 바닥 줄의 (최댓값 - 최솟값) <= K 인가
 bool check()
 {
-	int max = 0;
-	int min = INF;
+	int max = 0;                         // 최댓값
+	int min = INF;                       // 최솟값
 
-	for (int c = 1; c <= N; c++)
+	for (int c = 1; c <= N; c++)         // 바닥 줄에서
 	{
-		if (pizza[N][c] < min) min = pizza[N][c];
-		if (pizza[N][c] > max) max = pizza[N][c];
+		if (pizza[N][c] < min) min = pizza[N][c];   // 최솟값 갱신
+		if (pizza[N][c] > max) max = pizza[N][c];   // 최댓값 갱신
 	}
 
-	return (max - min) <= K;
+	return (max - min) <= K;             // 차이가 K 이하인가
 }
 
 int simulate()
 {
-	int count = 0;
-	while (1)
+	int count = 0;                       // 반복 횟수
+	while (1)                            // 조건을 만족할 때까지
 	{
-		addFlour();
-		roll();
-		press();
-		fold();
-		press();
+		addFlour();                      // 1) 밀가루 추가
+		roll();                          // 2) 도우 말기
+		press();                         // 3) 꾹 누르기
+		fold();                          // 4) 반 접기 두 번
+		press();                         // 5) 꾹 누르기
 
-		count++;
+		count++;                         // 반복 횟수 증가
 
 		// [확인 필요] 연습을 먼저 하고 검사한다 -> 처음부터 조건을 만족해도 1을 반환한다.
 		// (백준 23291 기준이면 루프 앞에서 먼저 검사해 0을 반환해야 한다)
 		if (check() == true)  break;
 	}
-	return count;
+	return count;                        // 반복 횟수 반환
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

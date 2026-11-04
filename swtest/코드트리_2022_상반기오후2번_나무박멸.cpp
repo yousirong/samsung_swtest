@@ -44,50 +44,50 @@
 	  - herbicide는 input()에서 초기화하지 않는다. 한 번만 실행하면 전역 0 초기화로 충분하지만
 	    여러 테스트케이스를 돌리거나 함수형으로 재호출하면 이전 값이 남는다.
 */
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (20 + 5)
-#define WALL (-1)
+#define MAX (20 + 5)           // N 최대 20 + 여유
+#define WALL (-1)              // 벽
 
-int T;
+int T;                         // 테스트 케이스 수
 
 int N, M, K, C; // 격자 크기, 햇수, 제초제 확산 범위, 제초제 유지 햇수
 int MAP[MAX][MAX]; // 양수 : 나무 그루 수, 0 : 빈칸, -1 : 벽
 int herbicide[MAX][MAX]; // 제초제 (남은 햇수, 0이면 없음)
 
-struct INFO
+struct INFO                    // 제초제 뿌릴 후보 정보
 {
-	int r;
-	int c;
-	int count;
+	int r;                     // 행
+	int c;                     // 열
+	int count;                 // 박멸되는 나무 수
 };
 
 // ↑, →, ↓, ←
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0, -1 };
+int dr[] = { -1, 0, 1, 0 };    // 방향별 행 변화량
+int dc[] = { 0, 1, 0, -1 };    // 방향별 열 변화량
 
 // ↖, ↗, ↘, ↙
-int dr2[] = { -1, -1, 1, 1 };
-int dc2[] = { -1, 1, 1, -1 };
+int dr2[] = { -1, -1, 1, 1 };  // 대각선별 행 변화량
+int dc2[] = { -1, 1, 1, -1 };  // 대각선별 열 변화량
 
 void input()
 {
-	scanf("%d %d %d %d", &N, &M, &K, &C);
+	scanf("%d %d %d %d", &N, &M, &K, &C);   // 격자 크기, 햇수, 확산 범위, 유지 햇수 입력
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 모든 행
+		for (int c = 1; c <= N; c++)     // 모든 열
+			scanf("%d", &MAP[r][c]);     // 칸 값 입력
 }
 
 void printMap(int map[MAX][MAX]) // for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%2d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%2d ", map[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 void spreadTree()
@@ -98,22 +98,22 @@ void spreadTree()
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (MAP[r][c] == 0 || MAP[r][c] == WALL) continue;
+			if (MAP[r][c] == 0 || MAP[r][c] == WALL) continue;   // 나무가 없으면 건너뜀
 
 			int count = 0; // 주변 나무의 개수
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)  // 4방향
 			{
-				int nr, nc;
+				int nr, nc;              // 이웃 칸
 
-				nr = r + dr[i];
-				nc = c + dc[i];
+				nr = r + dr[i];          // 이웃 행
+				nc = c + dc[i];          // 이웃 열
 
-				if (nr < 1 || nc < 1 || nr > N || nc > N) continue;
+				if (nr < 1 || nc < 1 || nr > N || nc > N) continue;   // 격자 밖
 
-				if (MAP[nr][nc] > 0) count++;
+				if (MAP[nr][nc] > 0) count++;   // 나무가 있으면 센다
 			}
 
-			MAP[r][c] += count;
+			MAP[r][c] += count;          // 그만큼 성장
 		}
 	}
 
@@ -124,20 +124,20 @@ void spreadTree()
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (MAP[r][c] == 0 || MAP[r][c] == WALL) continue;
+			if (MAP[r][c] == 0 || MAP[r][c] == WALL) continue;   // 나무가 없으면 건너뜀
 
 			// 먼저 번식 가능한 칸 수를 센다 (나눗셈의 분모).
 			int count = 0; // 번식 가능한 칸
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)  // 4방향
 			{
-				int nr, nc;
+				int nr, nc;              // 이웃 칸
 
-				nr = r + dr[i];
-				nc = c + dc[i];
+				nr = r + dr[i];          // 이웃 행
+				nc = c + dc[i];          // 이웃 열
 
-				if (nr < 1 || nc < 1 || nr > N || nc > N) continue;
+				if (nr < 1 || nc < 1 || nr > N || nc > N) continue;   // 격자 밖
 
-				if (MAP[nr][nc] == WALL) continue;
+				if (MAP[nr][nc] == WALL) continue;   // 벽
 
 				// 빈칸이면서 제초제가 없어야 한다.
 				if (MAP[nr][nc] == 0 && herbicide[nr][nc] == 0) count++;
@@ -147,22 +147,22 @@ void spreadTree()
 			// 가능한 칸이 없으면(count == 0) 아래 if에 한 번도 들어가지 않아 0으로 나누지 않는다.
 			for (int i = 0; i < 4; i++)
 			{
-				int nr, nc;
+				int nr, nc;              // 이웃 칸
 
-				nr = r + dr[i];
-				nc = c + dc[i];
+				nr = r + dr[i];          // 이웃 행
+				nc = c + dc[i];          // 이웃 열
 
-				if (nr < 1 || nc < 1 || nr > N || nc > N) continue;
+				if (nr < 1 || nc < 1 || nr > N || nc > N) continue;   // 격자 밖
 
-				if (MAP[nr][nc] == WALL) continue;
+				if (MAP[nr][nc] == WALL) continue;   // 벽
 
-				if (MAP[nr][nc] == 0 && herbicide[nr][nc] == 0)
-					tmpMAP[nr][nc] += (MAP[r][c] / count);
+				if (MAP[nr][nc] == 0 && herbicide[nr][nc] == 0)       // 번식 가능한 칸이면
+					tmpMAP[nr][nc] += (MAP[r][c] / count);            // 몫만큼 번식
 			}
 		}
 	}
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 번식 결과 반영
 		for (int c = 1; c <= N; c++)
 			MAP[r][c] += tmpMAP[r][c];
 }
@@ -171,37 +171,37 @@ void spreadTree()
 // MAP은 건드리지 않고 세기만 한다.
 int getDeleteTreeCount(int r, int c)
 {
-	int sum = 0;
+	int sum = 0;                         // 박멸 수
 
-	sum += MAP[r][c];
+	sum += MAP[r][c];                    // 중심 칸
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)          // 대각선 4방향
 	{
-		for (int k = 1; k <= K; k++)
+		for (int k = 1; k <= K; k++)     // K칸까지
 		{
-			int nr, nc;
+			int nr, nc;                  // k칸 떨어진 칸
 
-			nr = r + dr2[i] * k;
-			nc = c + dc2[i] * k;
+			nr = r + dr2[i] * k;         // 행
+			nc = c + dc2[i] * k;         // 열
 
 			// 격자 밖, 빈칸, 벽을 만나면 그 방향은 더 퍼지지 않는다.
 			if (nr < 1 || nc < 1 || nr > N || nc > N) break;
 			if (MAP[nr][nc] == 0 || MAP[nr][nc] == WALL) break;
 
-			sum += MAP[nr][nc];
+			sum += MAP[nr][nc];          // 나무 수 더하기
 		}
 	}
 
-	return sum;
+	return sum;                          // 박멸 수 반환
 }
 
 // 박멸 수가 가장 큰 칸을 고른다.
 INFO findMaxDeleteTree()
 {
-	INFO result;
-	int maxR, maxC, maxTree;
+	INFO result;                         // 결과
+	int maxR, maxC, maxTree;             // 최적 칸, 최대 박멸 수
 
-	maxR = maxC = maxTree = 0;
+	maxR = maxC = maxTree = 0;           // 초기화
 	// 행, 열이 작은 순서로 보면서 "더 클 때만" 갱신 -> 동점이면 앞선 칸이 남는다.
 	for (int r = 1; r <= N; r++) // 행이 작은 순서대로
 	{
@@ -210,12 +210,12 @@ INFO findMaxDeleteTree()
 			// 나무가 있는 칸만 후보로 본다. (나무가 있으면 박멸 수는 최소 1이라 빈칸보다 항상 낫다)
 			if (MAP[r][c] == 0 || MAP[r][c] == WALL) continue;
 
-			int deleteTreeCount = getDeleteTreeCount(r, c);
-			if (maxTree < deleteTreeCount)
+			int deleteTreeCount = getDeleteTreeCount(r, c);   // 이 칸의 박멸 수
+			if (maxTree < deleteTreeCount)                    // 더 크면
 			{
-				maxR = r;
-				maxC = c;
-				maxTree = deleteTreeCount;
+				maxR = r;                // 최적 행
+				maxC = c;                // 최적 열
+				maxTree = deleteTreeCount;   // 최대 박멸 수
 			}
 
 		}
@@ -226,35 +226,35 @@ INFO findMaxDeleteTree()
 	result.c = maxC;
 	result.count = maxTree;
 
-	return result;
+	return result;                       // 결과 반환
 }
 
 // (r, c)에 제초제를 실제로 뿌린다.
 void weeding(int r, int c)
 {
-	MAP[r][c] = 0;
-	herbicide[r][c] = C;
-	for (int i = 0; i < 4; i++)
+	MAP[r][c] = 0;                       // 중심 칸 나무 박멸
+	herbicide[r][c] = C;                 // 제초제 C년
+	for (int i = 0; i < 4; i++)          // 대각선 4방향
 	{
-		for (int k = 1; k <= K; k++)
+		for (int k = 1; k <= K; k++)     // K칸까지
 		{
-			int nr, nc;
+			int nr, nc;                  // k칸 떨어진 칸
 
-			nr = r + dr2[i] * k;
-			nc = c + dc2[i] * k;
+			nr = r + dr2[i] * k;         // 행
+			nc = c + dc2[i] * k;         // 열
 
-			if (nr < 1 || nc < 1 || nr > N || nc > N) break;
+			if (nr < 1 || nc < 1 || nr > N || nc > N) break;   // 격자 밖이면 멈춤
 			// 벽에는 적지 않고 멈춘다. (벽엔 나무가 생기지 않으니 적어도 안 적어도 같다)
 			if (MAP[nr][nc] == WALL) break;
 
 			// 나무가 없는 칸 : 그 칸까지는 뿌리고 멈춘다.
 			if (MAP[nr][nc] == 0)
 			{
-				herbicide[nr][nc] = C;
-				break;
+				herbicide[nr][nc] = C;   // 제초제 C년
+				break;                   // 멈춤
 			}
 
-			MAP[nr][nc] = 0;
+			MAP[nr][nc] = 0;             // 나무 박멸
 			herbicide[nr][nc] = C; // 이미 제초제가 있어도 C로 갱신
 		}
 	}
@@ -262,15 +262,15 @@ void weeding(int r, int c)
 
 int simulate()
 {
-	int sum = 0;
-	for (int m = 0; m < M; m++)
+	int sum = 0;                         // 총 박멸 수
+	for (int m = 0; m < M; m++)          // M년
 	{
 		spreadTree(); // 나무의 성장, 번식
 
 		// 번식이 끝난 뒤 1년씩 줄인다. 그래서 뿌린 뒤 정확히 C년 동안 번식을 막는다.
 		for (int r = 1; r <= N; r++)
 			for (int c = 1; c <= N; c++)
-				if (herbicide[r][c] != 0) herbicide[r][c]--;
+				if (herbicide[r][c] != 0) herbicide[r][c]--;   // 1년 감소
 
 		INFO target = findMaxDeleteTree(); // 제초제를 뿌릴 위치 선정
 
@@ -279,19 +279,19 @@ int simulate()
 		sum += target.count; // 총 박멸한 나무의 그루 수
 	}
 
-	return sum;
+	return sum;                          // 총합 반환
 }
 
 int main()
 {
 	// scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

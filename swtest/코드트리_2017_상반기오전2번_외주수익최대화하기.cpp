@@ -45,11 +45,11 @@
 	  이 파일은 <stdio.h>만 포함해서 충돌하지 않지만, 헤더를 추가하면 문제가 될 수 있다.
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (15 + 5)
+#define MAX (15 + 5)           // N 최대 15 + 여유
 
-int T;
+int T;                 // 테스트 케이스 수
 
 int N;                 // 총 날짜 수
 int time[MAX];         // i일에 시작하는 외주의 소요 기간
@@ -64,11 +64,11 @@ int maxAnswer;         // 가능한 최대 수익
 // ---------------------------
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 날짜 수 입력
 
-	for (int i = 1; i <= N; i++)
+	for (int i = 1; i <= N; i++)         // 1일부터 N일까지
 	{
-		scanf("%d %d", &time[i], &profit[i]);
+		scanf("%d %d", &time[i], &profit[i]);   // 소요 기간과 수익 입력
 	}
 }
 
@@ -77,9 +77,9 @@ void input()
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i <= N; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i <= N; i++)         // 0번부터 N번까지
+		printf("%d ", num_of_cases[i]);  // 선택 여부 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -94,7 +94,7 @@ bool check()
 {
 	bool visit[MAX] = { 0 };   // 호출할 때마다 새로 비운다
 
-	for (int i = 1; i <= N; i++)
+	for (int i = 1; i <= N; i++)         // 날짜마다
 	{
 		// 고르지 않은 날은 볼 필요 없다
 		if (num_of_cases[i] == 0)
@@ -115,7 +115,7 @@ bool check()
 		}
 	}
 
-	return true;
+	return true;                         // 모든 선택이 가능하다
 }
 
 // ---------------------------
@@ -125,14 +125,14 @@ bool check()
 // ---------------------------
 int getProfit()
 {
-	int sum = 0;
+	int sum = 0;                         // 총 수익
 
-	for (int i = 1; i <= N; i++)
+	for (int i = 1; i <= N; i++)         // 날짜마다
 	{
-		sum += (num_of_cases[i] * profit[i]);
+		sum += (num_of_cases[i] * profit[i]);   // 선택한 날의 수익만 더해진다
 	}
 
-	return sum;
+	return sum;                          // 총 수익 반환
 }
 
 // ---------------------------
@@ -150,20 +150,20 @@ void DFS(int depth)
 		// 겹치지 않고 N일 안에 끝나는 조합만 후보가 된다
 		if (check() == true)
 		{
-			int tmp = getProfit();
+			int tmp = getProfit();       // 이 조합의 수익
 
-			if (maxAnswer < tmp)
-				maxAnswer = tmp;
+			if (maxAnswer < tmp)         // 더 크면
+				maxAnswer = tmp;         // 최댓값 갱신
 		}
-		return;
+		return;                          // 되돌아간다
 	}
 
 	// 다음 날짜(depth + 1)를 0(안 함) / 1(함) 두 가지로 갈라 본다
 	for (int i = 0; i < 2; i++)
 	{
-		num_of_cases[depth + 1] = i;
+		num_of_cases[depth + 1] = i;     // 다음 날짜의 선택 여부
 
-		DFS(depth + 1);
+		DFS(depth + 1);                  // 그다음 날짜로
 	}
 }
 
@@ -173,17 +173,17 @@ int main()
 	// scanf("%d", &T);
 	int T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		// 아무것도 선택하지 않으면 수익 0이므로 0에서 시작하면 된다
 		maxAnswer = 0;
 
-		DFS(0);
+		DFS(0);                          // 조합 탐색 시작
 
-		printf("%d\n", maxAnswer);
+		printf("%d\n", maxAnswer);       // 최대 수익 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

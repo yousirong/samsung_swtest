@@ -55,17 +55,17 @@
       코드트리 쪽 조건이 다를 수 있으니 문제 설명을 확인하고 맞춰 두는 편이 좋다.
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX (20 + 5)
-#define INF (0x7fff0000)
+#define MAX (20 + 5)             // N 최대 20 + 여유
+#define INF (0x7fff0000)         // 아주 큰 값
 
-#define ROAD (0)
-#define WALL (1)
+#define ROAD (0)                 // 길
+#define WALL (1)                 // 벽 (입력값)
 
-int T;
+int T;                           // 테스트 케이스 수
 
-int N, M, C;
+int N, M, C;                     // 격자 크기, 승객 수, 배터리
 
 // MAP[r][c] : 0이면 길, -1이면 벽 (격자 바깥도 -1)
 int MAP[MAX][MAX];
@@ -79,11 +79,11 @@ int visit[MAX][MAX];
 // 좌표 한 쌍
 struct RC
 {
-    int r;
-    int c;
+    int r;                       // 행
+    int c;                       // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;            // struct RC를 RC로 줄여 쓰기
 
 RC car;                // 전기차의 현재 위치
 RC queue[MAX * MAX];   // BFS용 큐
@@ -98,9 +98,9 @@ struct PEOPLE
     bool check;   // 이미 데려다줬는지
 };
 
-typedef struct PEOPLE PEOPLE;
+typedef struct PEOPLE PEOPLE;    // struct PEOPLE을 PEOPLE로 줄여 쓰기
 
-PEOPLE people[MAX * MAX];
+PEOPLE people[MAX * MAX];        // 승객 목록 (1번부터)
 
 // findPeople()의 결과
 struct INFO
@@ -109,30 +109,30 @@ struct INFO
     int distance;       // 그 승객까지의 거리
 };
 
-typedef struct INFO INFO;
+typedef struct INFO INFO;        // struct INFO를 INFO로 줄여 쓰기
 
 // 방향 배열: ↑, →, ↓, ←
 // 우선순위는 아래 비교식으로 따로 처리하므로 이 순서 자체는 답에 영향을 주지 않는다.
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };      // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };       // 방향별 열 변화량
 
 /*
     입력
 */
 void input()
 {
-    scanf("%d %d %d", &N, &M, &C);
+    scanf("%d %d %d", &N, &M, &C);       // 격자 크기, 승객 수, 배터리 입력
 
     // 격자 바깥을 벽(-1)으로 채워 두면 BFS에서 범위 검사가 필요 없다
     for (int r = 0; r <= N + 1; r++)
         for (int c = 0; c <= N + 1; c++)
-            MAP[r][c] = -1;
+            MAP[r][c] = -1;              // 벽
 
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 실제 격자
     {
         for (int c = 1; c <= N; c++)
         {
-            scanf("%d", &MAP[r][c]);
+            scanf("%d", &MAP[r][c]);     // 칸 입력
 
             // 입력의 벽은 1이지만, 바깥 테두리와 똑같이 -1로 통일해 둔다.
             // 그러면 "벽인가"를 -1 하나로 검사할 수 있다.
@@ -140,19 +140,19 @@ void input()
         }
     }
 
-    scanf("%d %d", &car.r, &car.c);
+    scanf("%d %d", &car.r, &car.c);      // 차 시작 위치 입력
 
-    for (int m = 1; m <= M; m++)
+    for (int m = 1; m <= M; m++)         // 승객마다
     {
-        int sr, sc, er, ec;
+        int sr, sc, er, ec;              // 출발지, 목적지
 
-        scanf("%d %d %d %d", &sr, &sc, &er, &ec);
+        scanf("%d %d %d %d", &sr, &sc, &er, &ec);   // 승객 정보 입력
 
-        people[m].sr = sr;
-        people[m].sc = sc;
-        people[m].er = er;
-        people[m].ec = ec;
-        people[m].check = false;
+        people[m].sr = sr;               // 출발지 행
+        people[m].sc = sc;               // 출발지 열
+        people[m].er = er;               // 목적지 행
+        people[m].ec = ec;               // 목적지 열
+        people[m].check = false;         // 아직 안 태움
     }
 }
 
@@ -161,13 +161,13 @@ void input()
 */
 void printMap(int map[MAX][MAX])
 {
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 모든 행
     {
-        for (int c = 1; c <= N; c++)
-            printf("%2d ", map[r][c]);
-        putchar('\n');
+        for (int c = 1; c <= N; c++)     // 모든 열
+            printf("%2d ", map[r][c]);   // 값 출력
+        putchar('\n');                   // 행 끝 줄바꿈
     }
-    putchar('\n');
+    putchar('\n');                       // 빈 줄
 }
 
 /*
@@ -177,9 +177,9 @@ void printMap(int map[MAX][MAX])
 */
 INFO findPeople()
 {
-    int rp, wp;
+    int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
 
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 방문 기록 초기화
         for (int c = 1; c <= N; c++)
             visit[r][c] = 0;
 
@@ -192,49 +192,49 @@ INFO findPeople()
     // 길은 0, 벽은 -1이므로 0이 아닌 양수면 곧 승객 자리가 된다.
     for (int i = 1; i <= M; i++)
     {
-        if (people[i].check == true) continue;
+        if (people[i].check == true) continue;   // 이미 데려다준 승객은 제외
 
-        int pr = people[i].sr;
-        int pc = people[i].sc;
+        int pr = people[i].sr;           // 출발지 행
+        int pc = people[i].sc;           // 출발지 열
 
-        tmpMAP[pr][pc] = i;
+        tmpMAP[pr][pc] = i;              // 승객 번호 표시
 
         // 차가 이미 승객 위에 서 있으면 BFS를 돌릴 것도 없이 거리 0이다.
         // (BFS는 시작 칸을 후보로 검사하지 않으므로 이 처리가 필요하다)
         if (pr == car.r && pc == car.c)
         {
-            INFO result = { i, 0 };
-            return result;
+            INFO result = { i, 0 };      // 거리 0
+            return result;               // 바로 반환
         }
     }
 
-    rp = wp = 0;
+    rp = wp = 0;                         // 빈 큐
 
-    queue[wp].r = car.r;
-    queue[wp++].c = car.c;
+    queue[wp].r = car.r;                 // 시작 행 (차 위치)
+    queue[wp++].c = car.c;               // 시작 열, 삽입 위치 증가
 
     visit[car.r][car.c] = 1;   // 0은 미방문이므로 1부터 센다
 
-    int minDistance = INF;
-    int minR = INF;
-    int minC = INF;
-    int peopleNumber = -1;
+    int minDistance = INF;               // 가장 가까운 거리
+    int minR = INF;                      // 그 승객의 행
+    int minC = INF;                      // 그 승객의 열
+    int peopleNumber = -1;               // 고른 승객 번호
 
-    while (rp < wp)
+    while (rp < wp)                      // 처리할 칸이 남아 있는 동안
     {
-        RC out = queue[rp++];
+        RC out = queue[rp++];            // 한 칸 꺼낸다
 
-        for (int k = 0; k < 4; k++)
+        for (int k = 0; k < 4; k++)      // 4방향
         {
-            int nr = out.r + dr[k];
-            int nc = out.c + dc[k];
+            int nr = out.r + dr[k];      // 이웃 행
+            int nc = out.c + dc[k];      // 이웃 열
 
-            if (tmpMAP[nr][nc] == -1 || visit[nr][nc] != 0) continue;
+            if (tmpMAP[nr][nc] == -1 || visit[nr][nc] != 0) continue;   // 벽이거나 방문했으면 건너뜀
 
-            queue[wp].r = nr;
+            queue[wp].r = nr;            // 큐에 넣는다
             queue[wp++].c = nc;
 
-            visit[nr][nc] = visit[out.r][out.c] + 1;
+            visit[nr][nc] = visit[out.r][out.c] + 1;   // 거리 기록
 
             // 0이 아니면 승객이 서 있는 칸이다
             if (tmpMAP[nr][nc] != 0)
@@ -245,10 +245,10 @@ INFO findPeople()
                     || (visit[nr][nc] == minDistance && nr < minR)
                     || (visit[nr][nc] == minDistance && nr == minR && nc < minC))
                 {
-                    peopleNumber = tmpMAP[nr][nc];
-                    minDistance = visit[nr][nc];
-                    minR = nr;
-                    minC = nc;
+                    peopleNumber = tmpMAP[nr][nc];   // 승객 번호
+                    minDistance = visit[nr][nc];     // 거리
+                    minR = nr;                       // 행
+                    minC = nc;                       // 열
                 }
             }
         }
@@ -267,46 +267,46 @@ INFO findPeople()
 */
 int goToDestination(int er, int ec)
 {
-    int rp, wp;
+    int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
 
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 방문 기록 초기화
         for (int c = 1; c <= N; c++)
             visit[r][c] = 0;
 
-    for (int r = 0; r <= N + 1; r++)
+    for (int r = 0; r <= N + 1; r++)     // 작업용 배열 복사
         for (int c = 0; c <= N + 1; c++)
             tmpMAP[r][c] = MAP[r][c];
 
-    rp = wp = 0;
+    rp = wp = 0;                         // 빈 큐
 
-    queue[wp].r = car.r;
-    queue[wp++].c = car.c;
+    queue[wp].r = car.r;                 // 시작 행
+    queue[wp++].c = car.c;               // 시작 열, 삽입 위치 증가
 
-    visit[car.r][car.c] = 1;
+    visit[car.r][car.c] = 1;             // 시작 칸 거리 1
 
-    while (rp < wp)
+    while (rp < wp)                      // 처리할 칸이 남아 있는 동안
     {
-        RC out = queue[rp++];
+        RC out = queue[rp++];            // 한 칸 꺼낸다
 
         // 처음 꺼낸 목적지가 최단이다 (출발지 == 목적지인 경우 0이 나온다)
         if (out.r == er && out.c == ec)
             return visit[out.r][out.c] - 1;
 
-        for (int k = 0; k < 4; k++)
+        for (int k = 0; k < 4; k++)      // 4방향
         {
-            int nr = out.r + dr[k];
-            int nc = out.c + dc[k];
+            int nr = out.r + dr[k];      // 이웃 행
+            int nc = out.c + dc[k];      // 이웃 열
 
-            if (tmpMAP[nr][nc] == -1 || visit[nr][nc] != 0) continue;
+            if (tmpMAP[nr][nc] == -1 || visit[nr][nc] != 0) continue;   // 벽이거나 방문했으면 건너뜀
 
-            queue[wp].r = nr;
+            queue[wp].r = nr;            // 큐에 넣는다
             queue[wp++].c = nc;
 
-            visit[nr][nc] = visit[out.r][out.c] + 1;
+            visit[nr][nc] = visit[out.r][out.c] + 1;   // 거리 기록
         }
     }
 
-    return -1;
+    return -1;                           // 도달 불가
 }
 
 /*
@@ -314,7 +314,7 @@ int goToDestination(int er, int ec)
 */
 int simulate()
 {
-    for (int i = 0; i < M; i++)
+    for (int i = 0; i < M; i++)          // 승객 수만큼
     {
         // 1) 가장 가까운 승객 고르기
         INFO info = findPeople();
@@ -326,9 +326,9 @@ int simulate()
         //    (파일 상단 [확인 필요] 참고 : 이 조건은 <= 로 되어 있다)
         if (C <= info.distance) return -1;
 
-        C -= info.distance;
+        C -= info.distance;              // 이동한 만큼 배터리 감소
 
-        int number = info.peopleNumber;
+        int number = info.peopleNumber;  // 태울 승객 번호
 
         // 차를 승객 출발지로 옮긴다
         car.r = people[number].sr;
@@ -343,13 +343,13 @@ int simulate()
         // 거리만큼 쓰고 두 배를 받으므로 결과적으로 거리만큼 늘어난다
         C += capacity;
 
-        car.r = people[number].er;
+        car.r = people[number].er;       // 차를 목적지로 옮긴다
         car.c = people[number].ec;
 
-        people[number].check = true;
+        people[number].check = true;     // 데려다줬다고 표시
     }
 
-    return C;
+    return C;                            // 남은 배터리
 }
 
 int main()
@@ -358,12 +358,12 @@ int main()
     // scanf("%d", &T);
     T = 1;
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
+        input();                         // 입력
 
-        printf("%d\n", simulate());
+        printf("%d\n", simulate());      // 결과 출력
     }
 
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

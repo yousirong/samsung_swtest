@@ -56,13 +56,13 @@
       코드는 그대로 두었으니, 문제의 회전 정의를 확인한 뒤 위 형태로 바꿔 두는 것을 권한다.
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX (64 + 5)
+#define MAX (64 + 5)             // 2^6 = 64 + 여유
 
-int T;
+int T;                           // 테스트 케이스 수
 
-int N, Q, MAP_SIZE;
+int N, Q, MAP_SIZE;              // 지수 N, 명령 수, 실제 한 변 길이
 
 // MAP[r][c] : 그 칸의 얼음 양
 int MAP[MAX][MAX];
@@ -73,39 +73,39 @@ int tmpMAP[MAX][MAX];
 // L[q] : q번째 명령의 레벨
 int L[1000 + 50];
 
-bool visit[MAX][MAX];
+bool visit[MAX][MAX];            // BFS 방문 표시
 
 // 좌표 한 쌍
 struct RC
 {
-    int r;
-    int c;
+    int r;                       // 행
+    int c;                       // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;            // struct RC를 RC로 줄여 쓰기
 
-RC queue[MAX * MAX];
+RC queue[MAX * MAX];             // BFS용 큐
 
 // 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };      // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };       // 방향별 열 변화량
 
 /*
     입력
 */
 void input()
 {
-    scanf("%d %d", &N, &Q);
+    scanf("%d %d", &N, &Q);              // 지수 N, 명령 수 입력
 
     // 실제 격자 한 변의 길이는 2^N
     MAP_SIZE = 1 << N;
 
-    for (int r = 1; r <= MAP_SIZE; r++)
-        for (int c = 1; c <= MAP_SIZE; c++)
-            scanf("%d", &MAP[r][c]);
+    for (int r = 1; r <= MAP_SIZE; r++)      // 모든 행
+        for (int c = 1; c <= MAP_SIZE; c++)  // 모든 열
+            scanf("%d", &MAP[r][c]);         // 얼음 양 입력
 
-    for (int q = 0; q < Q; q++)
-        scanf("%d", &L[q]);
+    for (int q = 0; q < Q; q++)          // 명령마다
+        scanf("%d", &L[q]);              // 레벨 입력
 }
 
 /*
@@ -113,13 +113,13 @@ void input()
 */
 void printMap()
 {
-    for (int r = 1; r <= MAP_SIZE; r++)
+    for (int r = 1; r <= MAP_SIZE; r++)      // 모든 행
     {
-        for (int c = 1; c <= MAP_SIZE; c++)
-            printf("%d ", MAP[r][c]);
-        putchar('\n');
+        for (int c = 1; c <= MAP_SIZE; c++)  // 모든 열
+            printf("%d ", MAP[r][c]);        // 값 출력
+        putchar('\n');                       // 행 끝 줄바꿈
     }
-    putchar('\n');
+    putchar('\n');                           // 빈 줄
 }
 
 /*
@@ -131,7 +131,7 @@ void printMap()
 */
 void rotate(int sr, int sc, int size)
 {
-    int half = size / 2;
+    int half = size / 2;                 // 사분면 한 변 길이
 
     // 회전 전 상태를 0-based로 떠 놓는다 (덮어쓰기 사고 방지)
     for (int r = 0; r < size; r++)
@@ -166,18 +166,18 @@ void meltIce()
 {
     int ICE[MAX][MAX] = { 0 };   // 이번에 녹을 칸 표시
 
-    for (int r = 1; r <= MAP_SIZE; r++)
+    for (int r = 1; r <= MAP_SIZE; r++)      // 모든 행
     {
-        for (int c = 1; c <= MAP_SIZE; c++)
+        for (int c = 1; c <= MAP_SIZE; c++)  // 모든 열
         {
             if (MAP[r][c] == 0) continue;   // 얼음이 없으면 녹을 것도 없다
 
-            int count = 0;
+            int count = 0;               // 얼음 없는 이웃 수
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)  // 4방향
             {
-                int nr = r + dr[i];
-                int nc = c + dc[i];
+                int nr = r + dr[i];      // 이웃 행
+                int nc = c + dc[i];      // 이웃 열
 
                 // 얼음이 "없는" 이웃을 센다.
                 // 격자 바깥은 전역 배열이라 0이므로 자동으로 없는 칸이 된다.
@@ -193,7 +193,7 @@ void meltIce()
     // 판정이 모두 끝난 뒤 한꺼번에 반영해야 "동시에" 녹는 것이 된다
     for (int r = 1; r <= MAP_SIZE; r++)
         for (int c = 1; c <= MAP_SIZE; c++)
-            MAP[r][c] -= ICE[r][c];
+            MAP[r][c] -= ICE[r][c];      // 녹을 칸은 1 감소
 }
 
 /*
@@ -201,17 +201,17 @@ void meltIce()
 */
 void simulate()
 {
-    for (int q = 0; q < Q; q++)
+    for (int q = 0; q < Q; q++)          // 명령마다
     {
-        int level = L[q];
+        int level = L[q];                // 이번 레벨
         int divide = 1 << level;   // 부분 격자 한 변의 길이 2^L
 
         // 부분 격자의 왼쪽 위 좌표만 골라 순회한다
         for (int r = 1; r <= MAP_SIZE; r += divide)
             for (int c = 1; c <= MAP_SIZE; c += divide)
-                rotate(r, c, divide);
+                rotate(r, c, divide);    // 부분 격자 회전
 
-        meltIce();
+        meltIce();                       // 얼음 녹이기
     }
 }
 
@@ -220,13 +220,13 @@ void simulate()
 */
 int getIceCount()
 {
-    int sum = 0;
+    int sum = 0;                         // 얼음 합
 
-    for (int r = 1; r <= MAP_SIZE; r++)
-        for (int c = 1; c <= MAP_SIZE; c++)
-            sum += MAP[r][c];
+    for (int r = 1; r <= MAP_SIZE; r++)      // 모든 행
+        for (int c = 1; c <= MAP_SIZE; c++)  // 모든 열
+            sum += MAP[r][c];                // 더한다
 
-    return sum;
+    return sum;                          // 합 반환
 }
 
 /*
@@ -237,35 +237,35 @@ int getIceCount()
 */
 int BFS(int r, int c)
 {
-    int rp, wp;
+    int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
 
-    rp = wp = 0;
+    rp = wp = 0;                         // 빈 큐
 
-    queue[wp].r = r;
-    queue[wp++].c = c;
+    queue[wp].r = r;                     // 시작 행
+    queue[wp++].c = c;                   // 시작 열, 삽입 위치 증가
 
-    visit[r][c] = true;
+    visit[r][c] = true;                  // 시작 칸 방문 표시
 
-    while (rp < wp)
+    while (rp < wp)                      // 처리할 칸이 남아 있는 동안
     {
-        RC out = queue[rp++];
+        RC out = queue[rp++];            // 한 칸 꺼낸다
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; i++)      // 4방향
         {
-            int nr = out.r + dr[i];
-            int nc = out.c + dc[i];
+            int nr = out.r + dr[i];      // 이웃 행
+            int nc = out.c + dc[i];      // 이웃 열
 
             // 얼음이 없거나(격자 밖 포함) 이미 센 칸이면 건너뛴다
             if (MAP[nr][nc] == 0 || visit[nr][nc] == true) continue;
 
-            queue[wp].r = nr;
+            queue[wp].r = nr;            // 큐에 넣는다
             queue[wp++].c = nc;
 
-            visit[nr][nc] = true;
+            visit[nr][nc] = true;        // 방문 표시
         }
     }
 
-    return wp;
+    return wp;                           // 덩어리 크기
 }
 
 /*
@@ -273,25 +273,25 @@ int BFS(int r, int c)
 */
 int getGroupCount()
 {
-    for (int r = 1; r <= MAP_SIZE; r++)
+    for (int r = 1; r <= MAP_SIZE; r++)      // 방문 기록 초기화
         for (int c = 1; c <= MAP_SIZE; c++)
             visit[r][c] = false;
 
-    int max = 0;
+    int max = 0;                         // 가장 큰 덩어리
 
-    for (int r = 1; r <= MAP_SIZE; r++)
+    for (int r = 1; r <= MAP_SIZE; r++)      // 모든 행
     {
-        for (int c = 1; c <= MAP_SIZE; c++)
+        for (int c = 1; c <= MAP_SIZE; c++)  // 모든 열
         {
-            if (MAP[r][c] == 0 || visit[r][c] == true) continue;
+            if (MAP[r][c] == 0 || visit[r][c] == true) continue;   // 얼음 없거나 이미 센 칸
 
-            int tmp = BFS(r, c);
+            int tmp = BFS(r, c);         // 덩어리 크기
 
-            if (max < tmp) max = tmp;
+            if (max < tmp) max = tmp;    // 최댓값 갱신
         }
     }
 
-    return max;
+    return max;                          // 최댓값 반환
 }
 
 int main()
@@ -300,17 +300,17 @@ int main()
     // scanf("%d", &T);
     T = 1;
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
+        input();                         // 입력
 
-        simulate();
+        simulate();                      // 명령 수행
 
-        int iceCount = getIceCount();
-        int groupCount = getGroupCount();
+        int iceCount = getIceCount();    // 남은 얼음 합
+        int groupCount = getGroupCount();   // 가장 큰 덩어리
 
-        printf("%d\n%d\n", iceCount, groupCount);
+        printf("%d\n%d\n", iceCount, groupCount);   // 결과 출력
     }
 
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

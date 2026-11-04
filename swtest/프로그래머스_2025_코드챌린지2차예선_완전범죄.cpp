@@ -41,34 +41,34 @@
 	  - visit는 케이스마다 비워야 한다.
 	  - 답을 못 찾으면 answer가 INF 그대로 -> -1을 출력한다.
 */
-#include <stdio.h>
+#include <stdio.h>                  // scanf, printf 사용
 
-#define MAX_ITEM (40+5)
-#define MAX_T (120+5)
-#define INF (0x7fff0000)
+#define MAX_ITEM (40+5)             // 물건 최대 40개 + 여유
+#define MAX_T (120+5)               // 흔적 상한 120 + 여유
+#define INF (0x7fff0000)            // 아주 큰 값 (답 없음 표시)
 
-int T;
+int T;                              // 테스트 케이스 수
 
 int CNT, N, M;                      // 물건 수, A가 붙잡히는 흔적, B가 붙잡히는 흔적
 int A[MAX_ITEM], B[MAX_ITEM];       // 물건마다 A / B 흔적
 
 char visit[MAX_ITEM][MAX_T][MAX_T]; // visit[L][a][b] : 이 상태에 와 봤는가
 
-int answer;
+int answer;                         // A 흔적 누적의 최솟값
 
 void input()
 {
-	scanf("%d %d %d", &CNT, &N, &M);
+	scanf("%d %d %d", &CNT, &N, &M);     // 물건 수, n, m 입력
 
-	for (int i = 0; i < CNT; i++)
-		scanf("%d %d", &A[i], &B[i]);
+	for (int i = 0; i < CNT; i++)        // 물건마다
+		scanf("%d %d", &A[i], &B[i]);    // A 흔적, B 흔적 입력
 
-	for (int L = 0; L <= CNT; L++)
+	for (int L = 0; L <= CNT; L++)               // 모든 상태를
 		for (int a = 0; a < N; a++)
 			for (int b = 0; b < M; b++)
-				visit[L][a][b] = 0;
+				visit[L][a][b] = 0;              // 방문 안 함으로
 
-	answer = INF;
+	answer = INF;                        // 아직 답 없음
 }
 
 // L번 물건을 누가 훔칠지 정할 차례, 지금까지 A 흔적 a, B 흔적 b
@@ -78,12 +78,12 @@ void DFS(int L, int a, int b)
 	if (a >= answer) return;          // 가지치기
 	if (visit[L][a][b] == 1) return;  // 이미 본 상태
 
-	visit[L][a][b] = 1;
+	visit[L][a][b] = 1;               // 이 상태 방문 표시
 
 	if (L == CNT)                     // 모든 물건을 훔쳤다
 	{
-		if (a < answer) answer = a;
-		return;
+		if (a < answer) answer = a;   // 최솟값 갱신
+		return;                       // 되돌아간다
 	}
 
 	DFS(L + 1, a + A[L], b);          // A가 훔친다
@@ -93,17 +93,17 @@ void DFS(int L, int a, int b)
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		DFS(0, 0, 0);
+		DFS(0, 0, 0);                    // 0번 물건부터, 흔적 0
 
-		if (answer == INF) answer = -1;
+		if (answer == INF) answer = -1;  // 답이 없으면 -1
 
-		printf("%d\n", answer);
+		printf("%d\n", answer);          // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

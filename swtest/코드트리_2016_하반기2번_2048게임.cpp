@@ -45,19 +45,19 @@
 	  가지치기할 수 있지만, 1024가지는 그냥 다 돌려도 충분히 빠르다.
 */
 
-#include <stdio.h>
+#include <stdio.h>           // scanf, printf, putchar 사용
 
-#define MAX (20 + 5)
+#define MAX (20 + 5)         // N 최대 20 + 여유
 
 // 방향 번호
-#define UP (0)
-#define RIGHT (1)
-#define DOWN (2)
-#define LEFT (3)
+#define UP (0)               // 위
+#define RIGHT (1)            // 오른쪽
+#define DOWN (2)             // 아래
+#define LEFT (3)             // 왼쪽
 
-int T;
+int T;                  // 테스트 케이스 수
 
-int N;
+int N;                  // 보드 크기
 int oMAP[MAX][MAX];     // original map : 입력 원본 (절대 건드리지 않는다)
 int ansMAP[MAX][MAX];   // 시뮬레이션용 작업 보드
 
@@ -70,11 +70,11 @@ int maxAnswer;          // 만들 수 있는 가장 큰 블록 값
 // ---------------------------
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 보드 크기 입력
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			scanf("%d", &oMAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
+		for (int c = 1; c <= N; c++)     // 1열부터 N열까지
+			scanf("%d", &oMAP[r][c]);    // 블록 값 입력 (0 = 빈칸)
 }
 
 // ---------------------------
@@ -82,13 +82,13 @@ void input()
 // ---------------------------
 void printMap(int map[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%2d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%2d ", map[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -96,9 +96,9 @@ void printMap(int map[MAX][MAX])
 // ---------------------------
 void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			copy[r][c] = original[r][c];
+	for (int r = 1; r <= N; r++)         // 모든 행
+		for (int c = 1; c <= N; c++)     // 모든 열
+			copy[r][c] = original[r][c]; // 한 칸씩 복사
 }
 
 // ---------------------------
@@ -106,9 +106,9 @@ void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < 5; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < 5; i++)          // 5개 방향
+		printf("%d ", num_of_cases[i]);  // 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // --------------------------------------------------
@@ -130,10 +130,10 @@ void moveUp()
 		// 1단계 : 0이 아닌 블록만 위쪽으로 몰아 넣는다 (빈칸 제거)
 		for (int r = 1; r <= N; r++)
 		{
-			if (ansMAP[r][c] == 0)
-				continue;
+			if (ansMAP[r][c] == 0)       // 빈칸이면
+				continue;                // 건너뛴다
 
-			tmpMAP[index++][c] = ansMAP[r][c];
+			tmpMAP[index++][c] = ansMAP[r][c];   // 위쪽부터 차곡차곡
 		}
 
 		// 2단계 : 위에서부터 이웃한 두 칸을 비교해 같으면 합친다
@@ -154,14 +154,14 @@ void moveUp()
 			for (int tr = r + 1; tr <= N - 1; tr++)
 				tmpMAP[tr][c] = tmpMAP[tr + 1][c];
 
-			tmpMAP[N][c] = 0;
+			tmpMAP[N][c] = 0;            // 맨 아래 칸은 비운다
 
 			// 여기서 루프가 r+1로 넘어가므로, 방금 2배가 된 r번 칸은
 			// 다시 비교되지 않는다 = 연쇄 합체가 일어나지 않는다
 		}
 	}
 
-	copyMap(ansMAP, tmpMAP);
+	copyMap(ansMAP, tmpMAP);             // 결과를 작업 보드에 반영
 }
 
 // --------------------------------------------------
@@ -169,41 +169,41 @@ void moveUp()
 // --------------------------------------------------
 void moveRight()
 {
-	int tmpMAP[MAX][MAX] = { 0 };
+	int tmpMAP[MAX][MAX] = { 0 };        // 결과 보드 (0으로 초기화)
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 행마다
 	{
 		int index = N; // 오른쪽 끝부터 채워 넣을 위치
 
 		// 1단계 : 오른쪽부터 훑으며 0이 아닌 블록을 오른쪽으로 몰아 넣는다
 		for (int c = N; c >= 1; c--)
 		{
-			if (ansMAP[r][c] == 0)
-				continue;
+			if (ansMAP[r][c] == 0)       // 빈칸이면
+				continue;                // 건너뛴다
 
-			tmpMAP[r][index--] = ansMAP[r][c];
+			tmpMAP[r][index--] = ansMAP[r][c];   // 오른쪽부터 차곡차곡
 		}
 
 		// 2단계 : 오른쪽 끝에서부터 왼쪽 이웃과 비교해 합친다
 		for (int c = N; c >= 2; c--)
 		{
-			if (tmpMAP[r][c] != tmpMAP[r][c - 1])
-				continue;
+			if (tmpMAP[r][c] != tmpMAP[r][c - 1])   // 값이 다르면
+				continue;                           // 합칠 수 없다
 
-			if (tmpMAP[r][c] == 0)
-				break;
+			if (tmpMAP[r][c] == 0)       // 빈칸에 닿으면
+				break;                   // 더 볼 블록이 없다
 
-			tmpMAP[r][c] *= 2;
+			tmpMAP[r][c] *= 2;           // 앞쪽 칸을 2배로
 
 			// 왼쪽에 남은 블록들을 오른쪽으로 한 칸씩 당긴다
 			for (int tc = c - 1; tc >= 2; tc--)
 				tmpMAP[r][tc] = tmpMAP[r][tc - 1];
 
-			tmpMAP[r][1] = 0;
+			tmpMAP[r][1] = 0;            // 맨 왼쪽 칸은 비운다
 		}
 	}
 
-	copyMap(ansMAP, tmpMAP);
+	copyMap(ansMAP, tmpMAP);             // 결과를 작업 보드에 반영
 }
 
 // --------------------------------------------------
@@ -211,41 +211,41 @@ void moveRight()
 // --------------------------------------------------
 void moveDown()
 {
-	int tmpMAP[MAX][MAX] = { 0 };
+	int tmpMAP[MAX][MAX] = { 0 };        // 결과 보드 (0으로 초기화)
 
-	for (int c = 1; c <= N; c++)
+	for (int c = 1; c <= N; c++)         // 열마다
 	{
 		int index = N; // 아래 끝부터 채워 넣을 위치
 
 		// 1단계 : 아래부터 훑으며 0이 아닌 블록을 아래로 몰아 넣는다
 		for (int r = N; r >= 1; r--)
 		{
-			if (ansMAP[r][c] == 0)
-				continue;
+			if (ansMAP[r][c] == 0)       // 빈칸이면
+				continue;                // 건너뛴다
 
-			tmpMAP[index--][c] = ansMAP[r][c];
+			tmpMAP[index--][c] = ansMAP[r][c];   // 아래부터 차곡차곡
 		}
 
 		// 2단계 : 아래 끝에서부터 위쪽 이웃과 비교해 합친다
 		for (int r = N; r >= 2; r--)
 		{
-			if (tmpMAP[r][c] != tmpMAP[r - 1][c])
-				continue;
+			if (tmpMAP[r][c] != tmpMAP[r - 1][c])   // 값이 다르면
+				continue;                           // 합칠 수 없다
 
-			if (tmpMAP[r][c] == 0)
-				break;
+			if (tmpMAP[r][c] == 0)       // 빈칸에 닿으면
+				break;                   // 더 볼 블록이 없다
 
-			tmpMAP[r][c] *= 2;
+			tmpMAP[r][c] *= 2;           // 앞쪽 칸을 2배로
 
 			// 위쪽에 남은 블록들을 아래로 한 칸씩 당긴다
 			for (int tr = r - 1; tr >= 2; tr--)
 				tmpMAP[tr][c] = tmpMAP[tr - 1][c];
 
-			tmpMAP[1][c] = 0;
+			tmpMAP[1][c] = 0;            // 맨 위 칸은 비운다
 		}
 	}
 
-	copyMap(ansMAP, tmpMAP);
+	copyMap(ansMAP, tmpMAP);             // 결과를 작업 보드에 반영
 }
 
 // --------------------------------------------------
@@ -253,41 +253,41 @@ void moveDown()
 // --------------------------------------------------
 void moveLeft()
 {
-	int tmpMAP[MAX][MAX] = { 0 };
+	int tmpMAP[MAX][MAX] = { 0 };        // 결과 보드 (0으로 초기화)
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 행마다
 	{
 		int index = 1; // 왼쪽부터 채워 넣을 위치
 
 		// 1단계 : 0이 아닌 블록을 왼쪽으로 몰아 넣는다
 		for (int c = 1; c <= N; c++)
 		{
-			if (ansMAP[r][c] == 0)
-				continue;
+			if (ansMAP[r][c] == 0)       // 빈칸이면
+				continue;                // 건너뛴다
 
-			tmpMAP[r][index++] = ansMAP[r][c];
+			tmpMAP[r][index++] = ansMAP[r][c];   // 왼쪽부터 차곡차곡
 		}
 
 		// 2단계 : 왼쪽부터 오른쪽 이웃과 비교해 합친다
 		for (int c = 1; c <= N - 1; c++)
 		{
-			if (tmpMAP[r][c] != tmpMAP[r][c + 1])
-				continue;
+			if (tmpMAP[r][c] != tmpMAP[r][c + 1])   // 값이 다르면
+				continue;                           // 합칠 수 없다
 
-			if (tmpMAP[r][c] == 0)
-				break;
+			if (tmpMAP[r][c] == 0)       // 빈칸에 닿으면
+				break;                   // 더 볼 블록이 없다
 
-			tmpMAP[r][c] *= 2;
+			tmpMAP[r][c] *= 2;           // 앞쪽 칸을 2배로
 
 			// 오른쪽에 남은 블록들을 왼쪽으로 한 칸씩 당긴다
 			for (int tc = c + 1; tc <= N - 1; tc++)
 				tmpMAP[r][tc] = tmpMAP[r][tc + 1];
 
-			tmpMAP[r][N] = 0;
+			tmpMAP[r][N] = 0;            // 맨 오른쪽 칸은 비운다
 		}
 	}
 
-	copyMap(ansMAP, tmpMAP);
+	copyMap(ansMAP, tmpMAP);             // 결과를 작업 보드에 반영
 }
 
 // --------------------------------------------------
@@ -298,17 +298,17 @@ void simulate()
 	// 항상 원본에서 새로 시작해야 다음 수열이 오염되지 않는다
 	copyMap(ansMAP, oMAP);
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 5; i++)          // 5번 이동
 	{
-		int direction = num_of_cases[i];
+		int direction = num_of_cases[i]; // 이번 방향
 
-		if (direction == UP)
+		if (direction == UP)             // 위
 			moveUp();
-		else if (direction == RIGHT)
+		else if (direction == RIGHT)     // 오른쪽
 			moveRight();
-		else if (direction == DOWN)
+		else if (direction == DOWN)      // 아래
 			moveDown();
-		else if (direction == LEFT)
+		else if (direction == LEFT)      // 왼쪽
 			moveLeft();
 	}
 }
@@ -318,18 +318,18 @@ void simulate()
 // --------------------------------------------------
 int findMax()
 {
-	int maxValue = 0;
+	int maxValue = 0;                    // 가장 큰 값
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			if (maxValue < ansMAP[r][c])
-				maxValue = ansMAP[r][c];
+			if (maxValue < ansMAP[r][c]) // 더 크면
+				maxValue = ansMAP[r][c]; // 갱신
 		}
 	}
 
-	return maxValue;
+	return maxValue;                     // 가장 큰 값 반환
 }
 
 // --------------------------------------------------
@@ -342,20 +342,20 @@ void DFS(int depth)
 	{
 		// printCases();
 
-		simulate();
+		simulate();                      // 수열대로 5번 이동
 
-		int tmp = findMax();
-		if (maxAnswer < tmp)
-			maxAnswer = tmp;
+		int tmp = findMax();             // 결과 보드의 최댓값
+		if (maxAnswer < tmp)             // 더 크면
+			maxAnswer = tmp;             // 답 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
 	// 매 순번마다 네 방향 모두 시도 (중복 허용 = 중복순열)
 	for (int i = 0; i < 4; i++)
 	{
-		num_of_cases[depth] = i;
-		DFS(depth + 1);
+		num_of_cases[depth] = i;         // 이번 순번의 방향
+		DFS(depth + 1);                  // 다음 순번
 	}
 }
 
@@ -365,16 +365,16 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 보드 입력
 
-		maxAnswer = 0;
+		maxAnswer = 0;                   // 답 초기화
 
-		DFS(0);
+		DFS(0);                          // 모든 방향 수열 탐색
 
-		printf("%d\n", maxAnswer);
+		printf("%d\n", maxAnswer);       // 가장 큰 블록 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

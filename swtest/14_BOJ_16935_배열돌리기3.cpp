@@ -36,17 +36,17 @@
 	  swap 이후이므로 식에 등장하는 N, M은 이미 뒤바뀐 값이라는 점에 유의.
 */
 
-#include <stdio.h>
+#include <stdio.h>                // scanf, printf, putchar 사용
 
-#define MAX (100 + 10)
+#define MAX (100 + 10)            // 배열 최대 크기 (100 + 여유 10)
 
 // 명령 번호를 이름으로 정의 (main의 분기를 읽기 쉽게)
-#define FILP_UPDOWN (1)
-#define FILP_LEFTRIGHT (2)
-#define CLOCKWISE (3)
-#define COUNTER_CLOCKWISE (4)
-#define SPILT_CLOCKWISE (5)
-#define SPILT_COUNTERWISE (6)
+#define FILP_UPDOWN (1)           // 1번 : 상하 반전
+#define FILP_LEFTRIGHT (2)        // 2번 : 좌우 반전
+#define CLOCKWISE (3)             // 3번 : 시계 90도 회전
+#define COUNTER_CLOCKWISE (4)     // 4번 : 반시계 90도 회전
+#define SPILT_CLOCKWISE (5)       // 5번 : 사분면 시계 이동
+#define SPILT_COUNTERWISE (6)     // 6번 : 사분면 반시계 이동
 
 int N, M, R;          // N: 행 개수, M: 열 개수, R: 연산 개수
 int MAP[MAX][MAX];    // 현재 배열, 1-based
@@ -57,13 +57,13 @@ int temp[MAX][MAX];   // 연산 직전 상태 스냅샷(읽기 전용으로 사�
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d", &N, &M, &R);
+	scanf("%d %d %d", &N, &M, &R);       // 행 수, 열 수, 연산 수 입력
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 1열부터 M열까지
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // (r, c) 칸의 값 입력
 		}
 	}
 }
@@ -76,11 +76,11 @@ void input()
 // ---------------------------
 void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 현재 행 수만큼
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 현재 열 수만큼
 		{
-			copy[r][c] = original[r][c];
+			copy[r][c] = original[r][c]; // 한 칸씩 그대로 복사
 		}
 	}
 }
@@ -90,11 +90,11 @@ void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행에 대해
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 한 행의 모든 칸을
+			printf("%d ", MAP[r][c]);    // 공백으로 구분해 출력
+		putchar('\n');                   // 한 행이 끝나면 줄바꿈
 	}
 }
 
@@ -109,13 +109,13 @@ void printMap()
 // ---------------------------
 void filp_UpDown()
 {
-	copyMap(temp, MAP);
+	copyMap(temp, MAP);                  // 연산 전 상태 스냅샷
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 결과 배열의 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 결과 배열의 모든 열
 		{
-			MAP[r][c] = temp[N + 1 - r][c];
+			MAP[r][c] = temp[N + 1 - r][c];   // 위아래가 뒤집힌 행에서 값을 가져온다
 		}
 	}
 }
@@ -130,13 +130,13 @@ void filp_UpDown()
 // ---------------------------
 void filp_LeftRight()
 {
-	copyMap(temp, MAP);
+	copyMap(temp, MAP);                  // 연산 전 상태 스냅샷
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 결과 배열의 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 결과 배열의 모든 열
 		{
-			MAP[r][c] = temp[r][M + 1 - c];
+			MAP[r][c] = temp[r][M + 1 - c];   // 좌우가 뒤집힌 열에서 값을 가져온다
 		}
 	}
 }
@@ -158,15 +158,15 @@ void Clockwise()
 	copyMap(temp, MAP);
 
 	// 회전 후 행/열 크기 교환
-	int t = N;
-	N = M;
-	M = t;
+	int t = N;                           // 원래 N을 잠시 저장
+	N = M;                               // 새 행 수 = 원래 열 수
+	M = t;                               // 새 열 수 = 원래 행 수
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 회전 후 배열의 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 회전 후 배열의 모든 열
 		{
-			MAP[r][c] = temp[M + 1 - c][r];
+			MAP[r][c] = temp[M + 1 - c][r];   // 시계 90도 대응 좌표에서 값을 가져온다
 		}
 	}
 }
@@ -184,18 +184,18 @@ void Clockwise()
 // ---------------------------
 void counter_Clockwise()
 {
-	copyMap(temp, MAP);
+	copyMap(temp, MAP);                  // swap 전에 원본 전체를 스냅샷
 
 	// 회전 후 행/열 크기 교환
-	int t = N;
-	N = M;
-	M = t;
+	int t = N;                           // 원래 N을 잠시 저장
+	N = M;                               // 새 행 수 = 원래 열 수
+	M = t;                               // 새 열 수 = 원래 행 수
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 회전 후 배열의 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 회전 후 배열의 모든 열
 		{
-			MAP[r][c] = temp[c][N + 1 - r];
+			MAP[r][c] = temp[c][N + 1 - r];   // 반시계 90도 대응 좌표에서 값을 가져온다
 		}
 	}
 }
@@ -212,14 +212,14 @@ void counter_Clockwise()
 // ---------------------------
 void split_Clockwise()
 {
-	copyMap(temp, MAP);
+	copyMap(temp, MAP);                  // 연산 전 상태 스냅샷
 
-	int sr1, sc1, sr2, sc2, sr3, sc3, sr4, sc4;
-	int halfN, halfM;
+	int sr1, sc1, sr2, sc2, sr3, sc3, sr4, sc4;   // 사분면 1~4의 시작 행/열
+	int halfN, halfM;                    // 사분면 하나의 세로/가로 크기
 
 	// N, M이 짝수이므로 정확히 반으로 나뉜다
-	halfN = N / 2;
-	halfM = M / 2;
+	halfN = N / 2;                       // 사분면 세로 크기
+	halfM = M / 2;                       // 사분면 가로 크기
 
 	// 각 사분면의 시작(왼쪽 위) 좌표
 	sr1 = 1;         sc1 = 1;            // 1사분면 (좌상)
@@ -231,38 +231,38 @@ void split_Clockwise()
 	// 읽기는 전부 temp라서 네 번의 복사 순서는 서로 영향을 주지 않는다.
 
 	// 1 -> 2
-	for (int r = 0; r < halfN; r++)
+	for (int r = 0; r < halfN; r++)      // 블록 안 상대 행
 	{
-		for (int c = 0; c < halfM; c++)
+		for (int c = 0; c < halfM; c++)  // 블록 안 상대 열
 		{
-			MAP[sr2 + r][sc2 + c] = temp[sr1 + r][sc1 + c];
+			MAP[sr2 + r][sc2 + c] = temp[sr1 + r][sc1 + c];   // 1사분면 값을 2사분면 자리에
 		}
 	}
 
 	// 2 -> 3
-	for (int r = 0; r < halfN; r++)
+	for (int r = 0; r < halfN; r++)      // 블록 안 상대 행
 	{
-		for (int c = 0; c < halfM; c++)
+		for (int c = 0; c < halfM; c++)  // 블록 안 상대 열
 		{
-			MAP[sr3 + r][sc3 + c] = temp[sr2 + r][sc2 + c];
+			MAP[sr3 + r][sc3 + c] = temp[sr2 + r][sc2 + c];   // 2사분면 값을 3사분면 자리에
 		}
 	}
 
 	// 3 -> 4
-	for (int r = 0; r < halfN; r++)
+	for (int r = 0; r < halfN; r++)      // 블록 안 상대 행
 	{
-		for (int c = 0; c < halfM; c++)
+		for (int c = 0; c < halfM; c++)  // 블록 안 상대 열
 		{
-			MAP[sr4 + r][sc4 + c] = temp[sr3 + r][sc3 + c];
+			MAP[sr4 + r][sc4 + c] = temp[sr3 + r][sc3 + c];   // 3사분면 값을 4사분면 자리에
 		}
 	}
 
 	// 4 -> 1
-	for (int r = 0; r < halfN; r++)
+	for (int r = 0; r < halfN; r++)      // 블록 안 상대 행
 	{
-		for (int c = 0; c < halfM; c++)
+		for (int c = 0; c < halfM; c++)  // 블록 안 상대 열
 		{
-			MAP[sr1 + r][sc1 + c] = temp[sr4 + r][sc4 + c];
+			MAP[sr1 + r][sc1 + c] = temp[sr4 + r][sc4 + c];   // 4사분면 값을 1사분면 자리에
 		}
 	}
 }
@@ -278,13 +278,13 @@ void split_Clockwise()
 // ---------------------------
 void split_counterClockwise()
 {
-	copyMap(temp, MAP);
+	copyMap(temp, MAP);                  // 연산 전 상태 스냅샷
 
-	int sr1, sc1, sr2, sc2, sr3, sc3, sr4, sc4;
-	int halfN, halfM;
+	int sr1, sc1, sr2, sc2, sr3, sc3, sr4, sc4;   // 사분면 1~4의 시작 행/열
+	int halfN, halfM;                    // 사분면 하나의 세로/가로 크기
 
-	halfN = N / 2;
-	halfM = M / 2;
+	halfN = N / 2;                       // 사분면 세로 크기
+	halfM = M / 2;                       // 사분면 가로 크기
 
 	// 각 사분면의 시작(왼쪽 위) 좌표
 	sr1 = 1;         sc1 = 1;            // 1사분면 (좌상)
@@ -293,38 +293,38 @@ void split_counterClockwise()
 	sr4 = halfN + 1; sc4 = 1;            // 4사분면 (좌하)
 
 	// 2 -> 1
-	for (int r = 0; r < halfN; r++)
+	for (int r = 0; r < halfN; r++)      // 블록 안 상대 행
 	{
-		for (int c = 0; c < halfM; c++)
+		for (int c = 0; c < halfM; c++)  // 블록 안 상대 열
 		{
-			MAP[sr1 + r][sc1 + c] = temp[sr2 + r][sc2 + c];
+			MAP[sr1 + r][sc1 + c] = temp[sr2 + r][sc2 + c];   // 2사분면 값을 1사분면 자리에
 		}
 	}
 
 	// 3 -> 2
-	for (int r = 0; r < halfN; r++)
+	for (int r = 0; r < halfN; r++)      // 블록 안 상대 행
 	{
-		for (int c = 0; c < halfM; c++)
+		for (int c = 0; c < halfM; c++)  // 블록 안 상대 열
 		{
-			MAP[sr2 + r][sc2 + c] = temp[sr3 + r][sc3 + c];
+			MAP[sr2 + r][sc2 + c] = temp[sr3 + r][sc3 + c];   // 3사분면 값을 2사분면 자리에
 		}
 	}
 
 	// 4 -> 3
-	for (int r = 0; r < halfN; r++)
+	for (int r = 0; r < halfN; r++)      // 블록 안 상대 행
 	{
-		for (int c = 0; c < halfM; c++)
+		for (int c = 0; c < halfM; c++)  // 블록 안 상대 열
 		{
-			MAP[sr3 + r][sc3 + c] = temp[sr4 + r][sc4 + c];
+			MAP[sr3 + r][sc3 + c] = temp[sr4 + r][sc4 + c];   // 4사분면 값을 3사분면 자리에
 		}
 	}
 
 	// 1 -> 4
-	for (int r = 0; r < halfN; r++)
+	for (int r = 0; r < halfN; r++)      // 블록 안 상대 행
 	{
-		for (int c = 0; c < halfM; c++)
+		for (int c = 0; c < halfM; c++)  // 블록 안 상대 열
 		{
-			MAP[sr4 + r][sc4 + c] = temp[sr1 + r][sc1 + c];
+			MAP[sr4 + r][sc4 + c] = temp[sr1 + r][sc1 + c];   // 1사분면 값을 4사분면 자리에
 		}
 	}
 }
@@ -334,30 +334,30 @@ void split_counterClockwise()
 // ---------------------------
 int main()
 {
-	input();
+	input();                             // N, M, R, 배열 입력
 
 	// R개의 연산을 입력받는 즉시 차례대로 수행
 	for (int r = 0; r < R; r++)
 	{
-		int COMMAND;
-		scanf("%d", &COMMAND);
+		int COMMAND;                     // 이번 연산 번호
+		scanf("%d", &COMMAND);           // 연산 번호 입력
 
-		if (COMMAND == FILP_UPDOWN)
-			filp_UpDown();
-		else if (COMMAND == FILP_LEFTRIGHT)
-			filp_LeftRight();
-		else if (COMMAND == CLOCKWISE)
-			Clockwise();
-		else if (COMMAND == COUNTER_CLOCKWISE)
-			counter_Clockwise();
-		else if (COMMAND == SPILT_CLOCKWISE)
-			split_Clockwise();
-		else if (COMMAND == SPILT_COUNTERWISE)
-			split_counterClockwise();
+		if (COMMAND == FILP_UPDOWN)                  // 1번이면
+			filp_UpDown();                           // 상하 반전
+		else if (COMMAND == FILP_LEFTRIGHT)          // 2번이면
+			filp_LeftRight();                        // 좌우 반전
+		else if (COMMAND == CLOCKWISE)               // 3번이면
+			Clockwise();                             // 시계 90도 회전
+		else if (COMMAND == COUNTER_CLOCKWISE)       // 4번이면
+			counter_Clockwise();                     // 반시계 90도 회전
+		else if (COMMAND == SPILT_CLOCKWISE)         // 5번이면
+			split_Clockwise();                       // 사분면 시계 이동
+		else if (COMMAND == SPILT_COUNTERWISE)       // 6번이면
+			split_counterClockwise();                // 사분면 반시계 이동
 	}
 
 	// 최종 배열 출력
 	printMap();
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

@@ -47,109 +47,109 @@
 	           갱신이 안 되어 1번 경로(상, 상, 좌)를 강제로 탄다. 이 경로는 격자 밖일 수도 있다.
 	           -> step = maxMonster = -1 (불가능한 경로의 -1보다 커야 하므로 -1로 시작)
 */
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf, putchar 사용
 
-#define MAX (4+3)
-#define MAX_DIR (8+2)
+#define MAX (4+3)                  // 격자 4 + 테두리 여유
+#define MAX_DIR (8+2)              // 방향 8 + 여유
 
-int T;
+int T;                             // 테스트 케이스 수
 
-int M, TURN;
+int M, TURN;                       // 몬스터 수, 턴 수
 
 bool grid[MAX][MAX]; // true = 격자 바깥(벽)
 int deadBody[MAX][MAX]; // 시체의 남은 수명 (0 = 없음)
 
-struct PACKMAN
+struct PACKMAN                     // 팩맨 위치
 {
-	int r;
-	int c;
+	int r;                         // 행
+	int c;                         // 열
 };
 
-PACKMAN packMan;
+PACKMAN packMan;                   // 팩맨
 
 int monster[MAX][MAX][MAX_DIR]; // (r,c)에 dir 방향의 몬스터 수
 
 int num_of_cases[10]; // DFS로 만드는 중인 경로
 int position[64 + 10][3]; // 팩맨 경로 64가지 (사전 순)
-int pcnt;
+int pcnt;                  // 만든 경로 수
 
 // -, ↑, ←, ↓, →   (팩맨 우선순위 상, 좌, 하, 우 순서)
-int dr4[] = { 0, -1, 0, 1, 0 };
-int dc4[] = { 0, 0, -1, 0, 1 };
+int dr4[] = { 0, -1, 0, 1, 0 };    // 팩맨 방향별 행 변화량
+int dc4[] = { 0, 0, -1, 0, 1 };    // 팩맨 방향별 열 변화량
 
 // -, ↑, ↖, ←, ↙, ↓, ↘, →, ↗   (번호가 1 늘면 반시계 45도)
-int dr8[] = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
-int dc8[] = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };
+int dr8[] = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };   // 몬스터 방향별 행 변화량
+int dc8[] = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };   // 몬스터 방향별 열 변화량
 
 void input()
 {
 	// [버그 1] %D -> %d
 	scanf("%d %d %D %d", &M, &TURN, &packMan.r, &packMan.c);
 
-	for (int r = 1; r <= 4; r++)
+	for (int r = 1; r <= 4; r++)         // 모든 칸, 모든 방향
 		for (int c = 1; c <= 4; c++)
 			for (int d = 1; d <= 8; d++)
-				monster[r][c][d] = 0;
+				monster[r][c][d] = 0;    // 몬스터 수 초기화
 
-	for (int m = 0; m < M; m++)
+	for (int m = 0; m < M; m++)          // 몬스터마다
 	{
-		int r, c, d;
+		int r, c, d;                     // 위치, 방향
 
-		scanf("%d %d %d", &r, &c, &d);
+		scanf("%d %d %d", &r, &c, &d);   // 입력
 
 		// 같은 칸, 같은 방향이면 한 값으로 묶어 센다.
 		monster[r][c][d]++;
 	}
 
-	for (int r = 1; r <= 4; r++)
+	for (int r = 1; r <= 4; r++)         // 모든 칸
 		for (int c = 1; c <= 4; c++)
-			deadBody[r][c] = 0;
+			deadBody[r][c] = 0;          // 시체 없음
 
 	// 테두리를 벽으로 칠한 뒤 안쪽 4 x 4만 비운다.
 	// [버그 2] 0행이 빠졌다. r = 0부터 칠해야 위쪽 테두리도 벽이 된다.
 	for (int r = 1; r <= 5; r++)
 		for (int c = 0; c <= 5; c++)
-			grid[r][c] = true;
+			grid[r][c] = true;           // 벽
 
-	for (int r = 1; r <= 4; r++)
+	for (int r = 1; r <= 4; r++)         // 안쪽 4 x 4
 		for (int c = 1; c <= 4; c++)
-			grid[r][c] = false;
+			grid[r][c] = false;          // 갈 수 있는 칸
 }
 
 void printDeadBody() // for debug
 {
-	printf("Dead Body\n");
-	for (int r = 1; r <= 4; r++)
+	printf("Dead Body\n");               // 제목
+	for (int r = 1; r <= 4; r++)         // 모든 행
 	{
-		for (int c = 1; c <= 4; c++)
-			printf("%d ", deadBody[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= 4; c++)     // 모든 열
+			printf("%d ", deadBody[r][c]);   // 시체 수명 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 void printMonster() // for debug
 {
-	for (int r = 1; r <= 4; r++)
+	for (int r = 1; r <= 4; r++)         // 모든 행
 	{
-		for (int c = 1; c <= 4; c++)
+		for (int c = 1; c <= 4; c++)     // 모든 열
 		{
-			printf("(%d, %d)\n", r, c);
+			printf("(%d, %d)\n", r, c);  // 칸 좌표
 
-			for (int d = 1; d <= 8; d++)
-				printf("%d : %d / ", d, monster[r][c][d]);
-			putchar('\n');
+			for (int d = 1; d <= 8; d++) // 방향마다
+				printf("%d : %d / ", d, monster[r][c][d]);   // 방향별 몬스터 수
+			putchar('\n');               // 줄바꿈
 		}
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 void copyMonster(int copy[MAX][MAX][MAX_DIR], int original[MAX][MAX][MAX_DIR])
 {
-	for (int r = 1; r <= 4; r++)
+	for (int r = 1; r <= 4; r++)         // 모든 칸, 모든 방향
 		for (int c = 1; c <= 4; c++)
 			for (int d = 1; d <= 8; d++)
-				copy[r][c][d] = original[r][c][d];
+				copy[r][c][d] = original[r][c][d];   // 복사
 }
 
 // 완성된 경로 하나를 position[]에 저장한다.
@@ -158,24 +158,24 @@ void printCases()
 	//for (int i = 0; i < 3; i++) printf("%d ", num_of_cases[i]);
 	//putchar('\n');
 
-	position[pcnt][0] = num_of_cases[0];
-	position[pcnt][1] = num_of_cases[1];
-	position[pcnt++][2] = num_of_cases[2];
+	position[pcnt][0] = num_of_cases[0];     // 첫 이동
+	position[pcnt][1] = num_of_cases[1];     // 둘째 이동
+	position[pcnt++][2] = num_of_cases[2];   // 셋째 이동, 경로 수 증가
 }
 
 // 4방향 x 3번 = 64가지 경로를 사전 순으로 만든다 (중복 순열).
 void DFS(int depth)
 {
-	if (depth == 3)
+	if (depth == 3)                      // 3번 다 정했으면
 	{
-		printCases();
-		return;
+		printCases();                    // 경로 저장
+		return;                          // 되돌아간다
 	}
-	for (int i = 1; i <= 4; i++)
+	for (int i = 1; i <= 4; i++)         // 4방향
 	{
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // 이번 이동 방향
 
-		DFS(depth + 1);
+		DFS(depth + 1);                  // 다음 이동
 	}
 }
 
@@ -184,22 +184,22 @@ void moveMonster()
 {
 	// 모두 "동시에" 움직이므로 결과는 새 배열에 모은다.
 	int tmpMonster[MAX][MAX][MAX_DIR] = { 0 };
-	for (int r = 1; r <= 4; r++)
+	for (int r = 1; r <= 4; r++)         // 모든 행
 	{
-		for (int c = 1; c <= 4; c++)
+		for (int c = 1; c <= 4; c++)     // 모든 열
 		{
-			for (int d = 1; d <= 8; d++)
+			for (int d = 1; d <= 8; d++) // 모든 방향
 			{
-				if (monster[r][c][d] == 0) continue;
-				int i;
+				if (monster[r][c][d] == 0) continue;   // 몬스터 없으면 건너뜀
+				int i;                   // 회전 횟수
 				for (i = 0; i < 8; i++) //반시계 방향 회전
 				{
-					int nr, nc, dir;
+					int nr, nc, dir;     // 다음 칸, 방향
 
 					// d, d+1, ..., 8, 1, ... 순서로 1 ~ 8 범위를 돌게 한다.
 					dir = (d + i - 1 + 8) % 8 + 1;
-					nr = r + dr8[dir];
-					nc = c + dc8[dir];
+					nr = r + dr8[dir];   // 다음 행
+					nc = c + dc8[dir];   // 다음 열
 
 					// 팩맨 칸 / 시체 칸 / 격자 밖이면 다음 방향
 					// [버그 3] packMan.c -> nc == packMan.c
@@ -210,7 +210,7 @@ void moveMonster()
 					{
 						// 바뀐 방향(dir)을 그대로 가진 채 옮겨 간다.
 						tmpMonster[nr][nc][dir] += monster[r][c][d];
-						break;
+						break;           // 이동 끝
 					}
 				}
 				//이동 불가 : 방향도 원래대로 제자리
@@ -219,7 +219,7 @@ void moveMonster()
 		}
 	}
 
-	copyMonster(monster, tmpMonster);
+	copyMonster(monster, tmpMonster);    // 결과 반영
 }
 
 
@@ -230,52 +230,52 @@ int getMonster(int step)
 	PACKMAN tmpPackMan = packMan;
 	int tmpMonster[MAX][MAX][MAX_DIR] = { 0 };
 
-	copyMonster(tmpMonster, monster);
+	copyMonster(tmpMonster, monster);    // 몬스터 복사
 
-	int count = 0;
-	for (int i = 0; i < 3; i++)
+	int count = 0;                       // 먹은 몬스터 수
+	for (int i = 0; i < 3; i++)          // 3번 이동
 	{
-		int nr, nc;
+		int nr, nc;                      // 다음 칸
 
-		nr = tmpPackMan.r + dr4[position[step][i]];
-		nc = tmpPackMan.c + dc4[position[step][i]];
+		nr = tmpPackMan.r + dr4[position[step][i]];   // 다음 행
+		nc = tmpPackMan.c + dc4[position[step][i]];   // 다음 열
 
-		if (grid[nr][nc] == true) return -1;
+		if (grid[nr][nc] == true) return -1;   // 격자 밖이면 불가능한 경로
 
 		// 먹은 칸은 0으로 비워 같은 칸을 다시 지날 때 두 번 세지 않는다.
 		for (int d = 1; d <= 8; d++)
 		{
-			count += tmpMonster[nr][nc][d];
-			tmpMonster[nr][nc][d] = 0;
+			count += tmpMonster[nr][nc][d];  // 먹는다
+			tmpMonster[nr][nc][d] = 0;       // 칸 비우기
 		}
 
-		tmpPackMan.r = nr;
+		tmpPackMan.r = nr;               // 위치 갱신
 		tmpPackMan.c = nc;
 	}
 
-	return count;
+	return count;                        // 먹은 수 반환
 }
 
 // 3) 고른 경로로 실제로 이동하며 먹고, 먹은 칸에 시체를 남긴다.
 void movePackMan(int step)
 {
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)          // 3번 이동
 	{
-		int nr, nc;
+		int nr, nc;                      // 다음 칸
 
-		nr = packMan.r + dr4[position[step][i]];
-		nc = packMan.c + dc4[position[step][i]];
+		nr = packMan.r + dr4[position[step][i]];   // 다음 행
+		nc = packMan.c + dc4[position[step][i]];   // 다음 열
 
 		// 몬스터가 실제로 있었던 칸에만 시체가 생긴다.
 		for (int d = 1; d <= 8; d++)
 		{
-			if (monster[nr][nc][d] == 0) continue;
+			if (monster[nr][nc][d] == 0) continue;   // 없으면 건너뜀
 
-			monster[nr][nc][d] = 0;
+			monster[nr][nc][d] = 0;      // 먹는다
 			deadBody[nr][nc] = 3; // 곧바로 disappear()에서 1 줄어 2턴 남는다.
 		}
 
-		packMan.r = nr;
+		packMan.r = nr;                  // 위치 갱신
 		packMan.c = nc;
 	}
 }
@@ -284,16 +284,16 @@ void movePackMan(int step)
 // 4) 시체 수명 1 감소
 void disappear()
 {
-	for (int r = 1; r <= 4; r++)
+	for (int r = 1; r <= 4; r++)         // 모든 칸
 		for (int c = 1; c <= 4; c++)
-			if (deadBody[r][c] != 0) deadBody[r][c]--;
+			if (deadBody[r][c] != 0) deadBody[r][c]--;   // 수명 1 감소
 }
 
 void simulate()
 {
-	for (int t = 0; t < TURN; t++)
+	for (int t = 0; t < TURN; t++)       // 턴마다
 	{
-		int egg[MAX][MAX][MAX_DIR] = { 0 };
+		int egg[MAX][MAX][MAX_DIR] = { 0 };   // 알
 
 		// 1. 몬스터 복제 시도
 		copyMonster(egg, monster);
@@ -301,7 +301,7 @@ void simulate()
 		// 2. 몬스터 이동
 		moveMonster();
 
-		int step, maxMonster;
+		int step, maxMonster;            // 고른 경로, 최대로 먹는 수
 
 		// [버그 4] -1로 시작해야 0마리, 1마리 경로도 고를 수 있다.
 		step = maxMonster = 1;
@@ -309,11 +309,11 @@ void simulate()
 		// 사전 순으로 보면서 "더 클 때만" 갱신 -> 동점이면 앞선 경로가 남는다.
 		for (int i = 0; i < 64; i++)
 		{
-			int tmp = getMonster(i);
-			if (tmp > maxMonster)
+			int tmp = getMonster(i);     // i번 경로로 먹는 수
+			if (tmp > maxMonster)        // 더 많으면
 			{
-				maxMonster = tmp;
-				step = i;
+				maxMonster = tmp;        // 최댓값 갱신
+				step = i;                // 경로 갱신
 			}
 		}
 
@@ -327,19 +327,19 @@ void simulate()
 		for (int r = 1; r <= 4; r++)
 			for (int c = 1; c <= 4; c++)
 				for (int d = 1; d <= 8; d++)
-					monster[r][c][d] += egg[r][c][d];
+					monster[r][c][d] += egg[r][c][d];   // 알 부화
 	}
 }
 
 int getAnswer()
 {
-	int sum = 0;
-	for (int r = 1; r <= 4; r++)
+	int sum = 0;                         // 몬스터 수 합
+	for (int r = 1; r <= 4; r++)         // 모든 칸, 모든 방향
 		for (int c = 1; c <= 4; c++)
 			for (int d = 1; d <= 8; d++)
-				sum += monster[r][c][d];
+				sum += monster[r][c][d]; // 더한다
 
-	return sum;
+	return sum;                          // 합 반환
 }
 
 int main()
@@ -348,15 +348,15 @@ int main()
 	DFS(0);
 
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // TURN턴 진행
 
-		printf("%d\n", getAnswer());
+		printf("%d\n", getAnswer());     // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

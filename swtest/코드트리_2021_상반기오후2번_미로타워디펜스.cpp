@@ -96,14 +96,14 @@
 	      for (int i = 1; i < N * N; i++) monster[i] = newMonster[i];
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX_N (50 + 5)
-#define MAX_M (100 + 10)
+#define MAX_N (50 + 5)           // N 최대 49 + 여유
+#define MAX_M (100 + 10)         // M 최대 100 + 여유
 
-int T;
+int T;                           // 테스트 케이스 수
 
-int N, M;
+int N, M;                        // 격자 크기, 명령 수
 int MAP[MAX_N][MAX_N];   // 격자에 놓인 몬스터 번호
 int D[MAX_M];            // m번째 명령의 공격 방향
 int P[MAX_M];            // m번째 명령의 공격 거리
@@ -113,35 +113,35 @@ int monster[MAX_N * MAX_N];    // monster[i]  : 나선 i번째 자리의 몬스�
 
 // 나선을 그릴 때 쓰는 방향
 // ←, ↓, →, ↑ for snail
-int drs[] = { 0, 1, 0, -1 };
-int dcs[] = { -1, 0, 1, 0 };
+int drs[] = { 0, 1, 0, -1 };     // 나선 방향별 행 변화량
+int dcs[] = { -1, 0, 1, 0 };     // 나선 방향별 열 변화량
 
 // 타워가 공격하는 방향. 입력 d를 그대로 인덱스로 쓴다 (0부터 시작, 백준 21611과 다름)
 // →, ↓, ←, ↑
-int dr[] = { 0, 1, 0, -1 };
-int dc[] = { 1, 0, -1, 0 };
+int dr[] = { 0, 1, 0, -1 };      // 공격 방향별 행 변화량
+int dc[] = { 1, 0, -1, 0 };      // 공격 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 격자 크기, 명령 수 입력
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 모든 행
+		for (int c = 1; c <= N; c++)     // 모든 열
+			scanf("%d", &MAP[r][c]);     // 몬스터 번호 입력
 
-	for (int m = 0; m < M; m++)
-		scanf("%d %d", &D[m], &P[m]);
+	for (int m = 0; m < M; m++)          // 명령마다
+		scanf("%d %d", &D[m], &P[m]);    // 방향과 거리 입력
 }
 
 void printMap(int map[MAX_N][MAX_N]) // for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%2d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%2d ", map[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 /*
@@ -156,36 +156,36 @@ void printMap(int map[MAX_N][MAX_N]) // for debug
 */
 void makeSnail(int map[MAX_N][MAX_N], int arr[MAX_M])
 {
-	int sr, sc, direction;
-	int index, size;
+	int sr, sc, direction;               // 현재 위치, 방향
+	int index, size;                     // arr 읽을 위치, 구간 길이
 
 	sr = sc = (N + 1) / 2;   // 정가운데(타워 자리)에서 시작
 	direction = 0;           // 첫 방향은 왼쪽
-	index = 0;
-	size = 0;
+	index = 0;               // arr 처음부터
+	size = 0;                // 구간 길이 0부터
 
-	map[sr][sc] = arr[index++];
-	for (int i = 0; i < 2 * N - 1; i++)
+	map[sr][sc] = arr[index++];          // 가운데 칸 채우기
+	for (int i = 0; i < 2 * N - 1; i++)  // 구간 2N-1개
 	{
 		// 두 구간마다 길이가 1씩 늘어난다
 		if (i % 2 == 0) size++;
 
-		for (int s = 0; s < size; s++)
+		for (int s = 0; s < size; s++)   // 구간 길이만큼
 		{
-			int nr, nc;
+			int nr, nc;                  // 다음 칸
 
-			nr = sr + drs[direction];
-			nc = sc + dcs[direction];
+			nr = sr + drs[direction];    // 다음 행
+			nc = sc + dcs[direction];    // 다음 열
 
-			map[nr][nc] = arr[index++];
+			map[nr][nc] = arr[index++];  // 다음 값 깔기
 
-			sr = nr;
+			sr = nr;                     // 위치 갱신
 			sc = nc;
 		}
 
-		direction++;
+		direction++;                     // 다음 방향
 
-		if (direction == 4) direction = 0;
+		if (direction == 4) direction = 0;   // ↑ 다음은 ←
 	}
 }
 
@@ -202,15 +202,15 @@ void makeSnail(int map[MAX_N][MAX_N], int arr[MAX_M])
 */
 int deleteMonster()
 {
-	int score, count, start;
+	int score, count, start;             // 점수, 묶음 크기, 묶음 시작 위치
 
-	score = 0;
+	score = 0;                           // 점수 초기화
 	start = count = 1;   // start : 지금 보고 있는 묶음이 시작된 위치
 
 	int mcnt = 1;        // 살아남은 몬스터를 새로 채워 넣을 위치
-	for (int i = 1; i < N * N; i++)
+	for (int i = 1; i < N * N; i++)      // 줄을 앞에서부터
 	{
-		if (monster[i] == monster[i + 1]) count++;
+		if (monster[i] == monster[i + 1]) count++;   // 다음과 같으면 묶음 계속
 		else
 		{
 			// 값이 바뀌었다 = [start, start+count) 묶음이 여기서 끝났다
@@ -226,15 +226,15 @@ int deleteMonster()
 				score += (monster[i] * count);
 			}
 
-			count = 1;
-			start = i + 1;
+			count = 1;                   // 새 묶음 크기
+			start = i + 1;               // 새 묶음 시작 위치
 		}
 	}
 
 	// 남은 칸을 0으로 만들기
 	for (int i = mcnt; i < N * N; i++) monster[i] = 0;
 
-	return score;
+	return score;                        // 이번 점수 반환
 }
 
 /*
@@ -251,29 +251,29 @@ int deleteMonster()
 */
 void makeNewTower()
 {
-	int newMonster[MAX_N * MAX_N] = { 0 };
-	int ncnt, count;
+	int newMonster[MAX_N * MAX_N] = { 0 };   // 새 줄
+	int ncnt, count;                         // 새 줄에 쓸 위치, 묶음 크기
 
-	ncnt = count = 1;
-	for (int i = 1; i < N * N; i++)
+	ncnt = count = 1;                    // 초기화
+	for (int i = 1; i < N * N; i++)      // 줄을 앞에서부터
 	{
 		// 빈자리를 만나면 그 뒤로는 몬스터가 없다 (항상 앞으로 당겨져 있으므로)
 		if (monster[i] == 0) break;
 
-		if (monster[i] == monster[i + 1]) count++;
+		if (monster[i] == monster[i + 1]) count++;   // 다음과 같으면 묶음 계속
 		else
 		{
 			// 묶음이 끝났다 -> (크기, 번호) 두 마리로 바꿔 넣는다
 			newMonster[ncnt++] = count;
 			newMonster[ncnt++] = monster[i];
 
-			count = 1;
+			count = 1;                   // 새 묶음 크기
 		}
 
-		if (ncnt == N * N) break;
+		if (ncnt == N * N) break;        // 격자가 가득 차면 멈춤
 	}
 
-	for (int i = 1; i < ncnt; i++) monster[i] = newMonster[i];
+	for (int i = 1; i < ncnt; i++) monster[i] = newMonster[i];   // ([버그] 끝까지 덮어써야 한다)
 
 	// 새로 만든 줄을 다시 나선 순서로 격자에 깔아 놓는다
 	makeSnail(MAP, monster);
@@ -281,30 +281,30 @@ void makeNewTower()
 
 int simulate()
 {
-	int sr, sc;
+	int sr, sc;                          // 타워 위치
 
 	sr = sc = (N + 1) / 2;   // 타워는 정가운데에 고정
 
-	int score = 0;
-	for (int m = 0; m < M; m++)
+	int score = 0;                       // 총점
+	for (int m = 0; m < M; m++)          // 명령마다
 	{
-		int d, p;
+		int d, p;                        // 방향, 거리
 
-		d = D[m];
-		p = P[m];
+		d = D[m];                        // 이번 방향
+		p = P[m];                        // 이번 거리
 
 		// 1) 공격 : 타워에서 d 방향으로 거리 1 ~ p의 몬스터를 없앤다
 		for (int k = 1; k <= p; k++)
 		{
-			int nr, nc;
+			int nr, nc;                  // 공격받는 칸
 
-			nr = sr + (dr[d]) * k;
-			nc = sc + (dc[d]) * k;
+			nr = sr + (dr[d]) * k;       // k칸 떨어진 행
+			nc = sc + (dc[d]) * k;       // k칸 떨어진 열
 
 			// 처치한 몬스터의 번호가 그대로 점수가 된다.
 			// 원본(BOJ 21611)에는 없는 규칙이니 주의 (파일 상단 "원본과 다른 점" 참고)
 			score += MAP[nr][nc];
-			MAP[nr][nc] = 0;
+			MAP[nr][nc] = 0;             // 격자에서 지우기
 
 			// 격자에서 지웠으면 1차원 줄에서도 같은 자리를 비워 준다
 			int index = snail[nr][nc];
@@ -312,9 +312,9 @@ int simulate()
 		}
 
 		// 2) 정렬 : 빈자리를 없애고 몬스터를 앞으로 당긴다
-		int mcnt = 1;
+		int mcnt = 1;                    // 채워 넣을 위치
 		for (int i = 1; i < N * N; i++)
-			if (monster[i] != 0) monster[mcnt++] = monster[i];
+			if (monster[i] != 0) monster[mcnt++] = monster[i];   // 몬스터만 앞으로
 
 		// 남은 칸을 0으로 만들기
 		for (int i = mcnt; i < N * N; i++) monster[i] = 0;
@@ -323,18 +323,18 @@ int simulate()
 		//    deleteMonster가 터뜨리기와 당기기를 함께 하므로 이 루프 하나로 충분하다.
 		while (1)
 		{
-			int result = deleteMonster();
+			int result = deleteMonster(); // 한 번 터뜨리기
 
-			if (result == 0) break;
+			if (result == 0) break;       // 터진 게 없으면 끝
 
-			score += result;
+			score += result;              // 점수 누적
 		}
 
 		// 4) 재편성
 		makeNewTower();
 	}
 
-	return score;
+	return score;                        // 총점 반환
 }
 
 int main()
@@ -342,27 +342,27 @@ int main()
 	// 이 문제는 테스트 케이스가 하나다
 	// scanf("%d", &T);
 	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		// init
 		// 0, 1, 2, ... 를 나선 순서로 깔면 "그 칸이 몇 번째인지" 알려주는 번호표가 된다.
 		// 이 번호표 덕분에 격자 좌표 <-> 1차원 줄 인덱스를 바로 오갈 수 있다.
 		int snailIndex[MAX_N * MAX_N] = { 0 };
-		for (int i = 0; i < N * N; i++) snailIndex[i] = i;
+		for (int i = 0; i < N * N; i++) snailIndex[i] = i;   // 0, 1, 2, ...
 
-		makeSnail(snail, snailIndex);
+		makeSnail(snail, snailIndex);    // 나선 번호표 만들기
 
 		//printMap(snail);
 
 		// 격자에 놓인 몬스터를 나선 순서의 1차원 줄로 옮겨 담는다
 		for (int r = 1; r <= N; r++)
 			for (int c = 1; c <= N; c++)
-				monster[snail[r][c]] = MAP[r][c];
+				monster[snail[r][c]] = MAP[r][c];   // 줄에 옮기기
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

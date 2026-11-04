@@ -50,17 +50,17 @@
 	  안쪽 블록에서만 유효한 별개의 변수라 동작에는 문제가 없지만, 읽을 때 헷갈리기 쉽다.
 */
 
-#include <stdio.h>
+#include <stdio.h>          // scanf, printf, putchar 사용
 
-#define MAX (8 + 5)
-#define INF (0x7fff0000)
+#define MAX (8 + 5)         // N, M 최대 8 + 여유
+#define INF (0x7fff0000)    // 아주 큰 값
 
 // 칸의 상태
 #define EMPTY (0)   // 빈 칸
 #define OTHER (6)   // 벽
 #define MARK  (7)   // 감시된 칸 표시
 
-int T;
+int T;                  // 테스트 케이스 수
 
 int N, M;               // 격자 크기
 int MAP[MAX][MAX];      // 원본 (건드리지 않는다)
@@ -76,7 +76,7 @@ struct CHESS
 	int number;  // 종류 (1 ~ 5)
 };
 
-typedef struct CHESS CHESS;
+typedef struct CHESS CHESS;   // struct CHESS를 CHESS로 줄여 쓰기
 
 CHESS chess[8 + 2];     // 말 목록
 int cidx;               // 말 개수
@@ -84,15 +84,15 @@ int cidx;               // 말 개수
 int minAnswer;          // 사각지대의 최솟값
 
 // 방향 배열: 상(0), 우(1), 하(2), 좌(3) - 시계 방향 순서
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 격자 크기 입력
 
 	// 격자 바깥을 전부 벽으로 채워 둔다.
 	// 그래야 checkArea가 "벽을 만날 때까지"라는 조건 하나로 안전하게 멈춘다.
@@ -100,7 +100,7 @@ void input()
 	{
 		for (int c = 0; c <= M + 1; c++)
 		{
-			MAP[r][c] = OTHER;
+			MAP[r][c] = OTHER;           // 벽으로 채운다
 		}
 	}
 
@@ -109,13 +109,13 @@ void input()
 	{
 		for (int c = 1; c <= M; c++)
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 칸 상태 입력
 		}
 	}
 
 	// 말의 위치와 종류를 따로 목록으로 모아 둔다.
 	// 이후 DFS는 이 목록의 순서대로 방향을 정하면 된다.
-	cidx = 0;
+	cidx = 0;                            // 말 개수 초기화
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= M; c++)
@@ -124,9 +124,9 @@ void input()
 			if (MAP[r][c] == EMPTY || MAP[r][c] == OTHER)
 				continue;
 
-			chess[cidx].r = r;
-			chess[cidx].c = c;
-			chess[cidx++].number = MAP[r][c];
+			chess[cidx].r = r;           // 말의 행
+			chess[cidx].c = c;           // 말의 열
+			chess[cidx++].number = MAP[r][c];   // 말의 종류, 개수 증가
 		}
 	}
 }
@@ -136,13 +136,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 0; r <= N + 1; r++)
+	for (int r = 0; r <= N + 1; r++)     // 테두리 포함 모든 행
 	{
-		for (int c = 0; c <= M + 1; c++)
-			printf("%d ", tmpMAP[r][c]);
-		putchar('\n');
+		for (int c = 0; c <= M + 1; c++) // 테두리 포함 모든 열
+			printf("%d ", tmpMAP[r][c]); // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -150,11 +150,11 @@ void printMap()
 // ---------------------------
 void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 {
-	for (int i = 0; i <= N + 1; i++)
+	for (int i = 0; i <= N + 1; i++)     // 테두리 포함 모든 행
 	{
-		for (int k = 0; k <= M + 1; k++)
+		for (int k = 0; k <= M + 1; k++) // 테두리 포함 모든 열
 		{
-			copy[i][k] = original[i][k];
+			copy[i][k] = original[i][k]; // 한 칸씩 복사
 		}
 	}
 }
@@ -164,9 +164,9 @@ void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < cidx; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < cidx; i++)       // 말마다
+		printf("%d ", num_of_cases[i]);  // 고른 방향 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -176,19 +176,19 @@ void printCases()
 // ---------------------------
 void checkArea(int sr, int sc, int direction)
 {
-	int r = sr;
-	int c = sc;
+	int r = sr;                          // 현재 행
+	int c = sc;                          // 현재 열
 
-	while (1)
+	while (1)                            // 벽을 만날 때까지
 	{
-		r = r + dr[direction];
-		c = c + dc[direction];
+		r = r + dr[direction];           // 한 칸 전진 (행)
+		c = c + dc[direction];           // 한 칸 전진 (열)
 
 		// 벽에 닿으면 멈춘다 (격자 바깥도 벽이라 여기서 걸린다)
 		if (tmpMAP[r][c] == OTHER)
 			return;
 
-		tmpMAP[r][c] = MARK;
+		tmpMAP[r][c] = MARK;             // 감시됨 표시
 	}
 }
 
@@ -200,56 +200,56 @@ void simulate()
 	// 매번 원본에서 새로 시작
 	copyMap(tmpMAP, MAP);
 
-	for (int i = 0; i < cidx; i++)
+	for (int i = 0; i < cidx; i++)       // 말마다
 	{
-		int sr = chess[i].r;
-		int sc = chess[i].c;
-		int chessNumber = chess[i].number;
-		int direction = num_of_cases[i];
+		int sr = chess[i].r;             // 말의 행
+		int sc = chess[i].c;             // 말의 열
+		int chessNumber = chess[i].number;   // 말의 종류
+		int direction = num_of_cases[i]; // 고른 방향
 
 		// 1번 : 고른 방향 하나
 		if (chessNumber == 1)
 		{
-			checkArea(sr, sc, direction);
+			checkArea(sr, sc, direction);    // 한 방향 감시
 		}
 
 		// 2번 : 고른 방향과 그 반대 방향
 		//       방향 번호가 시계 순서라 +2가 정반대다 (넘치면 -4로 되돌림)
 		else if (chessNumber == 2)
 		{
-			int inverse = direction + 2;
-			if (inverse > 3) inverse -= 4;
+			int inverse = direction + 2;     // 반대 방향
+			if (inverse > 3) inverse -= 4;   // 0 ~ 3 범위로
 
-			checkArea(sr, sc, direction);
-			checkArea(sr, sc, inverse);
+			checkArea(sr, sc, direction);    // 고른 방향 감시
+			checkArea(sr, sc, inverse);      // 반대 방향 감시
 		}
 
 		// 3번 : 고른 방향과 그 시계 방향 다음 (직각 두 방향)
 		else if (chessNumber == 3)
 		{
-			int nextDir = direction + 1;
-			if (nextDir == 4) nextDir = 0;
+			int nextDir = direction + 1;     // 시계 방향 다음
+			if (nextDir == 4) nextDir = 0;   // 0 ~ 3 범위로
 
-			checkArea(sr, sc, direction);
-			checkArea(sr, sc, nextDir);
+			checkArea(sr, sc, direction);    // 고른 방향 감시
+			checkArea(sr, sc, nextDir);      // 직각 방향 감시
 		}
 
 		// 4번 : 고른 방향 하나만 빼고 나머지 세 방향
 		else if (chessNumber == 4)
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)      // 네 방향 중
 			{
-				if (i == direction) continue;
-				checkArea(sr, sc, i);
+				if (i == direction) continue;   // 고른 방향은 빼고
+				checkArea(sr, sc, i);           // 나머지 감시
 			}
 		}
 
 		// 5번 : 네 방향 모두 (방향 선택이 결과에 영향을 주지 않는다)
 		else if (chessNumber == 5)
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)      // 네 방향 모두
 			{
-				checkArea(sr, sc, i);
+				checkArea(sr, sc, i);        // 감시
 			}
 		}
 	}
@@ -260,11 +260,11 @@ void simulate()
 // ---------------------------
 int getArea()
 {
-	int sum = 0;
+	int sum = 0;                         // 사각지대 수
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 모든 열
 		{
 			// 말(1~5), 벽(6), 감시됨(7)은 모두 0이 아니다.
 			// 값이 0인 칸만 사각지대다.
@@ -272,7 +272,7 @@ int getArea()
 		}
 	}
 
-	return sum;
+	return sum;                          // 개수 반환
 }
 
 // ---------------------------
@@ -287,22 +287,22 @@ void DFS(int depth)
 	{
 		// printCases();
 
-		simulate();
+		simulate();                      // 감시 영역 칠하기
 
 		// printMap();
 
-		int tmp = getArea();
-		if (tmp < minAnswer)
-			minAnswer = tmp;
+		int tmp = getArea();             // 사각지대 수
+		if (tmp < minAnswer)             // 더 적으면
+			minAnswer = tmp;             // 최솟값 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
 	// 말 하나당 네 방향 (중복 허용 = 중복순열)
 	for (int i = 0; i < 4; i++)
 	{
-		num_of_cases[depth] = i;
-		DFS(depth + 1);
+		num_of_cases[depth] = i;         // 이 말의 방향
+		DFS(depth + 1);                  // 다음 말
 	}
 }
 
@@ -312,16 +312,16 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		minAnswer = INF;
+		minAnswer = INF;                 // 최솟값 초기화
 
-		DFS(0);
+		DFS(0);                          // 방향 조합 탐색
 
-		printf("%d\n", minAnswer);
+		printf("%d\n", minAnswer);       // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

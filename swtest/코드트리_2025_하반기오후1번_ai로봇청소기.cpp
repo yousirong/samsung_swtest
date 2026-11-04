@@ -39,64 +39,64 @@
 	  [버그 4] getPosition()이 갈 곳을 못 찾았을 때 { sc, sc } 를 돌려준다. { sr, sc } 여야 한다.
 	           먼지 칸에 닿을 수 없는 청소기가 엉뚱한 칸으로 순간이동한다.
 */
-#include <stdio.h>
+#include <stdio.h>                       // scanf, printf, putchar 사용
 
-#define MAX (30+5)
-#define WALL (-1)
-#define INF (0x7fff0000)
+#define MAX (30+5)                       // N 최대 30 + 여유
+#define WALL (-1)                        // 물건 / 격자 밖
+#define INF (0x7fff0000)                 // 아주 큰 값
 
-int T;
+int T;                                   // 테스트 케이스 수
 int N, K, L; // 격자 크기, 로봇 청소기의 개수, 테스트 횟수
 
-int MAP[MAX][MAX];
+int MAP[MAX][MAX];                       // 칸별 먼지 양 (-1 물건)
 bool check[MAX][MAX]; //청소기 좌표
 
-struct RC
+struct RC                                // 좌표
 {
-	int r;
-	int c;
+	int r;                               // 행
+	int c;                               // 열
 };
 
-RC cleaner[50+5];
+RC cleaner[50+5];                        // 청소기 위치 (1번부터)
 
-RC queue[MAX * MAX];
-int rcnt;
+RC queue[MAX * MAX];                     // BFS 큐
+int rcnt;                                // (사용하지 않음)
 
 // 우,하,좌,상
-int dr[] = { 0,1,0,-1 };
-int dc[] = { 1,0,-1,0 };
+int dr[] = { 0,1,0,-1 };                 // 방향별 행 변화량
+int dc[] = { 1,0,-1,0 };                 // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d %d", &N, &K, &L);
+	scanf("%d %d %d", &N, &K, &L);       // 격자 크기, 청소기 수, 테스트 횟수 입력
 
-	for (int r = 0; r <= N + 1; r++)
+	for (int r = 0; r <= N + 1; r++)     // 테두리 포함 전체를
 		for (int c = 0; c <= N + 1; c++)
-			MAP[r][c] = WALL;
+			MAP[r][c] = WALL;            // 벽으로
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 격자 입력
 		for (int c = 1; c <= N; c++)
 			scanf("%d", MAP[r][c]);
 			// [버그 1] & 가 빠졌다. scanf("%d", &MAP[r][c]) 여야 한다. 지금은 입력을 읽자마자 죽는다.
 
-	for (int k = 1; k <= K; k++)
+	for (int k = 1; k <= K; k++)         // 청소기별
 	{
-		int r, c;
+		int r, c;                        // 청소기 좌표
 
-		scanf("%d %d", &r, &c);
+		scanf("%d %d", &r, &c);          // 입력
 
-		cleaner[k].r = r;
-		cleaner[k].c = c;
+		cleaner[k].r = r;                // 행 저장
+		cleaner[k].c = c;                // 열 저장
 	}
 }
 
 void printMap() // for debug
 {
-	for (int k = 1; k <= K; k++)
+	for (int k = 1; k <= K; k++)         // 청소기 위치 출력
 		printf("%d] %d, %d\n", k, cleaner[k].r, cleaner[k].c);
 	putchar('\n');
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 격자 출력
 	{
 		for (int c = 1; c <= N; c++)
 			printf("%2d", MAP[r][c]);
@@ -107,62 +107,62 @@ void printMap() // for debug
 
 RC getPosition(int index)	//BFS
 {
-	RC ret;
-	int rp, wp;
-	rp = wp = 0;
-	int visit[MAX][MAX] = { 0 };
+	RC ret;                              // 결과 위치
+	int rp, wp;                          // 큐 위치
+	rp = wp = 0;                         // 큐 초기화
+	int visit[MAX][MAX] = { 0 };         // 방문 + 거리
 
-	int sr = cleaner[index].r;
-	int sc = cleaner[index].c;
+	int sr = cleaner[index].r;           // 청소기 행
+	int sc = cleaner[index].c;           // 청소기 열
 
 	if (MAP[sr][sc] > 0) return { sr,sc };
 	// 지금 칸에 먼지가 있으면 움직이지 않는다.
 
-	queue[wp].r = sr;
+	queue[wp].r = sr;                    // 시작 칸 넣기
 	queue[wp++].c = sc;
 
-	visit[sr][sc] = 1;
+	visit[sr][sc] = 1;                   // 방문 표시
 
-	ret.r = ret.c = INF;
-	int minDistance = INF;
-	while (rp < wp)
+	ret.r = ret.c = INF;                 // 아직 후보 없음
+	int minDistance = INF;               // 최소 거리
+	while (rp < wp)                      // 큐가 빌 때까지
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 하나 꺼내기
 
 		// 먼지를 찾은 경우 + 다른 청소기가 위치하지 않은 경우
 		if (MAP[out.r][out.c] > 0 && check[out.r][out.c] == false)
 		{
-			if (visit[out.r][out.c] < minDistance)
+			if (visit[out.r][out.c] < minDistance)        // 더 가까우면
 			{
-				minDistance = visit[out.r][out.c];
+				minDistance = visit[out.r][out.c];        // 갱신
 				ret = out;
 			}
-			else if (visit[out.r][out.c] == minDistance)
+			else if (visit[out.r][out.c] == minDistance)  // 거리가 같으면
 			{
-				if (out.r < ret.r) ret = out;
+				if (out.r < ret.r) ret = out;             // 행이 작은 쪽
 				else if (out.r == ret.r)
 				{
-					if (out.c < ret.c)
+					if (out.c < ret.c)                    // 열이 작은 쪽
 						ret = out;
 				}
 			}
-			continue;
+			continue;                    // 먼지 칸 너머로는 퍼지지 않음
 		}
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸
 
 			nr = out.r + dr[i];
 			nc = out.c + dc[i];
 
-			if (MAP[nr][nc] == WALL || check[nr][nc] == true) continue;
-			if (visit[nr][nc] != 0) continue;
+			if (MAP[nr][nc] == WALL || check[nr][nc] == true) continue;   // 물건이거나 다른 청소기
+			if (visit[nr][nc] != 0) continue;                           // 방문함
 
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣기
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = visit[out.r][out.c] + 1;	
+			visit[nr][nc] = visit[out.r][out.c] + 1;	   // 거리 기록
 		}
 
 	}
@@ -170,37 +170,37 @@ RC getPosition(int index)	//BFS
 	if (ret.r == INF) return { sc,sc };
 	// [버그 4] { sr, sc } 여야 한다. 갈 곳이 없으면 제자리에 있어야 한다.
 
-	return ret;
+	return ret;                          // 찾은 위치 반환
 }
-int min(int a, int b)
+int min(int a, int b)                    // 작은 값
 {
 	return a < b ? a : b;
 }
 
-int getDirection(int index)
+int getDirection(int index)              // 청소할 방향 정하기
 {
-	RC target = cleaner[index];
+	RC target = cleaner[index];          // 청소기 위치
 
 	int total = min(MAP[target.r][target.c], 20);
 	// 자기 칸 + 상하좌우 다섯 칸에서 지울 수 있는 먼지(칸마다 최대 20)를 모두 더해 둔다.
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)          // 상하좌우
 	{
-		int nr, nc;
+		int nr, nc;                      // 이웃 칸
 		nr = target.r + dr[i];
 		nc = target.c + dc[i];
-		if (MAP[nr][nc] == WALL) continue;
+		if (MAP[nr][nc] == WALL) continue;   // 물건 제외
 
-		total += min(MAP[nr][nc], 20);
+		total += min(MAP[nr][nc], 20);   // 누적
 	}
-	int maxDir = -1;
-	int maxDust = -1;
-	int changeDir[] = { 2,3,0,1 };
+	int maxDir = -1;                     // 최적 방향
+	int maxDust = -1;                    // 최대 청소량
+	int changeDir[] = { 2,3,0,1 };       // 반대 방향 표
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)          // 우하좌상
 	{
-		int reserve = changeDir[i];
+		int reserve = changeDir[i];      // 빠지는 반대 방향
 
-		int nr, nc;
+		int nr, nc;                      // 빠지는 칸
 
 		nr = target.r + dr[reserve];
 		nc = target.c + dc[reserve];
@@ -217,50 +217,50 @@ int getDirection(int index)
 		}
 	}
 
-	return maxDir;
+	return maxDir;                       // 방향 반환
 }
 
-void clean(int index)
+void clean(int index)                    // 청소
 {
-	int changeDir[] = { 2,3,0,1 };
+	int changeDir[] = { 2,3,0,1 };       // 반대 방향 표
 
-	RC target = cleaner[index];
-	int direction= getDirection(index);
-	int reserve = changeDir[direction];
+	RC target = cleaner[index];          // 청소기 위치
+	int direction= getDirection(index);  // 바라볼 방향
+	int reserve = changeDir[direction];  // 빠지는 방향
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)          // 상하좌우
 	{
-		if (i == reserve) continue;
+		if (i == reserve) continue;      // 빠지는 방향 제외
 
-		int nr, nc;
+		int nr, nc;                      // 청소할 칸
 
 		nr = target.r + dr[i];
 		nc = target.c + dc[i];
 
-		if (MAP[nr][nc] == WALL) continue;
+		if (MAP[nr][nc] == WALL) continue;   // 물건 제외
 
-		MAP[nr][nc] -= 20;
+		MAP[nr][nc] -= 20;               // 먼지 20 제거
 		if (MAP[nr][nc] < 0) MAP[target.r][target.c] = 0;
 		// [버그 2] 이웃(MAP[nr][nc])을 0으로 만들어야 한다. 지금은 자기 칸을 0으로 만들어 이웃이 음수로 남는다.
 		// [버그 3] 이 함수는 자기 칸(target)을 청소하지 않는다. 자기 칸도 최대 20 지워야 한다.
 	}
 }
 
-void addDust()
+void addDust()                           // 먼지 축적
 {
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (MAP[r][c] == 0 || MAP[r][c] == WALL) continue;
-			MAP[r][c] += 5;
+			if (MAP[r][c] == 0 || MAP[r][c] == WALL) continue;   // 먼지 없는 칸, 물건 제외
+			MAP[r][c] += 5;              // 5 증가
 		}
 	}
 }
 
-void spreadDust()
+void spreadDust()                        // 먼지 확산
 {
-	int tmpMAP[MAX][MAX] = { 0 };
+	int tmpMAP[MAX][MAX] = { 0 };        // 확산량 모음
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= N; c++)
@@ -268,47 +268,47 @@ void spreadDust()
 			if (MAP[r][c] != 0) continue;
 			// 먼지가 0인 칸에만 생긴다. (물건 칸은 -1이라 여기서 같이 걸러진다)
 
-			int sum = 0;
-			for (int i = 0; i < 4; i++)
+			int sum = 0;                 // 이웃 먼지 합
+			for (int i = 0; i < 4; i++)  // 상하좌우
 			{
 				int nr, nc;
 				nr = r + dr[i];
 				nc = c + dc[i];
 
-				if (MAP[nr][nc] == WALL) continue;
+				if (MAP[nr][nc] == WALL) continue;   // 물건 제외
 
-				sum += MAP[nr][nc];
+				sum += MAP[nr][nc];      // 누적
 			}
-			tmpMAP[r][c] = sum / 10;
+			tmpMAP[r][c] = sum / 10;     // 1/10 (몫)
 		}
 	}
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 한꺼번에 반영
 		for (int c = 1; c <= N; c++)
 			MAP[r][c] += tmpMAP[r][c];
 }
 
-int getDust()
+int getDust()                            // 전체 먼지 합
 {
-	int sum = 0;
+	int sum = 0;                         // 합
 
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (MAP[r][c] == WALL)continue;
-			sum += MAP[r][c];
+			if (MAP[r][c] == WALL)continue;   // 물건 제외
+			sum += MAP[r][c];            // 누적
 		}
 	}
-	return sum;
+	return sum;                          // 반환
 }
 
 
 void simulate()
 {
-	for (int l = 0; l < L; l++)
+	for (int l = 0; l < L; l++)          // L번 테스트
 	{
-		for (int r = 1; r <= N; r++)
+		for (int r = 1; r <= N; r++)     // 청소기 표시 초기화
 			for (int c = 1; c <= N; c++)
 				check[r][c] = false;
 
@@ -319,14 +319,14 @@ void simulate()
 		// 1. 청소기 이동
 		for (int k = 1; k <= K; k++)
 		{
-			RC rc = getPosition(k);
+			RC rc = getPosition(k);      // 갈 칸
 
-			check[cleaner[k].r][cleaner[k].c] = false;
+			check[cleaner[k].r][cleaner[k].c] = false;   // 옛 칸 표시 해제
 
-			cleaner[k].r = rc.r;
+			cleaner[k].r = rc.r;         // 이동
 			cleaner[k].c = rc.c;
 
-			check[cleaner[k].r][cleaner[k].c] = true;
+			check[cleaner[k].r][cleaner[k].c] = true;    // 새 칸 표시
 
 		}
 
@@ -348,12 +348,12 @@ void simulate()
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // 시뮬레이션 + 출력
 	}
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

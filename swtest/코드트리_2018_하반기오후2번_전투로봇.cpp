@@ -51,70 +51,70 @@
 	  0은 "더 잡을 게 없다"는 뜻으로만 쓰이므로 신호가 겹치지 않는다.
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX (20 + 5)
-#define INF (0x7fff0000)
+#define MAX (20 + 5)             // N 최대 20 + 여유
+#define INF (0x7fff0000)         // 아주 큰 값
 
-#define ROBOT_POSITION (9)
+#define ROBOT_POSITION (9)       // 입력에서 로봇 위치를 나타내는 값
 
-int T;
+int T;                 // 테스트 케이스 수
 
-int N;
+int N;                 // 격자 크기
 int MAP[MAX][MAX];     // 칸의 몬스터 크기 (0이면 빈칸)
 int visit[MAX][MAX];   // BFS 방문 여부 + 거리 (0이면 미방문/도달 불가)
 
 // 로봇 상태
 struct ROBOT
 {
-	int r;
-	int c;
+	int r;        // 행
+	int c;        // 열
 	int attack;   // 현재 레벨에서 제거한 몬스터 수
 	int level;    // 현재 레벨
 };
 
-typedef struct ROBOT ROBOT;
+typedef struct ROBOT ROBOT;   // struct ROBOT을 ROBOT으로 줄여 쓰기
 
-ROBOT battleRobot;
+ROBOT battleRobot;     // 전투로봇
 
 // 좌표 한 쌍
 struct RC
 {
-	int r;
-	int c;
+	int r;             // 행
+	int c;             // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;  // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];   // BFS용 큐
 
 // 방향 배열: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 격자 크기 입력
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 칸 값 입력
 
-			if (MAP[r][c] == ROBOT_POSITION)
+			if (MAP[r][c] == ROBOT_POSITION)   // 로봇 위치면
 			{
 				// 로봇이 서 있는 칸에는 몬스터가 없으므로 빈칸으로 바꿔 둔다.
 				// 이렇게 해야 이후 판정에서 자기 자신을 몬스터로 오인하지 않는다.
 				MAP[r][c] = 0;
 
-				battleRobot.r = r;
-				battleRobot.c = c;
-				battleRobot.attack = 0;
-				battleRobot.level = 2;
+				battleRobot.r = r;       // 로봇 행
+				battleRobot.c = c;       // 로봇 열
+				battleRobot.attack = 0;  // 제거 수 0
+				battleRobot.level = 2;   // 시작 레벨 2
 			}
 		}
 	}
@@ -125,13 +125,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", visit[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", visit[r][c]);  // 거리 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -141,16 +141,16 @@ void printMap()
 // ---------------------------
 bool monsterExists()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			if (MAP[r][c] != 0 && MAP[r][c] < battleRobot.level)
-				return true;
+			if (MAP[r][c] != 0 && MAP[r][c] < battleRobot.level)   // 잡을 수 있는 몬스터면
+				return true;                                       // 있다
 		}
 	}
 
-	return false;
+	return false;                        // 없다
 }
 
 // ---------------------------
@@ -167,26 +167,26 @@ void BFS()
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			visit[r][c] = 0;
+			visit[r][c] = 0;             // 거리 초기화
 		}
 	}
 
-	int rp, wp;
-	rp = wp = 0;
+	int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
+	rp = wp = 0;                         // 빈 큐
 
-	queue[wp].r = battleRobot.r;
-	queue[wp++].c = battleRobot.c;
+	queue[wp].r = battleRobot.r;         // 시작 행 (로봇 위치)
+	queue[wp++].c = battleRobot.c;       // 시작 열, 삽입 위치 증가
 
 	visit[battleRobot.r][battleRobot.c] = 1;   // 0은 미방문이라 1부터 센다
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 한 칸 꺼낸다
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr = out.r + dr[i];
-			int nc = out.c + dc[i];
+			int nr = out.r + dr[i];      // 이웃 행
+			int nc = out.c + dc[i];      // 이웃 열
 
 			// 격자 밖
 			if (nr < 1 || nc < 1 || nr > N || nc > N)
@@ -201,10 +201,10 @@ void BFS()
 			if (visit[nr][nc] != 0)
 				continue;
 
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 이웃 행 기록
+			queue[wp++].c = nc;          // 이웃 열 기록, 삽입 위치 증가
 
-			visit[nr][nc] = visit[out.r][out.c] + 1;
+			visit[nr][nc] = visit[out.r][out.c] + 1;   // 거리 기록
 		}
 	}
 }
@@ -220,10 +220,10 @@ int simulate()
 	if (monsterExists() == false)
 		return 0;
 
-	BFS();
+	BFS();                               // 현재 위치 기준 거리 계산
 
-	int tmpR, tmpC;
-	int minTime = INF;
+	int tmpR, tmpC;                      // 고른 몬스터 위치
+	int minTime = INF;                   // 가장 가까운 거리
 
 	// 후보 고르기.
 	// 위 -> 아래, 왼쪽 -> 오른쪽 순으로 훑고 "더 가까울 때만" 갱신하므로
@@ -240,11 +240,11 @@ int simulate()
 			if (battleRobot.level <= MAP[r][c])
 				continue;
 
-			if (visit[r][c] < minTime)
+			if (visit[r][c] < minTime)   // 더 가까우면
 			{
-				minTime = visit[r][c];
-				tmpR = r;
-				tmpC = c;
+				minTime = visit[r][c];   // 거리 갱신
+				tmpR = r;                // 후보 행
+				tmpC = c;                // 후보 열
 			}
 		}
 	}
@@ -262,13 +262,13 @@ int simulate()
 	battleRobot.r = tmpR;       // 로봇이 그 자리로 이동
 	battleRobot.c = tmpC;
 
-	battleRobot.attack++;
+	battleRobot.attack++;       // 제거 수 증가
 
 	// 현재 레벨만큼 잡으면 레벨업하고 카운터를 초기화한다
 	if (battleRobot.attack == battleRobot.level)
 	{
-		battleRobot.level++;
-		battleRobot.attack = 0;
+		battleRobot.level++;         // 레벨업
+		battleRobot.attack = 0;      // 제거 수 초기화
 	}
 
 	// visit은 시작 칸을 1로 잡았으므로 실제 이동 시간은 -1
@@ -281,25 +281,25 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		int time = 0;   // 누적 이동 시간
 
-		while (1)
+		while (1)                        // 잡을 몬스터가 없을 때까지
 		{
-			int result = simulate();
+			int result = simulate();     // 한 마리 잡기
 
 			// 0이면 더 잡을 몬스터가 없다는 뜻
 			if (result == 0)
 				break;
 
-			time += result;
+			time += result;              // 이동 시간 누적
 		}
 
-		printf("%d\n", time);
+		printf("%d\n", time);            // 총 시간 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

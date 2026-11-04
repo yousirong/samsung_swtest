@@ -52,12 +52,12 @@
 	  보드에는 벽(#), 구멍(O), 빈칸(.)만 남는다. 바깥 테두리가 벽이라 범위 검사도 필요 없다.
 */
 
-#include <stdio.h>
+#include <stdio.h>                // scanf, printf, putchar 사용
 
-#define MAX (10 + 5)
-#define INF (0x7fff0000)
+#define MAX (10 + 5)              // 보드 최대 10 + 여유
+#define INF (0x7fff0000)          // 실패 표시용 큰 값
 
-int T;
+int T;                    // 테스트 케이스 수
 
 int N, M;                 // 보드 크기
 char MAP[MAX][MAX];       // 보드 (# 벽, O 구멍, . 빈칸)
@@ -67,48 +67,48 @@ int num_of_cases[10 + 5]; // DFS로 만든 방향 수열 (길이 10)
 // 좌표 한 쌍
 struct RC
 {
-	int r;
-	int c;
+	int r;                    // 행
+	int c;                    // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;         // struct RC를 RC로 줄여 쓰기
 
 RC RED, BLUE;             // 사탕의 "처음" 위치 (시뮬레이션마다 여기서 다시 출발)
 
 int minAnswer;            // 지금까지 찾은 최소 기울이기 횟수
 
 // 방향 배열: ↑(0), →(1), ↓(2), ←(3)
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 보드 크기 입력
 
-	for (int r = 0; r < N; r++)
+	for (int r = 0; r < N; r++)          // 모든 행
 	{
-		for (int c = 0; c < M; c++)
+		for (int c = 0; c < M; c++)      // 모든 열
 		{
-			scanf(" %c", &MAP[r][c]);
+			scanf(" %c", &MAP[r][c]);    // 공백을 건너뛰고 한 글자 입력
 
 			// 사탕은 위치만 따로 들고, 보드에서는 빈칸으로 지운다.
 			// 사탕이 계속 이동하기 때문에 보드에 남겨 두면 상태가 어긋난다.
-			if (MAP[r][c] == 'R')
+			if (MAP[r][c] == 'R')        // 빨간 사탕이면
 			{
-				RED.r = r;
-				RED.c = c;
+				RED.r = r;               // 위치 행
+				RED.c = c;               // 위치 열
 
-				MAP[r][c] = '.';
+				MAP[r][c] = '.';         // 보드에서는 빈칸으로
 			}
-			else if (MAP[r][c] == 'B')
+			else if (MAP[r][c] == 'B')   // 파란 사탕이면
 			{
-				BLUE.r = r;
-				BLUE.c = c;
+				BLUE.r = r;              // 위치 행
+				BLUE.c = c;              // 위치 열
 
-				MAP[r][c] = '.';
+				MAP[r][c] = '.';         // 보드에서는 빈칸으로
 			}
 		}
 	}
@@ -119,12 +119,12 @@ void input()
 // ---------------------------
 void printMap()
 {
-	MAP[RED.r][RED.c] = 'R';
-	MAP[BLUE.r][BLUE.c] = 'B';
+	MAP[RED.r][RED.c] = 'R';             // 빨간 사탕 잠시 표시
+	MAP[BLUE.r][BLUE.c] = 'B';           // 파란 사탕 잠시 표시
 
-	for (int r = 0; r < N; r++)
-		printf("%s\n", MAP[r]);
-	putchar('\n');
+	for (int r = 0; r < N; r++)          // 모든 행
+		printf("%s\n", MAP[r]);          // 한 줄 출력
+	putchar('\n');                       // 빈 줄
 
 	// 출력용으로만 얹었으므로 곧바로 되돌린다
 	MAP[RED.r][RED.c] = '.';
@@ -136,9 +136,9 @@ void printMap()
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < 10; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < 10; i++)         // 10개 방향
+		printf("%d ", num_of_cases[i]);  // 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -149,7 +149,7 @@ void printCases()
 // ---------------------------
 int simulate()
 {
-	RC red, blue;
+	RC red, blue;                        // 이번 시뮬레이션의 사탕 위치
 
 	// 매번 초기 위치에서 새로 시작한다 (전역 RED/BLUE는 건드리지 않는다)
 	red = RED;
@@ -158,7 +158,7 @@ int simulate()
 	// 정해진 순서대로 최대 10번 기울인다
 	for (int i = 0; i < 10; i++)
 	{
-		int direction = num_of_cases[i];
+		int direction = num_of_cases[i]; // 이번에 기울일 방향
 
 		// 한 번 기울이면 더 이상 못 움직일 때까지 한 칸씩 계속 민다
 		while (1)
@@ -189,28 +189,28 @@ int simulate()
 			// 2) 둘 다 갈 수 있음 -> 나란히 한 칸씩 이동
 			if (checkWallRed == false && checkWallBlue == false)
 			{
-				red.r = red_nr;
-				red.c = red_nc;
+				red.r = red_nr;          // 빨강 한 칸 이동 (행)
+				red.c = red_nc;          // 빨강 한 칸 이동 (열)
 
-				blue.r = blue_nr;
-				blue.c = blue_nc;
+				blue.r = blue_nr;        // 파랑 한 칸 이동 (행)
+				blue.c = blue_nc;        // 파랑 한 칸 이동 (열)
 			}
 			// 3) 빨강만 벽에 막힘 -> 파랑이 빨강 자리로 밀고 들어가는 게 아니라면 파랑만 이동
 			else if (checkWallRed == true && checkCandyBlue == false)
 			{
-				blue.r = blue_nr;
-				blue.c = blue_nc;
+				blue.r = blue_nr;        // 파랑만 이동 (행)
+				blue.c = blue_nc;        // 파랑만 이동 (열)
 			}
 			// 4) 파랑만 벽에 막힘 -> 빨강이 파랑 자리로 밀고 들어가는 게 아니라면 빨강만 이동
 			else if (checkWallBlue == true && checkCandyRed == false)
 			{
-				red.r = red_nr;
-				red.c = red_nc;
+				red.r = red_nr;          // 빨강만 이동 (행)
+				red.c = red_nc;          // 빨강만 이동 (열)
 			}
 			// 그 외 : 서로를 막고 있어 아무도 못 움직인다
 			else
 			{
-				break;
+				break;                   // 이번 기울이기 끝
 			}
 
 			// ----- 빨간 사탕이 구멍에 들어간 경우 -----
@@ -223,8 +223,8 @@ int simulate()
 					if (MAP[blue.r][blue.c] == 'O')
 						return INF;   // 파랑도 빠짐 -> 실패
 
-					blue.r += dr[direction];
-					blue.c += dc[direction];
+					blue.r += dr[direction];   // 파랑 한 칸 더 (행)
+					blue.c += dc[direction];   // 파랑 한 칸 더 (열)
 				}
 
 				// 빨강만 빠졌다 -> 성공. 지금까지 기울인 횟수는 i + 1번.
@@ -254,23 +254,23 @@ void DFS(int depth, int direction)
 	{
 		// printCases();
 
-		int tmp = simulate();
-		if (tmp < minAnswer)
-			minAnswer = tmp;
+		int tmp = simulate();            // 이 수열의 결과
+		if (tmp < minAnswer)             // 더 적은 횟수면
+			minAnswer = tmp;             // 최솟값 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)          // 4방향 후보
 	{
 		// 직전과 같은 방향은 건너뛴다.
 		// 이미 그 방향 끝까지 굴러가 있어서 다시 기울여도 상태가 바뀌지 않는다.
 		if (i == direction)
 			continue;
 
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // 이번 순번의 방향
 
-		DFS(depth + 1, i);
+		DFS(depth + 1, i);               // 다음 순번
 	}
 }
 
@@ -280,21 +280,21 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 보드 입력
 
-		minAnswer = INF;
+		minAnswer = INF;                 // 최솟값 초기화
 
 		// 가능한 모든 방향 수열을 만들어 시뮬레이션
 		DFS(0, -1);
 
 		// 한 번도 성공하지 못했으면 -1
 		if (minAnswer == INF)
-			printf("-1\n");
+			printf("-1\n");              // 실패
 		else
-			printf("%d\n", minAnswer);
+			printf("%d\n", minAnswer);   // 최소 횟수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

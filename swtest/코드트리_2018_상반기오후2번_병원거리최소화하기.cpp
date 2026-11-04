@@ -32,17 +32,17 @@
 	     (문제 조건상 병원이 최소 M개는 있으므로 갱신되지 않는 경우는 없다)
 */
 
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf, putchar 사용
 
-#define MAX (50 + 10)
-#define MAX_HOSPITAL (13 + 5)
-#define INF (0x7fff0000)
+#define MAX (50 + 10)              // N 최대 50 + 여유
+#define MAX_HOSPITAL (13 + 5)      // 병원 최대 13개 + 여유
+#define INF (0x7fff0000)           // 아주 큰 값
 
 // 칸의 의미
-#define PERSON   (1)
-#define HOSPITAL (2)
+#define PERSON   (1)               // 사람
+#define HOSPITAL (2)               // 병원
 
-int T;
+int T;                     // 테스트 케이스 수
 
 int N, M;                  // N: 격자 크기, M: 남길 병원 수
 int MAP[MAX][MAX];         // 격자 (좌표 수집이 끝나면 사실상 쓰지 않는다)
@@ -52,11 +52,11 @@ int num_of_cases[MAX];     // 고른 병원의 인덱스들
 // 좌표 한 쌍
 struct RC
 {
-	int r;
-	int c;
+	int r;                 // 행
+	int c;                 // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;      // struct RC를 RC로 줄여 쓰기
 
 RC person[MAX * 2];               // 사람 좌표 목록
 RC hospital[MAX_HOSPITAL];        // 병원 좌표 목록
@@ -69,25 +69,25 @@ int minAnswer;                    // 도시의 병원 거리 최솟값
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 격자 크기, 남길 병원 수 입력
 
-	pcnt = hcnt = 0;
+	pcnt = hcnt = 0;                     // 개수 초기화
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 칸 입력
 
-			if (MAP[r][c] == PERSON)
+			if (MAP[r][c] == PERSON)     // 사람이면
 			{
-				person[pcnt].r = r;
-				person[pcnt++].c = c;
+				person[pcnt].r = r;      // 사람 목록에 행
+				person[pcnt++].c = c;    // 사람 목록에 열, 개수 증가
 			}
-			else if (MAP[r][c] == HOSPITAL)
+			else if (MAP[r][c] == HOSPITAL)   // 병원이면
 			{
-				hospital[hcnt].r = r;
-				hospital[hcnt++].c = c;
+				hospital[hcnt].r = r;    // 병원 목록에 행
+				hospital[hcnt++].c = c;  // 병원 목록에 열, 개수 증가
 			}
 		}
 	}
@@ -98,13 +98,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", MAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -112,9 +112,9 @@ void printMap()
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < M; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < M; i++)          // 고른 M개
+		printf("%d ", num_of_cases[i]);  // 인덱스 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -122,7 +122,7 @@ void printCases()
 // ---------------------------
 int abs(int x)
 {
-	return (x > 0) ? x : -x;
+	return (x > 0) ? x : -x;             // 양수면 그대로, 아니면 부호 반전
 }
 
 // ---------------------------
@@ -130,7 +130,7 @@ int abs(int x)
 // ---------------------------
 int getDistance(int r1, int c1, int r2, int c2)
 {
-	return abs(r1 - r2) + abs(c1 - c2);
+	return abs(r1 - r2) + abs(c1 - c2);  // 행 차이 + 열 차이
 }
 
 // ---------------------------
@@ -142,35 +142,35 @@ int getDistance(int r1, int c1, int r2, int c2)
 // ---------------------------
 int calculate()
 {
-	bool selectedHospital[MAX_HOSPITAL] = { 0 };
+	bool selectedHospital[MAX_HOSPITAL] = { 0 };   // 이번 조합에서 남긴 병원 표시
 
-	for (int i = 0; i < M; i++)
-		selectedHospital[num_of_cases[i]] = true;
+	for (int i = 0; i < M; i++)          // 고른 M개
+		selectedHospital[num_of_cases[i]] = true;   // 표시
 
-	int sum = 0;
+	int sum = 0;                         // 도시의 병원 거리
 
-	for (int i = 0; i < pcnt; i++)
+	for (int i = 0; i < pcnt; i++)       // 사람마다
 	{
-		int minDistance = INF;
+		int minDistance = INF;           // 가장 가까운 병원까지 거리
 
 		// 선택된 병원만 후보로 본다
 		for (int k = 0; k < hcnt; k++)
 		{
-			if (selectedHospital[k] == false)
-				continue;
+			if (selectedHospital[k] == false)   // 폐업한 병원은
+				continue;                       // 건너뛴다
 
-			int distance = getDistance(
+			int distance = getDistance(         // 사람과 병원 사이 거리
 				person[i].r, person[i].c,
 				hospital[k].r, hospital[k].c
 			);
 
-			minDistance = (distance < minDistance) ? distance : minDistance;
+			minDistance = (distance < minDistance) ? distance : minDistance;   // 최솟값 갱신
 		}
 
-		sum += minDistance;
+		sum += minDistance;              // 이 사람의 병원 거리 더하기
 	}
 
-	return sum;
+	return sum;                          // 합 반환
 }
 
 // ---------------------------
@@ -186,16 +186,16 @@ void DFS(int depth, int start)
 	{
 		// printCases();
 
-		int tmp = calculate();
-		if (tmp < minAnswer)
-			minAnswer = tmp;
+		int tmp = calculate();           // 이 조합의 병원 거리
+		if (tmp < minAnswer)             // 더 작으면
+			minAnswer = tmp;             // 최솟값 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
-	for (int i = start; i < hcnt; i++)
+	for (int i = start; i < hcnt; i++)   // start부터 병원 후보
 	{
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // i번 병원을 남긴다
 
 		// 조합이므로 다음은 i보다 뒤에서만 고른다
 		DFS(depth + 1, i + 1);
@@ -208,16 +208,16 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		minAnswer = INF;
+		minAnswer = INF;                 // 최솟값 초기화
 
-		DFS(0, 0);
+		DFS(0, 0);                       // 조합 탐색 시작
 
-		printf("%d\n", minAnswer);
+		printf("%d\n", minAnswer);       // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

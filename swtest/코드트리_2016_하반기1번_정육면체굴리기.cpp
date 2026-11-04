@@ -48,17 +48,17 @@
 	  그래서 범위 검사를 좌표를 실제로 옮기기 전에 먼저 해야 한다.
 */
 
-#include <stdio.h>
+#include <stdio.h>         // scanf, printf, putchar 사용
 
-#define MAX (20 + 10)
+#define MAX (20 + 10)      // 지도 최대 20 + 여유
 
 // 명령 번호
-#define EAST  (1)
-#define WEST  (2)
-#define NORTH (3)
-#define SOUTH (4)
+#define EAST  (1)          // 동
+#define WEST  (2)          // 서
+#define NORTH (3)          // 북
+#define SOUTH (4)          // 남
 
-int T;
+int T;         // 테스트 케이스 수
 
 int N, M;      // 지도 크기 (N행 M열)
 int R, C;      // 주사위의 현재 위치
@@ -78,34 +78,34 @@ struct CUBE
 	int bottom;  // 아랫면 (지도와 값을 주고받는 면)
 };
 
-typedef struct CUBE CUBE;
+typedef struct CUBE CUBE;   // struct CUBE를 CUBE로 줄여 쓰기
 
 CUBE cube;     // 전역이라 여섯 면이 모두 0으로 시작한다 (문제 조건과 일치)
 
 // 방향 배열. 명령 번호(1~4)를 인덱스로 그대로 쓰기 위해 0번은 더미로 비워 둔다.
 //   1=동, 2=서, 3=북, 4=남
-int dr[] = { 0, 0, 0, -1, 1 };
-int dc[] = { 0, 1,-1,  0, 0 };
+int dr[] = { 0, 0, 0, -1, 1 };   // 명령별 행 변화량
+int dc[] = { 0, 1,-1,  0, 0 };   // 명령별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d %d %d", &N, &M, &R, &C, &K);
+	scanf("%d %d %d %d %d", &N, &M, &R, &C, &K);   // 지도 크기, 주사위 위치, 명령 수 입력
 
 	// 지도 (0-based)
 	for (int r = 0; r < N; r++)
 	{
 		for (int c = 0; c < M; c++)
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 칸의 수 입력
 		}
 	}
 
 	// 명령 목록
 	for (int k = 0; k < K; k++)
-		scanf("%d", &command[k]);
+		scanf("%d", &command[k]);        // k번째 명령 입력
 }
 
 // ---------------------------
@@ -113,17 +113,17 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 0; r < N; r++)
+	for (int r = 0; r < N; r++)          // 모든 행
 	{
-		for (int c = 0; c < M; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 0; c < M; c++)      // 모든 열
+			printf("%d ", MAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 
-	for (int k = 0; k < K; k++)
-		printf("%d ", command[k]);
-	putchar('\n');
+	for (int k = 0; k < K; k++)          // 모든 명령
+		printf("%d ", command[k]);       // 명령 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -136,10 +136,10 @@ void printMap()
 // ---------------------------
 void printCube()
 {
-	printf("   %d\n", cube.up);
-	printf("%d %d %d\n", cube.left, cube.top, cube.right);
-	printf("   %d\n", cube.down);
-	printf("   %d\n", cube.bottom);
+	printf("   %d\n", cube.up);                                  // 북쪽 옆면
+	printf("%d %d %d\n", cube.left, cube.top, cube.right);       // 서쪽, 윗면, 동쪽
+	printf("   %d\n", cube.down);                                // 남쪽 옆면
+	printf("   %d\n", cube.bottom);                              // 바닥면
 }
 
 /* --------------------------------------------------
@@ -157,7 +157,7 @@ void printCube()
 // 동쪽으로 굴리기 (회전축: up, down)
 void moveEast()
 {
-	int tmp[6] = {
+	int tmp[6] = {                       // 굴리기 전 여섯 면 스냅샷
 		cube.up, cube.left, cube.top,
 		cube.right, cube.down, cube.bottom
 	};
@@ -171,7 +171,7 @@ void moveEast()
 // 서쪽으로 굴리기 (동쪽 굴리기의 역방향, 회전축: up, down)
 void moveWest()
 {
-	int tmp[6] = {
+	int tmp[6] = {                       // 굴리기 전 여섯 면 스냅샷
 		cube.up, cube.left, cube.top,
 		cube.right, cube.down, cube.bottom
 	};
@@ -185,7 +185,7 @@ void moveWest()
 // 북쪽으로 굴리기 (회전축: left, right)
 void moveNorth()
 {
-	int tmp[6] = {
+	int tmp[6] = {                       // 굴리기 전 여섯 면 스냅샷
 		cube.up, cube.left, cube.top,
 		cube.right, cube.down, cube.bottom
 	};
@@ -199,7 +199,7 @@ void moveNorth()
 // 남쪽으로 굴리기 (북쪽 굴리기의 역방향, 회전축: left, right)
 void moveSouth()
 {
-	int tmp[6] = {
+	int tmp[6] = {                       // 굴리기 전 여섯 면 스냅샷
 		cube.up, cube.left, cube.top,
 		cube.right, cube.down, cube.bottom
 	};
@@ -215,9 +215,9 @@ void moveSouth()
 // ---------------------------
 void simulate()
 {
-	for (int k = 0; k < K; k++)
+	for (int k = 0; k < K; k++)          // 명령을 순서대로
 	{
-		int cmd = command[k];
+		int cmd = command[k];            // 이번 명령
 
 		// 1) 지도 밖으로 나가는 명령은 통째로 무시한다.
 		//    좌표를 옮기기 전에 검사해야 하고, 굴리기와 출력도 하지 않는다.
@@ -226,14 +226,14 @@ void simulate()
 			continue;
 
 		// 2) 위치 이동
-		R = R + dr[cmd];
-		C = C + dc[cmd];
+		R = R + dr[cmd];                 // 새 행
+		C = C + dc[cmd];                 // 새 열
 
 		// 3) 주사위 회전
-		if (cmd == EAST) moveEast();
-		else if (cmd == WEST) moveWest();
-		else if (cmd == NORTH) moveNorth();
-		else if (cmd == SOUTH) moveSouth();
+		if (cmd == EAST) moveEast();             // 동쪽으로 굴림
+		else if (cmd == WEST) moveWest();        // 서쪽으로 굴림
+		else if (cmd == NORTH) moveNorth();      // 북쪽으로 굴림
+		else if (cmd == SOUTH) moveSouth();      // 남쪽으로 굴림
 
 		// 4) 도착한 칸과 바닥면 사이의 값 교환
 		if (MAP[R][C] == 0)
@@ -259,11 +259,11 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 0; tc < T; tc++)
+	for (int tc = 0; tc < T; tc++)       // 테스트 케이스 반복
 	{
-		input();
-		simulate();
+		input();                         // 입력
+		simulate();                      // 명령 수행
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

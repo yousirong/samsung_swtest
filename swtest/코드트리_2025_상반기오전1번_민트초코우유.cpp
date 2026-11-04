@@ -47,84 +47,84 @@
 	  - 전역 이름 index 는 리눅스 <strings.h>의 index() 함수와 겹칠 수 있다.
 	    stdio.h만 쓰는 지금은 괜찮지만 다른 헤더를 붙일 때는 이름을 바꾸는 편이 안전하다.
 */
-#include <stdio.h>
+#include <stdio.h>                       // scanf, printf, putchar 사용
 
-#define MAX (50 + 5)
+#define MAX (50 + 5)                     // N 최대 50 + 여유
 
 #define TMINT_CHOKO_MILK (111)
 // T = 1, C = 10, M = 100 을 더한 값으로 조합을 나타낸다.
-#define TMINT_CHOKO (1 + 10)
-#define TMINT_MILK (1 + 100)
-#define CHOKO_MILK (100 + 10)
-#define MILK (100)
-#define CHOKO (10)
-#define TMINT (1)
+#define TMINT_CHOKO (1 + 10)             // TC
+#define TMINT_MILK (1 + 100)             // TM
+#define CHOKO_MILK (100 + 10)            // CM
+#define MILK (100)                       // M
+#define CHOKO (10)                       // C
+#define TMINT (1)                        // T
 
-#define UP (0)
-#define DOWN (1)
-#define LEFT (2)
-#define RIGHT (3)
+#define UP (0)                           // 위
+#define DOWN (1)                         // 아래
+#define LEFT (2)                         // 왼쪽
+#define RIGHT (3)                        // 오른쪽
 
-int TestCase;
-int N, T;
-char F[MAX][MAX];
-int B[MAX][MAX];
+int TestCase;                            // 테스트 케이스 수
+int N, T;                                // 교실 크기, 날 수
+char F[MAX][MAX];                        // 입력 음식 문자
+int B[MAX][MAX];                         // 입력 신앙심
 
-struct STUDENT
+struct STUDENT                           // 학생 정보
 {
 	int food; // 신봉하는 음식
 	int believe; // 신앙심
 	bool isLeader; // 대표
 	int defense; // 방어 여부
 	int row; // 대표자 선정을 위한 값
-	int col;
+	int col;                             // 열
 };
 
-STUDENT student[MAX][MAX];
-STUDENT candidates[MAX * MAX];
-int ccnt;
+STUDENT student[MAX][MAX];               // 학생 격자
+STUDENT candidates[MAX * MAX];           // 한 그룹의 학생들
+int ccnt;                                // 그룹 인원 수
 
-STUDENT group[3 + 1][MAX * MAX];
-int index[3 + 1];
+STUDENT group[3 + 1][MAX * MAX];         // 단계별 대표 목록 (1, 2, 3)
+int index[3 + 1];                        // 단계별 대표 수
 
-struct RC
+struct RC                                // 좌표
 {
-	int r;
-	int c;
+	int r;                               // 행
+	int c;                               // 열
 };
 
-RC queue[MAX * MAX];
-bool visit[MAX][MAX];
+RC queue[MAX * MAX];                     // BFS 큐
+bool visit[MAX][MAX];                    // BFS 방문 표시
 
 // 위, 아래, 왼쪽, 오른쪽
-int dr[4] = { -1, 1, 0, 0 };
-int dc[4] = { 0, 0, -1, 1 };
+int dr[4] = { -1, 1, 0, 0 };             // 방향별 행 변화량
+int dc[4] = { 0, 0, -1, 1 };             // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d", &N, &T);
+	scanf("%d %d", &N, &T);              // 교실 크기, 날 수 입력
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 음식 입력
 		for (int c = 1; c <= N; c++)
 			scanf(" %c", &F[r][c]);
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 신앙심 입력
 		for (int c = 1; c <= N; c++)
 			scanf("%d", &B[r][c]);
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 학생 정보 구성
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			student[r][c].believe = B[r][c];
+			student[r][c].believe = B[r][c];   // 신앙심
 			student[r][c].isLeader = false; // 초기화
 			student[r][c].defense = 0; // 초기화
-			student[r][c].row = r;
-			student[r][c].col = c;
+			student[r][c].row = r;       // 행
+			student[r][c].col = c;       // 열
 
-			if (F[r][c] == 'T') student[r][c].food = TMINT;
-			else if (F[r][c] == 'C') student[r][c].food = CHOKO;
-			else if (F[r][c] == 'M') student[r][c].food = MILK;
+			if (F[r][c] == 'T') student[r][c].food = TMINT;        // 민트
+			else if (F[r][c] == 'C') student[r][c].food = CHOKO;   // 초코
+			else if (F[r][c] == 'M') student[r][c].food = MILK;    // 우유
 		}
 	}
 }
@@ -135,7 +135,7 @@ void printBelieve() // for debug
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			printf("%d ", student[r][c].believe);
+			printf("%d ", student[r][c].believe);   // 신앙심 출력
 		}
 		putchar('\n');
 	}
@@ -148,7 +148,7 @@ void printFood() // for debug
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			printf("%3d ", student[r][c].food);
+			printf("%3d ", student[r][c].food);     // 음식 값 출력
 		}
 		putchar('\n');
 	}
@@ -157,19 +157,19 @@ void printFood() // for debug
 
 void printGroup() // for debug
 {
-	for (int g = 1; g <= 3; g++)
+	for (int g = 1; g <= 3; g++)         // 단계별
 	{
-		int gIndex = index[g];
+		int gIndex = index[g];           // 대표 수
 		printf("group %d ", g);
 
-		for (int i = 0; i < gIndex; i++)
+		for (int i = 0; i < gIndex; i++) // 대표 좌표 출력
 			printf("(%d, %d) ", group[g][i].row, group[g][i].col);
 
 		putchar('\n');
 	}
 }
 
-void morning()
+void morning()                           // 아침 : 신앙심 +1
 {
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= N; c++)
@@ -183,104 +183,104 @@ bool isPriority(STUDENT a, STUDENT b)
 	// 신앙심이 크면 우선, 같으면 행 -> 열이 작은 쪽
 	if (a.row != b.row) return a.row < b.row;
 
-	return a.col < b.col;
+	return a.col < b.col;                // 열이 작은 쪽
 }
 
-void BFS(int r, int c)
+void BFS(int r, int c)                   // (r, c)가 속한 그룹 찾고 대표 처리
 {
-	int rp, wp;
+	int rp, wp;                          // 큐 위치
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 큐 초기화
 
-	queue[wp].r = r;
+	queue[wp].r = r;                     // 시작 칸 넣기
 	queue[wp++].c = c;
 
-	visit[r][c] = true;
+	visit[r][c] = true;                  // 방문 표시
 
-	ccnt = 0;
-	candidates[ccnt++] = student[r][c];
+	ccnt = 0;                            // 그룹 인원 초기화
+	candidates[ccnt++] = student[r][c];  // 시작 학생 추가
 
-	while (rp < wp)
+	while (rp < wp)                      // 큐가 빌 때까지
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 하나 꺼내기
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸
 
 			nr = out.r + dr[i];
 			nc = out.c + dc[i];
 
-			if (nr < 1 || nc < 1 || nr > N || nc > N) continue;
-			if (visit[nr][nc] == true) continue;
+			if (nr < 1 || nc < 1 || nr > N || nc > N) continue;   // 격자 밖
+			if (visit[nr][nc] == true) continue;                 // 방문함
 
 			// 인접한 학생들과 신봉 음식이 완전히 같은 경우에만 그룹을 형성
 			if (student[out.r][out.c].food != student[nr][nc].food) continue;
 			// (조합까지 완전히 같아야 한다. TC와 T는 다른 그룹이다)
 
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣기
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = true;
+			visit[nr][nc] = true;        // 방문 표시
 
-			candidates[ccnt++] = student[nr][nc];
+			candidates[ccnt++] = student[nr][nc];   // 그룹에 추가
 		}
 	}
 
-	STUDENT leader = { 0 };
-	for (int i = 0; i < ccnt; i++)
-		if (isPriority(candidates[i], leader) == true)
-			leader = candidates[i];
+	STUDENT leader = { 0 };              // 대표 (신앙심 0으로 시작해 누구든 이김)
+	for (int i = 0; i < ccnt; i++)       // 그룹원 중
+		if (isPriority(candidates[i], leader) == true)   // 더 우선이면
+			leader = candidates[i];      // 대표 갱신
 
-	student[leader.row][leader.col].isLeader = true;
+	student[leader.row][leader.col].isLeader = true;   // 대표 표시
 	student[leader.row][leader.col].believe += (ccnt - 1);
 	// 대표는 (인원 - 1)만큼 오르고, 아래에서 나머지는 1씩 내린다.
 
-	for (int i = 0; i < ccnt; i++)
+	for (int i = 0; i < ccnt; i++)       // 그룹원 중
 	{
 		STUDENT c = candidates[i];
 
-		if (c.row == leader.row && c.col == leader.col) continue;
+		if (c.row == leader.row && c.col == leader.col) continue;   // 대표 제외
 
-		student[c.row][c.col].believe--;
+		student[c.row][c.col].believe--; // 신앙심 -1
 	}
 }
 
-void lunch()
+void lunch()                             // 점심 : 그룹 만들고 대표 뽑기
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 방문, 대표 표시 초기화
 		for (int c = 1; c <= N; c++)
 			visit[r][c] = student[r][c].isLeader = false;
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 칸
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (visit[r][c] == true) continue;
+			if (visit[r][c] == true) continue;   // 이미 그룹에 속함
 
-			BFS(r, c);
+			BFS(r, c);                   // 새 그룹 처리
 		}
 	}
 }
 
-int getGroupNumber(int food)
+int getGroupNumber(int food)             // 음식 조합의 단계 (1, 2, 3)
 {
 	if (food == TMINT_CHOKO_MILK) return 3;
 	// 단일 음식 1단계, 두 가지 조합 2단계, 세 가지 조합 3단계
 	if (food == TMINT || food == CHOKO || food == MILK) return 1;
 
-	return 2;
+	return 2;                            // 두 가지 조합
 }
 
-int mixFood(int sFood, int nFood)
+int mixFood(int sFood, int nFood)        // 음식 합치기
 {
 	return sFood | nFood;
 	// 1, 10, 100의 비트가 겹치지 않아 OR가 곧 "음식 합치기"다.
 }
 
-void dinner()
+void dinner()                            // 저녁 : 전파
 {
-	for (int g = 1; g <= 3; g++) index[g] = 0;
+	for (int g = 1; g <= 3; g++) index[g] = 0;   // 단계별 대표 수 초기화
 
 	// 그룹 별 분리
 	for (int r = 1; r <= N; r++)
@@ -289,28 +289,28 @@ void dinner()
 		{
 			STUDENT s = student[r][c];
 
-			if (s.isLeader == false) continue;
+			if (s.isLeader == false) continue;   // 대표만
 
-			int groupNumber = getGroupNumber(s.food);
+			int groupNumber = getGroupNumber(s.food);   // 단계
 
-			group[groupNumber][index[groupNumber]++] = s;
+			group[groupNumber][index[groupNumber]++] = s;   // 단계별 목록에 추가
 		}
 	}
 
 	// 그룹 내 정렬
 	for (int g = 1; g <= 3; g++)
 	{
-		int gIndex = index[g];
-		for (int i = 0; i < gIndex - 1; i++)
+		int gIndex = index[g];           // 대표 수
+		for (int i = 0; i < gIndex - 1; i++)       // 선택 정렬
 		{
 			for (int k = i + 1; k < gIndex; k++)
 			{
 				STUDENT a = group[g][i];
 				STUDENT b = group[g][k];
 
-				if (isPriority(a, b) == false)
+				if (isPriority(a, b) == false)   // b가 더 우선이면
 				{
-					group[g][i] = b;
+					group[g][i] = b;     // 교환
 					group[g][k] = a;
 				}
 			}
@@ -320,22 +320,22 @@ void dinner()
 	// printGroup();
 
 	// 전파 시작
-	for (int g = 1; g <= 3; g++)
+	for (int g = 1; g <= 3; g++)         // 단계 순서대로
 	{
 		int gIndex = index[g];
-		for (int i = 0; i < gIndex; i++)
+		for (int i = 0; i < gIndex; i++) // 대표 순서대로
 		{
-			int gr, gc;
+			int gr, gc;                  // 대표 좌표
 
 			gr = group[g][i].row;
 			gc = group[g][i].col;
 
-			STUDENT spreader = student[gr][gc];
+			STUDENT spreader = student[gr][gc];   // 지금 값으로 다시 읽기
 
 			// 방어 상태에서는 대표자가 되어도 전파를 하지 않음.
 			if (spreader.defense != 0) continue;
 
-			int sr, sc;
+			int sr, sc;                  // 전파 현재 위치
 
 			sr = spreader.row;
 			sc = spreader.col;
@@ -344,11 +344,11 @@ void dinner()
 			student[sr][sc].believe = 1;
 
 			int x = spreader.believe - 1; // 간절함
-			int dir = spreader.believe % 4;
+			int dir = spreader.believe % 4;   // 전파 방향
 
 			while (1)
 			{
-				int nr, nc;
+				int nr, nc;              // 다음 칸
 
 				nr = sr + dr[dir];
 				nc = sc + dc[dir];
@@ -378,71 +378,71 @@ void dinner()
 
 				if (x > y) // 강한 전파 성공
 				{
-					x -= (y + 1);
-					if (x < 0) x = 0;
+					x -= (y + 1);        // 간절함 감소
+					if (x < 0) x = 0;    // 음수 방지
 
-					student[next.row][next.col].believe++;
-					student[next.row][next.col].food = spreader.food;
+					student[next.row][next.col].believe++;              // 신앙심 +1
+					student[next.row][next.col].food = spreader.food;   // 음식 교체
 				}
 				else // x <= y, 약한 전파 성공
 				{
-					student[next.row][next.col].believe += x;
-					student[next.row][next.col].food = mixFood(spreader.food, next.food);
+					student[next.row][next.col].believe += x;           // 신앙심 += x
+					student[next.row][next.col].food = mixFood(spreader.food, next.food);   // 음식 합치기
 
-					x = 0;
+					x = 0;               // 간절함 소진
 
-					break;
+					break;               // 전파 끝
 				}
 
-				sr = nr;
+				sr = nr;                 // 한 칸 진행
 				sc = nc;
 			}
 		}
 	}
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 방어 상태 해제
 		for (int c = 1; c <= N; c++)
 			student[r][c].defense = 0;
 }
 
-void printAnswer()
+void printAnswer()                       // 조합별 신앙심 합 출력
 {
-	int sum[TMINT_CHOKO_MILK + 1] = { 0 };
+	int sum[TMINT_CHOKO_MILK + 1] = { 0 };   // 음식 값을 인덱스로 쓰는 합 배열
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 학생
 		for (int c = 1; c <= N; c++)
-			sum[student[r][c].food] += student[r][c].believe;
+			sum[student[r][c].food] += student[r][c].believe;   // 합 누적
 
 	int outputIndex[7]
-		= { TMINT_CHOKO_MILK, TMINT_CHOKO, TMINT_MILK, CHOKO_MILK, MILK, CHOKO, TMINT };
+		= { TMINT_CHOKO_MILK, TMINT_CHOKO, TMINT_MILK, CHOKO_MILK, MILK, CHOKO, TMINT };   // 출력 순서
 
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 7; i++)          // 순서대로 출력
 		printf("%d ", sum[outputIndex[i]]);
-	putchar('\n');
+	putchar('\n');                       // 줄바꿈
 }
 
 void simulate()
 {
-	for (int t = 0; t < T; t++)
+	for (int t = 0; t < T; t++)          // T일
 	{
-		morning();
-		lunch();
-		dinner();
+		morning();                       // 아침
+		lunch();                         // 점심
+		dinner();                        // 저녁
 
-		printAnswer();
+		printAnswer();                   // 결과 출력
 	}
 }
 
 int main()
 {
 	// scanf("%d", &TestCase);
-	TestCase = 1;
-	for (int tc = 1; tc <= TestCase; tc++)
+	TestCase = 1;                        // 테스트 케이스 1개
+	for (int tc = 1; tc <= TestCase; tc++)   // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // 시뮬레이션
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

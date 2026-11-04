@@ -30,9 +30,9 @@
 	     별도 예외 처리 없이 맞는 답이 나온다.
 */
 
-#include <stdio.h>
+#include <stdio.h>              // scanf, printf, putchar 사용
 
-#define MAX (300 + 30)
+#define MAX (300 + 30)          // L 최대 300 + 여유
 
 int T;                  // 테스트 케이스 수
 int L;                  // 체스판 한 변의 길이
@@ -47,27 +47,27 @@ struct RC
 	int c;   // col
 };
 
-typedef struct RC RC;
+typedef struct RC RC;           // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];    // BFS용 큐 (한 칸이 최대 한 번 들어간다)
 
 // 나이트의 8가지 점프 : (행, 열)이 (±1, ±2) 또는 (±2, ±1)
-int dr[] = { -2, -1, 1, 2, 2, 1, -1, -2 };
-int dc[] = { 1,  2, 2, 1, -1, -2, -2, -1 };
+int dr[] = { -2, -1, 1, 2, 2, 1, -1, -2 };   // 점프별 행 변화량
+int dc[] = { 1,  2, 2, 1, -1, -2, -2, -1 };  // 점프별 열 변화량
 
 // ---------------------------
 // 입력 (테스트 케이스 하나)
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d %d %d", &L, &sr, &sc, &er, &ec);
+	scanf("%d %d %d %d %d", &L, &sr, &sc, &er, &ec);   // 판 크기, 시작 좌표, 목표 좌표 입력
 
 	// 케이스마다 반드시 초기화. 0 = 아직 방문하지 않음.
-	for (int r = 0; r < L; r++)
+	for (int r = 0; r < L; r++)          // 0행부터 L-1행까지
 	{
-		for (int c = 0; c < L; c++)
+		for (int c = 0; c < L; c++)      // 0열부터 L-1열까지
 		{
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 미방문으로 초기화
 		}
 	}
 }
@@ -77,13 +77,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 0; r < L; r++)
+	for (int r = 0; r < L; r++)          // 모든 행
 	{
-		for (int c = 0; c < L; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 0; c < L; c++)      // 모든 열
+			printf("%d ", MAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -93,18 +93,18 @@ int BFS(int r, int c)
 {
 	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;  // 빈 큐
 
 	// 시작 칸을 큐에 넣는다
-	queue[wp].r = r;
-	queue[wp++].c = c;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp++].c = c;                   // 시작 열, 삽입 위치 증가
 
 	// 시작 칸을 1로 표시 (0은 미방문을 뜻하므로 거리를 1부터 센다)
 	MAP[r][c] = 1;
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 한 칸 꺼낸다
 
 		// BFS는 가까운 칸부터 꺼내므로, 처음 꺼낸 목표 칸이 최단이다
 		if (out.r == er && out.c == ec)
@@ -113,10 +113,10 @@ int BFS(int r, int c)
 		// 나이트의 8방향 점프
 		for (int i = 0; i < 8; i++)
 		{
-			int nr, nc;
+			int nr, nc;                  // 점프한 칸 좌표
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 점프한 행
+			nc = out.c + dc[i];          // 점프한 열
 
 			// 체스판 밖 (0-based라 0 ~ L-1이 유효 범위)
 			if (nr < 0 || nc < 0 || nr > L - 1 || nc > L - 1)
@@ -126,8 +126,8 @@ int BFS(int r, int c)
 			if (MAP[nr][nc] != 0)
 				continue;
 
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 점프한 행 기록
+			queue[wp++].c = nc;          // 점프한 열 기록, 삽입 위치 증가
 
 			// 값을 넣는 순간이 방문 표시이자 거리 기록
 			MAP[nr][nc] = MAP[out.r][out.c] + 1;
@@ -143,14 +143,14 @@ int BFS(int r, int c)
 // ---------------------------
 int main()
 {
-	scanf("%d", &T);
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
 
-	for (int tc = 0; tc < T; tc++)
+	for (int tc = 0; tc < T; tc++)       // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 한 케이스 입력 + 초기화
 
-		printf("%d\n", BFS(sr, sc));
+		printf("%d\n", BFS(sr, sc));     // 최소 이동 횟수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

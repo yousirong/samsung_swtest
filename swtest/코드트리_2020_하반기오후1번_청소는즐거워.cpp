@@ -53,49 +53,49 @@
 	  방향은 track[i].dir(그 칸에서 나가는 방향)을 쓴다.
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (500 + 20)
+#define MAX (500 + 20)         // N 최대 499 + 여유
 
-int T;
+int T;                 // 테스트 케이스 수
 
-int N;
+int N;                 // 격자 크기
 int MAP[MAX][MAX];     // 각 칸의 모래 양
 int snail[MAX][MAX];   // 달팽이 순서 번호 (디버그용)
 
 // 토네이도의 경로 한 칸
 struct RCD
 {
-	int r;
-	int c;
+	int r;             // 행
+	int c;             // 열
 	int dir;   // 이 칸에서 다음 칸으로 갈 때의 방향
 };
 
-RCD track[MAX * MAX];
-int tcnt;
+RCD track[MAX * MAX];  // 토네이도 경로
+int tcnt;              // 경로 칸 수
 
 // 방향 배열 : ←(0), ↓(1), →(2), ↑(3)
-int dr[] = { 0, 1, 0, -1 };
-int dc[] = { -1, 0, 1, 0 };
+int dr[] = { 0, 1, 0, -1 };    // 방향별 행 변화량
+int dc[] = { -1, 0, 1, 0 };    // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 격자 크기 입력
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 모든 행
+		for (int c = 1; c <= N; c++)     // 모든 열
+			scanf("%d", &MAP[r][c]);     // 모래 양 입력
 }
 
 void printMap(int map[MAX][MAX]) // for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", map[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 /*
@@ -112,28 +112,28 @@ void printMap(int map[MAX][MAX]) // for debug
 // ←, ↓, →, ↑
 int ratio[4][5][5] =
 {
-	{
+	{                                    // ← 방향
 		{0,  0, 2, 0, 0},
 		{0, 10, 7, 1, 0},
 		{5,  0, 0, 0, 0},
 		{0, 10, 7, 1, 0},
 		{0,  0, 2, 0, 0},
 	},
-	{
+	{                                    // ↓ 방향
 		{0,  0, 0,  0, 0},
 		{0,  1, 0,  1, 0},
 		{2,  7, 0,  7, 2},
 		{0, 10, 0, 10, 0},
 		{0,  0, 5,  0, 0},
 	},
-	{
+	{                                    // → 방향
 		{0, 0, 2,  0, 0},
 		{0, 1, 7, 10, 0},
 		{0, 0, 0,  0, 5},
 		{0, 1, 7, 10, 0},
 		{0, 0, 2,  0, 0},
 	},
-	{
+	{                                    // ↑ 방향
 		{0,  0, 5,  0, 0},
 		{0, 10, 0, 10, 0},
 		{2,  7, 0,  7, 2},
@@ -150,42 +150,42 @@ int ratio[4][5][5] =
 */
 void makeSnail()
 {
-	int sr, sc, direction;
-	int index, size;
+	int sr, sc, direction;               // 현재 위치, 방향
+	int index, size;                     // 순서 번호, 구간 길이
 
 	sr = sc = (N + 1) / 2;   // 정가운데에서 시작
 	direction = 0;           // 첫 방향은 왼쪽
-	index = 1;
-	size = 0;
+	index = 1;               // 순서 번호 1부터
+	size = 0;                // 구간 길이 0부터
 
-	snail[sr][sc] = index++;
-	track[tcnt].r = sr;
+	snail[sr][sc] = index++;             // 시작 칸 번호
+	track[tcnt].r = sr;                  // 경로에 시작 칸 추가
 	track[tcnt++].c = sc;
 
-	for (int i = 0; i < 2 * N - 1; i++)
+	for (int i = 0; i < 2 * N - 1; i++)  // 구간 2N-1개
 	{
 		// 두 구간마다 길이가 1씩 늘어난다
 		if (i % 2 == 0) size++;
 
-		for (int s = 0; s < size; s++)
+		for (int s = 0; s < size; s++)   // 구간 길이만큼 직진
 		{
-			int nr, nc;
+			int nr, nc;                  // 다음 칸
 
-			nr = sr + dr[direction];
-			nc = sc + dc[direction];
+			nr = sr + dr[direction];     // 다음 행
+			nc = sc + dc[direction];     // 다음 열
 
-			snail[nr][nc] = index++;
+			snail[nr][nc] = index++;     // 순서 번호 기록
 
-			sr = nr;
+			sr = nr;                     // 위치 갱신
 			sc = nc;
 
-			track[tcnt].r = nr;
+			track[tcnt].r = nr;          // 경로에 추가
 			track[tcnt++].c = nc;
 		}
 
-		direction++;
+		direction++;                     // 다음 방향
 
-		if (direction == 4) direction = 0;
+		if (direction == 4) direction = 0;   // ↑ 다음은 ←
 	}
 
 	// 마지막 구간이 격자 밖으로 한 칸 넘칠 수 있으므로 실제로 쓸 N*N개만 남긴다
@@ -195,12 +195,12 @@ void makeSnail()
 	// 만들면서 방향을 같이 기록하는 것보다 이렇게 나중에 채우는 편이 실수가 적다.
 	for (int i = 0; i < tcnt - 1; i++)
 	{
-		int r, c, nr, nc;
+		int r, c, nr, nc;                // 현재 칸, 다음 칸
 
-		r = track[i].r;
-		c = track[i].c;
-		nr = track[i + 1].r;
-		nc = track[i + 1].c;
+		r = track[i].r;                  // 현재 행
+		c = track[i].c;                  // 현재 열
+		nr = track[i + 1].r;             // 다음 행
+		nc = track[i + 1].c;             // 다음 열
 
 		if (nc - c == -1) track[i].dir = 0; // 왼쪽
 		else if (nc - c == 1) track[i].dir = 2; // 오른쪽
@@ -232,16 +232,16 @@ int clean(int sr, int sc, int dir)
 	{
 		for (int c = 0; c < 5; c++)
 		{
-			int tr, tc, dust;
+			int tr, tc, dust;            // 실제 좌표, 흩어질 양
 
-			tr = sr + r - 2;
-			tc = sc + c - 2;
+			tr = sr + r - 2;             // 실제 행
+			tc = sc + c - 2;             // 실제 열
 
 			// 비율은 항상 "흩뿌리기 전 값"인 center를 기준으로 한다
 			dust = center * ratio[dir][r][c] / 100;
 
-			tmpMAP[r][c] = dust;
-			MAP[sr][sc] -= dust;
+			tmpMAP[r][c] = dust;         // 받을 양 기록
+			MAP[sr][sc] -= dust;         // 원래 칸에서 뺀다
 		}
 	}
 
@@ -250,23 +250,23 @@ int clean(int sr, int sc, int dir)
 	MAP[sr][sc] = 0;   // 토네이도가 지나간 칸에는 모래가 남지 않는다
 
 	// 3) 계산이 모두 끝난 뒤에 한꺼번에 반영한다
-	int ret = 0;
+	int ret = 0;                         // 밖으로 나간 양
 	for (int r = 0; r < 5; r++)
 	{
 		for (int c = 0; c < 5; c++)
 		{
-			int tr, tc;
+			int tr, tc;                  // 실제 좌표
 
-			tr = sr + r - 2;
-			tc = sc + c - 2;
+			tr = sr + r - 2;             // 실제 행
+			tc = sc + c - 2;             // 실제 열
 
 			// 격자 밖으로 나간 몫은 MAP에 넣지 않고 따로 모은다 (이게 정답이 된다)
 			if (tr < 1 || tc < 1 || tr > N || tc > N) ret += tmpMAP[r][c];
-			else MAP[tr][tc] += tmpMAP[r][c];
+			else MAP[tr][tc] += tmpMAP[r][c];   // 격자 안이면 더한다
 		}
 	}
 
-	return ret;
+	return ret;                          // 밖으로 나간 양 반환
 }
 
 /*
@@ -274,10 +274,10 @@ int clean(int sr, int sc, int dir)
 */
 int simulate()
 {
-	int outDust = 0;
-	for (int i = 0; i < tcnt - 1; i++)
+	int outDust = 0;                     // 밖으로 나간 총량
+	for (int i = 0; i < tcnt - 1; i++)   // 경로를 따라
 	{
-		int r, c, dir;
+		int r, c, dir;                   // 대상 칸, 방향
 
 		// 토네이도는 "이동한 뒤" 그 칸을 흩뿌리므로 대상 칸은 track[i + 1]이다
 		r = track[i + 1].r;
@@ -286,10 +286,10 @@ int simulate()
 		// 방향은 track[i]에서 track[i+1]로 갈 때의 방향
 		dir = track[i].dir;
 
-		outDust += clean(r, c, dir);
+		outDust += clean(r, c, dir);     // 흩뿌리고 밖으로 나간 양 누적
 	}
 
-	return outDust;
+	return outDust;                      // 총량 반환
 }
 
 int main()
@@ -297,14 +297,14 @@ int main()
 	// 이 문제는 테스트 케이스가 하나다
 	// scanf("%d", &T);
 	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		makeSnail();
+		makeSnail();                     // 경로 만들기
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

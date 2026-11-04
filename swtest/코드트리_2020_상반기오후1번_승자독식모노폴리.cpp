@@ -49,13 +49,13 @@
          그래서 이동 후 MAP을 갱신해도 남의 유효한 계약을 덮어쓸 일이 없다.
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX (20 + 5)
-#define WALL (-1)
+#define MAX (20 + 5)             // N 최대 20 + 여유
+#define WALL (-1)                // 격자 바깥 표시
 
-int T;
-int N, M, K;
+int T;                           // 테스트 케이스 수
+int N, M, K;                     // 격자 크기, 플레이어 수, 계약 유지 시간
 
 // MAP[r][c] : 그 칸의 계약 주인 (0이면 주인 없음, 격자 바깥은 WALL)
 int MAP[MAX][MAX];
@@ -73,39 +73,39 @@ struct PLAYER
     bool dead;               // 탈락했는지
 };
 
-typedef struct PLAYER PLAYER;
+typedef struct PLAYER PLAYER;   // struct PLAYER를 PLAYER로 줄여 쓰기
 
-PLAYER player[MAX * MAX];
+PLAYER player[MAX * MAX];       // 플레이어 목록 (1번부터)
 
 // 방향 번호 : 1 위, 2 아래, 3 왼쪽, 4 오른쪽 (0은 더미)
-int dr[] = { 0, -1, 1, 0, 0 };
-int dc[] = { 0,  0, 0,-1, 1 };
+int dr[] = { 0, -1, 1, 0, 0 };  // 방향별 행 변화량
+int dc[] = { 0,  0, 0,-1, 1 };  // 방향별 열 변화량
 
 /*
     입력
 */
 void input()
 {
-    scanf("%d %d %d", &N, &M, &K);
+    scanf("%d %d %d", &N, &M, &K);       // 격자 크기, 플레이어 수, 계약 시간 입력
 
     // 격자 안팎을 일단 전부 WALL로 밀어 둔다.
     // 실제 칸은 바로 아래에서 덮어쓰므로, 결과적으로 바깥 테두리만 WALL로 남는다.
     for (int r = 0; r <= N + 1; r++)
         for (int c = 0; c <= N + 1; c++)
-            MAP[r][c] = WALL;
+            MAP[r][c] = WALL;            // 벽으로 채운다
 
     // 초기 보드. 0이 아닌 값은 그 자리에 있는 플레이어 번호다.
     for (int r = 1; r <= N; r++)
     {
         for (int c = 1; c <= N; c++)
         {
-            scanf("%d", &MAP[r][c]);
+            scanf("%d", &MAP[r][c]);     // 칸 값 입력
 
-            int playerNumber = MAP[r][c];
-            if (playerNumber != 0)
+            int playerNumber = MAP[r][c];   // 플레이어 번호 (0이면 빈칸)
+            if (playerNumber != 0)          // 플레이어가 있으면
             {
-                player[playerNumber].r = r;
-                player[playerNumber].c = c;
+                player[playerNumber].r = r;     // 위치 행
+                player[playerNumber].c = c;     // 위치 열
             }
         }
     }
@@ -113,15 +113,15 @@ void input()
     // 초기 방향
     for (int i = 1; i <= M; i++)
     {
-        int dir;
-        scanf("%d", &dir);
-        player[i].dir = dir;
+        int dir;                         // 방향
+        scanf("%d", &dir);               // 입력
+        player[i].dir = dir;             // 저장
     }
 
     // 방향 우선순위 표 (현재 방향 d마다 시도 순서 4개)
-    for (int i = 1; i <= M; i++)
-        for (int d = 1; d <= 4; d++)
-            scanf("%d %d %d %d",
+    for (int i = 1; i <= M; i++)         // 플레이어마다
+        for (int d = 1; d <= 4; d++)     // 현재 방향마다
+            scanf("%d %d %d %d",         // 시도 순서 4개 입력
                 &player[i].priority[d][1],
                 &player[i].priority[d][2],
                 &player[i].priority[d][3],
@@ -133,13 +133,13 @@ void input()
 */
 void printMap(int map[MAX][MAX])
 {
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 모든 행
     {
-        for (int c = 1; c <= N; c++)
-            printf("%d ", map[r][c]);
-        putchar('\n');
+        for (int c = 1; c <= N; c++)     // 모든 열
+            printf("%d ", map[r][c]);    // 값 출력
+        putchar('\n');                   // 행 끝 줄바꿈
     }
-    putchar('\n');
+    putchar('\n');                       // 빈 줄
 }
 
 /*
@@ -147,8 +147,8 @@ void printMap(int map[MAX][MAX])
 */
 void printPlayer(int number)
 {
-    PLAYER p = player[number];
-    printf("number %d / (%d, %d) / dir %d / dead %d\n",
+    PLAYER p = player[number];           // 그 플레이어
+    printf("number %d / (%d, %d) / dir %d / dead %d\n",   // 상태 출력
         number, p.r, p.c, p.dir, p.dead);
 }
 
@@ -157,8 +157,8 @@ void printPlayer(int number)
 */
 void printPlayerAll()
 {
-    for (int m = 1; m <= M; m++)
-        printPlayer(m);
+    for (int m = 1; m <= M; m++)         // 모든 플레이어
+        printPlayer(m);                  // 출력
 }
 
 /*
@@ -173,33 +173,33 @@ void printPlayerAll()
 */
 int getDirection(int number)
 {
-    PLAYER p = player[number];
-    int dir = p.dir;
+    PLAYER p = player[number];           // 그 플레이어
+    int dir = p.dir;                     // 현재 방향
 
     // 1단계 : 계약 없는 칸
     for (int i = 1; i <= 4; i++)
     {
-        int nextDir = p.priority[dir][i];
-        int nr = p.r + dr[nextDir];
-        int nc = p.c + dc[nextDir];
+        int nextDir = p.priority[dir][i];   // i번째 후보 방향
+        int nr = p.r + dr[nextDir];         // 그 방향 행
+        int nc = p.c + dc[nextDir];         // 그 방향 열
 
         // 격자 바깥은 계약이 없어 보이므로 반드시 따로 걸러야 한다
         if (MAP[nr][nc] == WALL) continue;
 
-        if (time[nr][nc] == 0)
-            return nextDir;
+        if (time[nr][nc] == 0)           // 계약이 없으면
+            return nextDir;              // 그 방향으로
     }
 
     // 2단계 : 내 계약이 살아 있는 칸
     // (여기서는 벽을 따로 안 걸러도 된다. 벽의 MAP 값은 WALL이라 number와 같아질 수 없다)
     for (int i = 1; i <= 4; i++)
     {
-        int nextDir = p.priority[dir][i];
-        int nr = p.r + dr[nextDir];
-        int nc = p.c + dc[nextDir];
+        int nextDir = p.priority[dir][i];   // i번째 후보 방향
+        int nr = p.r + dr[nextDir];         // 그 방향 행
+        int nc = p.c + dc[nextDir];         // 그 방향 열
 
-        if (MAP[nr][nc] == number)
-            return nextDir;
+        if (MAP[nr][nc] == number)       // 내 계약 칸이면
+            return nextDir;              // 그 방향으로
     }
 
     return -1;   // 자기 계약은 지금 서 있는 칸에도 있으므로 정상적으로는 나오지 않는다
@@ -214,34 +214,34 @@ int simulate()
 {
     int playerCount = M;   // 살아 있는 플레이어 수
 
-    for (int i = 1; i <= 1000; i++)
+    for (int i = 1; i <= 1000; i++)      // 1초 ~ 1000초
     {
         // 1) 지금 서 있는 칸에 계약을 새로 남긴다 (남은 시간을 K로 갱신)
         for (int p = 1; p <= M; p++)
         {
-            if (player[p].dead == true) continue;
+            if (player[p].dead == true) continue;   // 탈락자는 건너뜀
 
-            int r = player[p].r;
-            int c = player[p].c;
+            int r = player[p].r;         // 현재 행
+            int c = player[p].c;         // 현재 열
 
-            MAP[r][c] = p;
-            time[r][c] = K;
+            MAP[r][c] = p;               // 계약 주인
+            time[r][c] = K;              // 남은 시간 K
         }
 
         // 2) 이동. tmpMAP에는 "이번 턴에 그 칸을 차지한 플레이어"를 기록한다.
         int tmpMAP[MAX][MAX] = { 0 };
 
-        for (int p = 1; p <= M; p++)
+        for (int p = 1; p <= M; p++)     // 번호 순서대로
         {
-            if (player[p].dead == true) continue;
+            if (player[p].dead == true) continue;   // 탈락자는 건너뜀
 
-            int sr = player[p].r;
-            int sc = player[p].c;
+            int sr = player[p].r;        // 현재 행
+            int sc = player[p].c;        // 현재 열
 
-            int dir = getDirection(p);
+            int dir = getDirection(p);   // 이동 방향 결정
 
-            int nr = sr + dr[dir];
-            int nc = sc + dc[dir];
+            int nr = sr + dr[dir];       // 도착 행
+            int nc = sc + dc[dir];       // 도착 열
 
             // 3) 충돌 처리
             if (tmpMAP[nr][nc] == 0)
@@ -251,7 +251,7 @@ int simulate()
                 player[p].c = nc;
                 player[p].dir = dir;
 
-                tmpMAP[nr][nc] = p;
+                tmpMAP[nr][nc] = p;      // 이 칸은 p가 차지
             }
             else
             {
@@ -270,11 +270,11 @@ int simulate()
                     // 내가 더 작다 -> 있던 쪽을 밀어내고 내가 차지
                     player[anotherPlayer].dead = true;
 
-                    player[p].r = nr;
+                    player[p].r = nr;    // 내 위치 갱신
                     player[p].c = nc;
-                    player[p].dir = dir;
+                    player[p].dir = dir; // 내 방향 갱신
 
-                    tmpMAP[nr][nc] = p;
+                    tmpMAP[nr][nc] = p;  // 이 칸은 p가 차지
                 }
             }
         }
@@ -286,8 +286,8 @@ int simulate()
         {
             for (int c = 1; c <= N; c++)
             {
-                if (tmpMAP[r][c] == 0) continue;
-                MAP[r][c] = tmpMAP[r][c];
+                if (tmpMAP[r][c] == 0) continue;   // 아무도 안 온 칸은 그대로
+                MAP[r][c] = tmpMAP[r][c];          // 차지한 플레이어로 갱신
             }
         }
 
@@ -301,10 +301,10 @@ int simulate()
         // 4) 계약 시간 감소. 이동과 충돌이 모두 끝난 뒤에 한 번만 한다.
         for (int r = 1; r <= N; r++)
             for (int c = 1; c <= N; c++)
-                if (time[r][c] != 0) time[r][c]--;
+                if (time[r][c] != 0) time[r][c]--;   // 남은 시간 1 감소
     }
 
-    return -1;
+    return -1;                           // 1000초 안에 안 끝남
 }
 
 int main()
@@ -313,11 +313,11 @@ int main()
     // scanf("%d", &T);
     T = 1;
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
-        printf("%d\n", simulate());
+        input();                         // 입력
+        printf("%d\n", simulate());      // 결과 출력
     }
 
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

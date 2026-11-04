@@ -32,9 +32,9 @@
 	  방문 표시는 큐에 "넣을 때" 해야 같은 칸이 중복으로 들어가지 않는다.
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX (100 + 10)
+#define MAX (100 + 10)           // N, M 최대 100 + 여유
 
 int N, M;                // N: 행 수, M: 열 수
 
@@ -42,17 +42,17 @@ int MAP[MAX][MAX];       // 처음엔 지도(1/0), BFS 이후엔 최단 거리
 bool visit[MAX][MAX];    // 방문 여부
 
 // 방향 배열: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = {  0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };      // 방향별 행 변화량
+int dc[] = {  0, 1, 0,-1 };      // 방향별 열 변화량
 
 // 좌표 한 쌍
 struct RC
 {
-	int r;
-	int c;
+	int r;                       // 행
+	int c;                       // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;            // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];     // BFS용 큐 (한 칸이 최대 한 번 들어간다)
 
@@ -61,23 +61,23 @@ RC queue[MAX * MAX];     // BFS용 큐 (한 칸이 최대 한 번 들어간다)
 // ---------------------------
 void printMap()
 {
-	printf("MAP\n");
-	for (int r = 1; r <= N; r++)
+	printf("MAP\n");                     // 거리 배열 제목
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%2d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%2d ", MAP[r][c]);   // 거리 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 
-	printf("visit\n");
-	for (int r = 1; r <= N; r++)
+	printf("visit\n");                   // 방문 배열 제목
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%2d ", visit[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%2d ", visit[r][c]); // 방문 여부 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -85,14 +85,14 @@ void printMap()
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 행 수와 열 수 입력
 
 	// 입력이 "101101"처럼 붙어 있으므로 %1d로 한 자리씩 읽는다
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= M; c++)
 		{
-			scanf("%1d", &MAP[r][c]);
+			scanf("%1d", &MAP[r][c]);    // 한 자리(1: 길, 0: 벽) 입력
 		}
 	}
 }
@@ -104,26 +104,26 @@ void BFS(int r, int c)
 {
 	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;  // 빈 큐
 
 	// 시작 칸을 큐에 넣고 방문 표시
 	// (거리는 MAP[r][c]에 남아 있는 입력값 1이 그대로 쓰인다)
-	queue[wp].r = r;
-	queue[wp++].c = c;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp++].c = c;                   // 시작 열, 삽입 위치 증가
 
-	visit[r][c] = true;
+	visit[r][c] = true;                  // 시작 칸 방문 표시
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 한 칸 꺼낸다
 
 		// 상하좌우
 		for (int i = 0; i < 4; i++)
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸 좌표
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
 			// 이동 불가 조건
 			//   1) 벽 (MAP == 0). 지도 바깥도 0이라 여기서 함께 걸린다.
@@ -131,8 +131,8 @@ void BFS(int r, int c)
 			if (MAP[nr][nc] == 0 || visit[nr][nc] == true)
 				continue;
 
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 이웃 행 기록
+			queue[wp++].c = nc;          // 이웃 열 기록, 삽입 위치 증가
 
 			// 큐에 넣는 즉시 방문 표시 (중복 삽입 방지)
 			visit[nr][nc] = true;
@@ -148,12 +148,12 @@ void BFS(int r, int c)
 // ---------------------------
 int main()
 {
-	input();
+	input();      // 미로 입력
 
 	BFS(1, 1);    // 출발점에서 한 번만 돌리면 모든 칸의 거리가 채워진다
 
 	// 도착점까지의 최단 거리 (문제에서 항상 도달 가능하다고 보장한다)
 	printf("%d\n", MAP[N][M]);
 
-	return 0;
+	return 0;     // 프로그램 정상 종료
 }

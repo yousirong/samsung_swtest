@@ -54,40 +54,40 @@
 	  매년 구간을 앞으로 되감아 재사용하는 방식으로 줄일 수 있다.
 */
 
-#include <stdio.h>
+#include <stdio.h>                // scanf, printf, putchar 사용
 
-#define MAX (10 + 5)
-#define MAX_VIRUS (100000)
-#define OFFSET (10000)
+#define MAX (10 + 5)              // N 최대 10 + 여유
+#define MAX_VIRUS (100000)        // 칸마다 덱 배열 크기
+#define OFFSET (10000)            // 덱 시작 위치 (앞쪽으로 자랄 여유)
 
-int T;
+int T;                // 테스트 케이스 수
 
-int N, M, K;
+int N, M, K;          // 격자 크기, 초기 바이러스 수, 년수
 int food[MAX][MAX];   // 그 칸에 남아 있는 양분
 int MAP[MAX][MAX];    // 겨울마다 더해지는 양분
 
 // virus[r][c][front ... back-1] : (r, c)에 있는 바이러스들의 나이 (오름차순)
 int virus[MAX][MAX][MAX_VIRUS];
-int front[MAX][MAX];
-int back[MAX][MAX];
+int front[MAX][MAX];  // 칸마다 덱의 앞 위치
+int back[MAX][MAX];   // 칸마다 덱의 뒤(다음 삽입) 위치
 
 // 8방향: 북, 북동, 동, 남동, 남, 남서, 서, 북서
-int dr[] = { -1, -1, 0, 1, 1, 1, 0, -1 };
-int dc[] = { 0,  1, 1, 1, 0,-1,-1, -1 };
+int dr[] = { -1, -1, 0, 1, 1, 1, 0, -1 };   // 방향별 행 변화량
+int dc[] = { 0,  1, 1, 1, 0,-1,-1, -1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d", &N, &M, &K);
+	scanf("%d %d %d", &N, &M, &K);       // 격자 크기, 바이러스 수, 년수 입력
 
 	// 겨울마다 추가될 양분
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 칸별 추가 양분 입력
 		}
 	}
 
@@ -96,7 +96,7 @@ void input()
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			food[r][c] = 5;
+			food[r][c] = 5;              // 처음 양분 5
 		}
 	}
 
@@ -106,18 +106,18 @@ void input()
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			front[r][c] = back[r][c] = OFFSET;
+			front[r][c] = back[r][c] = OFFSET;   // 빈 덱
 		}
 	}
 
 	// 초기 바이러스. 입력이 나이 오름차순으로 주어진다고 보고 뒤에 순서대로 넣는다.
 	for (int i = 0; i < M; i++)
 	{
-		int r, c, age;
-		scanf("%d %d %d", &r, &c, &age);
+		int r, c, age;                   // 위치, 나이
+		scanf("%d %d %d", &r, &c, &age); // 바이러스 정보 입력
 
-		int& virusCount = back[r][c];
-		virus[r][c][virusCount++] = age;
+		int& virusCount = back[r][c];    // 그 칸 덱의 뒤 위치 (참조)
+		virus[r][c][virusCount++] = age; // 뒤에 넣고 뒤 위치 증가
 	}
 }
 
@@ -126,20 +126,20 @@ void input()
 // ---------------------------
 void printVirus()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			if ((back[r][c] - front[r][c]) == 0)
-				continue;
+			if ((back[r][c] - front[r][c]) == 0)   // 바이러스가 없으면
+				continue;                          // 건너뛴다
 
-			printf("%d, %d : ", r, c);
+			printf("%d, %d : ", r, c);   // 칸 좌표
 			for (int t = front[r][c]; t < back[r][c]; t++)
-				printf("%d ", virus[r][c][t]);
-			putchar('\n');
+				printf("%d ", virus[r][c][t]);     // 나이 출력
+			putchar('\n');               // 줄바꿈
 		}
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // --------------------------------------------------
@@ -149,24 +149,24 @@ void printVirus()
 // --------------------------------------------------
 void step1_2()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
 			// 올해 시작 시점의 구간을 먼저 붙잡아 둔다.
 			// 아래에서 fr / bk를 움직여도 이 값들은 변하지 않는다.
 			int start = front[r][c];
 			int end = back[r][c];
 
-			int& fr = front[r][c];
-			int& bk = back[r][c];
+			int& fr = front[r][c];       // 앞 위치 (참조)
+			int& bk = back[r][c];        // 뒤 위치 (참조)
 
-			int t;
+			int t;                       // 지금 보는 위치
 
 			// ----- 봄 : 어린 것부터 먹인다 -----
 			for (t = start; t < end; t++)
 			{
-				if (virus[r][c][t] <= food[r][c])
+				if (virus[r][c][t] <= food[r][c])   // 먹을 수 있으면
 				{
 					food[r][c] -= virus[r][c][t];   // 자기 나이만큼 먹고
 					virus[r][c][t]++;               // 나이가 하나 는다
@@ -187,8 +187,8 @@ void step1_2()
 			// ----- 여름 : 죽은 것들을 양분으로 -----
 			for (; t < end; t++)
 			{
-				food[r][c] += (virus[r][c][t] / 2);
-				fr++;
+				food[r][c] += (virus[r][c][t] / 2);   // 나이/2 만큼 양분으로
+				fr++;                                 // 앞 구간에서 버린다
 			}
 
 			// 이제 front == end 이고, 살아남은 바이러스는 [end, back) 구간에 있다
@@ -201,24 +201,24 @@ void step1_2()
 // --------------------------------------------------
 void step3()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			int start = front[r][c];
-			int end = back[r][c];
+			int start = front[r][c];     // 덱 시작
+			int end = back[r][c];        // 덱 끝
 
-			for (int t = start; t < end; t++)
+			for (int t = start; t < end; t++)   // 칸의 바이러스마다
 			{
-				if (virus[r][c][t] % 5 != 0)
-					continue;
+				if (virus[r][c][t] % 5 != 0)    // 나이가 5의 배수가 아니면
+					continue;                   // 번식 안 함
 
-				for (int i = 0; i < 8; i++)
+				for (int i = 0; i < 8; i++)     // 8방향
 				{
-					int nr, nc;
+					int nr, nc;                 // 이웃 칸
 
-					nr = r + dr[i];
-					nc = c + dc[i];
+					nr = r + dr[i];             // 이웃 행
+					nc = c + dc[i];             // 이웃 열
 
 					// 격자 밖
 					if (nr < 1 || nc < 1 || nr > N || nc > N)
@@ -227,8 +227,8 @@ void step3()
 					// 나이 1은 가장 어리므로 덱의 앞쪽에 넣어야 정렬이 유지된다.
 					// (아직 처리 전인 칸이라면 이 새 바이러스도 훑게 되지만,
 					//  1은 5의 배수가 아니라 번식하지 않으므로 문제없다)
-					int& fr = front[nr][nc];
-					virus[nr][nc][--fr] = 1;
+					int& fr = front[nr][nc];    // 이웃 칸 앞 위치 (참조)
+					virus[nr][nc][--fr] = 1;    // 앞에 나이 1 추가
 				}
 			}
 		}
@@ -240,11 +240,11 @@ void step3()
 // --------------------------------------------------
 void step4()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			food[r][c] += MAP[r][c];
+			food[r][c] += MAP[r][c];     // 정해진 양분 추가
 		}
 	}
 }
@@ -254,17 +254,17 @@ void step4()
 // ---------------------------
 int getAnswer()
 {
-	int sum = 0;
+	int sum = 0;                         // 총 바이러스 수
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			sum += (back[r][c] - front[r][c]);
+			sum += (back[r][c] - front[r][c]);   // 칸의 바이러스 수 더하기
 		}
 	}
 
-	return sum;
+	return sum;                          // 총합 반환
 }
 
 int main()
@@ -273,9 +273,9 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		// K년 = 네 계절 x K회
 		for (int time = 0; time < K; time++)
@@ -285,7 +285,7 @@ int main()
 			step4();   // 겨울
 		}
 
-		printf("%d\n", getAnswer());
+		printf("%d\n", getAnswer());     // 살아 있는 바이러스 수 출력
 	}
 
 	// 덱이 실제로 어디까지 밀렸는지(= 얼마나 큰 배열이 필요한지) 확인할 때 쓰는 디버그 코드
@@ -295,5 +295,5 @@ int main()
 			printf("%d %d / %d %d\n", r, c, front[r][c], back[r][c]);
 	*/
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

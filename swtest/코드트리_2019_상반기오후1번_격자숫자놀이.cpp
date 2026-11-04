@@ -62,21 +62,21 @@
 	  checkVirus()가 격자를 통째로 훑지만 -2 칸이 최대 10개뿐이라 호출이 적어 문제없다.
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX_N (50 + 5)
-#define MAX_M (10 + 3)
+#define MAX_N (50 + 5)           // N 최대 50 + 여유
+#define MAX_M (10 + 3)           // M 최대 10 + 여유
 
-#define INF (0x7fff0000)
+#define INF (0x7fff0000)         // 아주 큰 값 (실패 표시)
 
 // 입력에서의 의미 (전처리 후에는 벽 -1, 병원 후보 -2로 바뀐다)
 #define VIRUS (0)     // 빈 칸
 #define WALL  (1)     // 벽
 #define HOSPITAL (2)  // 병원 후보
 
-int T;
+int T;                      // 테스트 케이스 수
 
-int N, M;
+int N, M;                   // 격자 크기, 활성화할 병원 수
 int MAP[MAX_N][MAX_N];      // 전처리를 마친 원본 (건드리지 않는다)
 int tmpMAP[MAX_N][MAX_N];   // 조합마다 새로 복사해 쓰는 작업용 격자
 
@@ -87,11 +87,11 @@ int minAnswer;              // 최소 시간
 // 좌표 한 쌍
 struct RC
 {
-	int r;
-	int c;
+	int r;                  // 행
+	int c;                  // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;       // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX_N * MAX_N];    // BFS용 큐
 
@@ -99,42 +99,42 @@ RC hospital[MAX_N];         // 병원 후보 좌표 목록
 int hcnt;                   // 병원 후보 개수
 
 // 방향 배열: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 입력 + 값 인코딩 전처리
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 격자 크기, 병원 수 입력
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 칸 값 입력
 		}
 	}
 
 	// 벽은 -1, 병원 후보는 -2로 밀어 둔다.
 	// BFS가 양수(시각)를 덮어쓸 것이므로 원래 값과 섞이지 않게 하기 위함.
-	hcnt = 0;
+	hcnt = 0;                            // 후보 수 초기화
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (MAP[r][c] == WALL)
+			if (MAP[r][c] == WALL)       // 벽이면
 			{
-				MAP[r][c] = -1;
+				MAP[r][c] = -1;          // -1로
 			}
-			else if (MAP[r][c] == HOSPITAL)
+			else if (MAP[r][c] == HOSPITAL)   // 병원 후보면
 			{
 				// 좌표는 따로 목록으로 모아 조합 탐색에 쓴다
 				hospital[hcnt].r = r;
 				hospital[hcnt++].c = c;
 
-				MAP[r][c] = -2;
+				MAP[r][c] = -2;          // -2로
 			}
 		}
 	}
@@ -145,13 +145,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%2d ", tmpMAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%2d ", tmpMAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -159,9 +159,9 @@ void printMap()
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < M; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < M; i++)          // 고른 M개
+		printf("%d ", num_of_cases[i]);  // 인덱스 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -169,11 +169,11 @@ void printCases()
 // ---------------------------
 void copyMAP(int copy[MAX_N][MAX_N], int original[MAX_N][MAX_N])
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			copy[r][c] = original[r][c];
+			copy[r][c] = original[r][c]; // 한 칸씩 복사
 		}
 	}
 }
@@ -183,16 +183,16 @@ void copyMAP(int copy[MAX_N][MAX_N], int original[MAX_N][MAX_N])
 // ---------------------------
 bool checkVirus()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			if (tmpMAP[r][c] == VIRUS)
-				return true;
+			if (tmpMAP[r][c] == VIRUS)   // 안 퍼진 빈 칸이면
+				return true;             // 남아 있다
 		}
 	}
 
-	return false;
+	return false;                        // 모두 퍼졌다
 }
 
 // ---------------------------
@@ -206,41 +206,41 @@ void BFS()
 	// 고른 후보를 활성 병원으로 바꾼다. 시작 시각은 1.
 	for (int i = 0; i < M; i++)
 	{
-		int hr, hc;
-		int index = num_of_cases[i];
+		int hr, hc;                      // 병원 좌표
+		int index = num_of_cases[i];     // 후보 목록 인덱스
 
-		hr = hospital[index].r;
-		hc = hospital[index].c;
+		hr = hospital[index].r;          // 병원 행
+		hc = hospital[index].c;          // 병원 열
 
-		tmpMAP[hr][hc] = 1;
+		tmpMAP[hr][hc] = 1;              // 활성 병원 (시각 1)
 	}
 
-	int rp, wp;
-	rp = wp = 0;
+	int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
+	rp = wp = 0;                         // 빈 큐
 
 	// 값이 1인 칸(= 활성 병원)을 전부 큐에 넣어 동시에 출발시킨다
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (tmpMAP[r][c] == 1)
+			if (tmpMAP[r][c] == 1)       // 활성 병원이면
 			{
-				queue[wp].r = r;
+				queue[wp].r = r;         // 큐에 넣는다
 				queue[wp++].c = c;
 			}
 		}
 	}
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 한 칸 꺼낸다
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
 			// 격자 밖
 			if (nr < 1 || nc < 1 || nr > N || nc > N)
@@ -250,21 +250,21 @@ void BFS()
 			// 시각을 써 넣는 것이 곧 방문 표시라 visit 배열이 필요 없다.
 			if (tmpMAP[nr][nc] == 0)
 			{
-				queue[wp].r = nr;
+				queue[wp].r = nr;        // 큐에 넣는다
 				queue[wp++].c = nc;
 
-				tmpMAP[nr][nc] = tmpMAP[out.r][out.c] + 1;
+				tmpMAP[nr][nc] = tmpMAP[out.r][out.c] + 1;   // 퍼진 시각 기록
 			}
 			// 활성화하지 않은 병원 칸은 "아직 채울 빈 칸이 남아 있을 때만" 지나간다.
 			// 그래야 마지막 빈 칸이 채워진 뒤의 확산이 최댓값을 부풀리지 않는다.
 			else if (tmpMAP[nr][nc] == -2)
 			{
-				if (checkVirus() == true)
+				if (checkVirus() == true)    // 빈 칸이 남아 있으면
 				{
-					queue[wp].r = nr;
+					queue[wp].r = nr;        // 큐에 넣는다
 					queue[wp++].c = nc;
 
-					tmpMAP[nr][nc] = tmpMAP[out.r][out.c] + 1;
+					tmpMAP[nr][nc] = tmpMAP[out.r][out.c] + 1;   // 시각 기록
 				}
 			}
 			// 벽(-1)이나 이미 시각이 적힌 칸(양수)은 여기서 자동으로 걸러진다
@@ -280,22 +280,22 @@ void BFS()
 // ---------------------------
 int getAnswer()
 {
-	int max = 0;
+	int max = 0;                         // 가장 늦은 시각
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
 			// 끝까지 퍼지지 못한 칸이 있다
 			if (tmpMAP[r][c] == 0)
 				return INF;
 
-			if (max < tmpMAP[r][c])
-				max = tmpMAP[r][c];
+			if (max < tmpMAP[r][c])      // 더 늦으면
+				max = tmpMAP[r][c];      // 최댓값 갱신
 		}
 	}
 
-	return max - 1;
+	return max - 1;                      // 실제 경과 시간
 }
 
 // ---------------------------
@@ -306,22 +306,22 @@ int getAnswer()
 // ---------------------------
 void DFS(int depth, int start)
 {
-	if (depth == M)
+	if (depth == M)                      // M개를 다 골랐으면
 	{
 		// printCases();
 
-		BFS();
+		BFS();                           // 퍼뜨려 본다
 
-		int tmp = getAnswer();
-		if (tmp < minAnswer)
-			minAnswer = tmp;
+		int tmp = getAnswer();           // 걸린 시간
+		if (tmp < minAnswer)             // 더 짧으면
+			minAnswer = tmp;             // 최솟값 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
-	for (int i = start; i < hcnt; i++)
+	for (int i = start; i < hcnt; i++)   // start부터 후보
 	{
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // i번 후보 선택
 
 		// 조합이므로 다음은 i보다 뒤에서만 고른다
 		DFS(depth + 1, i + 1);
@@ -334,20 +334,20 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		minAnswer = INF;
+		minAnswer = INF;                 // 최솟값 초기화
 
-		DFS(0, 0);
+		DFS(0, 0);                       // 조합 탐색 시작
 
 		// 어떤 조합으로도 전부 퍼뜨리지 못했다
 		if (minAnswer == INF)
-			printf("-1\n");
+			printf("-1\n");              // 불가능
 		else
-			printf("%d\n", minAnswer);
+			printf("%d\n", minAnswer);   // 최소 시간 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

@@ -44,19 +44,19 @@
 //       1 1 / 1 2 / 1 3 / 2 2 / 2 3 / 3 3   (총 3H2 = 4C2 = 6가지)
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
-#define MAX (7 + 3)
+#define MAX (7 + 3)      // N, M 최대 7 + 여유
 
-int N, M;
+int N, M;                // N: 후보 수 범위, M: 고를 개수
 int num_of_cases[MAX];   // 만들고 있는 수열
 
 // 완성된 수열 한 줄 출력
 void printCases()
 {
-	for (int i = 0; i < M; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < M; i++)          // M개 자리를
+		printf("%d ", num_of_cases[i]);  // 차례로 출력
+	putchar('\n');                       // 한 경우 끝 줄바꿈
 }
 
 // 재귀로 중복조합 생성
@@ -67,15 +67,15 @@ void DFS(int depth, int start)
 	// M개를 다 골랐으면 한 경우 완성
 	if (depth == M)
 	{
-		printCases();
-		return;
+		printCases();                    // 완성된 수열 출력
+		return;                          // 되돌아간다
 	}
 
 	// 앞에서 고른 값보다 작은 값은 보지 않는다.
 	// 이 제한 덕분에 항상 비내림차순이 되고, 같은 조합이 두 번 만들어지지 않는다.
 	for (int i = start; i <= N; i++)
 	{
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // 이 자리에 i를 놓는다
 
 		// 다음 자리의 시작값을 i로 넘긴다 = 같은 값을 다시 골라도 된다 (중복 허용)
 		// i + 1로 넘기면 그 순간 일반 조합이 된다.
@@ -85,11 +85,11 @@ void DFS(int depth, int start)
 
 int main()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // N과 M 입력
 
 	DFS(0, 1);   // 0번째 자리부터, 첫 후보는 1부터
 
-	return 0;
+	return 0;    // 프로그램 정상 종료
 }
 
 // ====================================================================
@@ -104,11 +104,11 @@ int main()
 //   15652와 재귀 구조는 같고, 넣는 값이 i 대신 number[i]라는 점만 다르다.
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
-#define MAX (7 + 3)
+#define MAX (7 + 3)      // N, M 최대 7 + 여유
 
-int N, M;
+int N, M;                // N: 후보 개수, M: 고를 개수
 
 int num_of_cases[MAX];   // 만들고 있는 수열
 int number[MAX];         // 후보로 주어진 수들 (1-based로 저장)
@@ -116,9 +116,9 @@ int number[MAX];         // 후보로 주어진 수들 (1-based로 저장)
 // 완성된 수열 한 줄 출력
 void printCases()
 {
-	for (int i = 0; i < M; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < M; i++)          // M개 자리를
+		printf("%d ", num_of_cases[i]);  // 차례로 출력
+	putchar('\n');                       // 한 경우 끝 줄바꿈
 }
 
 // 재귀로 중복조합 생성
@@ -126,13 +126,13 @@ void printCases()
 //   start : 이번 자리에 고를 수 있는 최소 "인덱스"
 void DFS(int depth, int start)
 {
-	if (depth == M)
+	if (depth == M)                      // M개를 다 골랐으면
 	{
-		printCases();
-		return;
+		printCases();                    // 완성된 수열 출력
+		return;                          // 되돌아간다
 	}
 
-	for (int i = start; i <= N; i++)
+	for (int i = start; i <= N; i++)     // start 인덱스부터 후보 확인
 	{
 		// 15652와 유일하게 다른 줄 : 인덱스가 아니라 실제 입력값을 담는다
 		num_of_cases[depth] = number[i];
@@ -144,29 +144,29 @@ void DFS(int depth, int start)
 
 int main()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // N과 M 입력
 
 	// 후보 수 입력
 	for (int i = 1; i <= N; i++)
-		scanf("%d", &number[i]);
+		scanf("%d", &number[i]);         // i번째 후보 입력
 
 	// 오름차순 정렬 (선택 정렬)
 	// 정렬해 둬야 "인덱스 증가 = 값이 작아지지 않음"이 되어
 	// 비내림차순 조건과 사전순 출력이 동시에 만족된다.
-	for (int i = 1; i <= N - 1; i++)
+	for (int i = 1; i <= N - 1; i++)     // 기준 위치
 	{
-		for (int k = i + 1; k <= N; k++)
+		for (int k = i + 1; k <= N; k++) // 기준 뒤의 모든 위치
 		{
-			if (number[i] > number[k])
+			if (number[i] > number[k])   // 뒤쪽 값이 더 작으면
 			{
-				int tmp = number[i];
+				int tmp = number[i];     // 두 값을 맞바꾼다
 				number[i] = number[k];
 				number[k] = tmp;
 			}
 		}
 	}
 
-	DFS(0, 1);
+	DFS(0, 1);                           // 0번째 자리부터, 첫 인덱스 1부터
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

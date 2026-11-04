@@ -37,16 +37,16 @@
 	  4) countEmpty의 `sum += !tmpMAP[r][c]` 는 값이 0일 때만 1을 더하는 관용 표현이다.
 */
 
-#include <stdio.h>
+#include <stdio.h>          // scanf, printf, putchar 사용
 
-#define MAX (8 + 3)
+#define MAX (8 + 3)         // N, M 최대 8 + 여유
 
 // 칸의 상태
 #define EMPTY (0)   // 빈 칸
 #define WALL  (1)   // 벽
 #define FIRE  (2)   // 불(바이러스)
 
-int T;
+int T;                  // 테스트 케이스 수
 
 int N, M;               // 격자 크기
 int MAP[MAX][MAX];      // 원본 (건드리지 않는다)
@@ -58,30 +58,30 @@ int maxAnswer;          // 안전 영역의 최댓값
 // 좌표 한 쌍
 struct RC
 {
-	int r;
-	int c;
+	int r;                  // 행
+	int c;                  // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;       // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];        // BFS용 큐
 RC emptyRoom[MAX * MAX];    // 빈 칸 좌표를 1차원으로 펴 놓은 목록
 int emptyCount;             // 빈 칸 개수
 
 // 4방향: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 격자 크기 입력
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= M; c++)
-			scanf("%d", &MAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
+		for (int c = 1; c <= M; c++)     // 1열부터 M열까지
+			scanf("%d", &MAP[r][c]);     // 칸 상태 입력
 }
 
 // ---------------------------
@@ -89,13 +89,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", tmpMAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%d ", tmpMAP[r][c]); // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -103,9 +103,9 @@ void printMap()
 // ---------------------------
 void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= M; c++)
-			copy[r][c] = original[r][c];
+	for (int r = 1; r <= N; r++)         // 모든 행
+		for (int c = 1; c <= M; c++)     // 모든 열
+			copy[r][c] = original[r][c]; // 한 칸씩 복사
 }
 
 // ---------------------------
@@ -113,9 +113,9 @@ void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < 3; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < 3; i++)          // 고른 3개
+		printf("%d ", num_of_cases[i]);  // 인덱스 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -126,16 +126,16 @@ void printCases()
 // ---------------------------
 void setEmptyCount()
 {
-	emptyCount = 0;
+	emptyCount = 0;                      // 빈 칸 수 초기화
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 모든 열
 		{
-			if (MAP[r][c] == EMPTY)
+			if (MAP[r][c] == EMPTY)      // 빈 칸이면
 			{
-				emptyRoom[emptyCount].r = r;
-				emptyRoom[emptyCount++].c = c;
+				emptyRoom[emptyCount].r = r;     // 목록에 행 기록
+				emptyRoom[emptyCount++].c = c;   // 목록에 열 기록, 개수 증가
 			}
 		}
 	}
@@ -146,18 +146,18 @@ void setEmptyCount()
 // ---------------------------
 int countEmpty()
 {
-	int sum = 0;
+	int sum = 0;                         // 안전 영역 수
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 모든 열
 		{
 			// !x 는 x가 0일 때만 1이 된다 (빈 칸만 세기)
 			sum += !tmpMAP[r][c];
 		}
 	}
 
-	return sum;
+	return sum;                          // 개수 반환
 }
 
 // ---------------------------
@@ -171,42 +171,42 @@ void BFS()
 	// 1) 고른 인덱스 3곳에 벽 설치
 	for (int i = 0; i < 3; i++)
 	{
-		int wr, wc;
-		int index = num_of_cases[i];
+		int wr, wc;                      // 벽을 세울 좌표
+		int index = num_of_cases[i];     // 빈 칸 목록의 인덱스
 
-		wr = emptyRoom[index].r;
-		wc = emptyRoom[index].c;
+		wr = emptyRoom[index].r;         // 그 빈 칸의 행
+		wc = emptyRoom[index].c;         // 그 빈 칸의 열
 
-		tmpMAP[wr][wc] = WALL;
+		tmpMAP[wr][wc] = WALL;           // 벽 세우기
 	}
 
 	// 2) 모든 불을 큐에 넣고 시작하는 멀티 소스 BFS
-	int rp, wp;
-	rp = wp = 0;
+	int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
+	rp = wp = 0;                         // 빈 큐
 
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= M; c++)
 		{
-			if (tmpMAP[r][c] == FIRE)
+			if (tmpMAP[r][c] == FIRE)    // 불이면
 			{
-				queue[wp].r = r;
-				queue[wp++].c = c;
+				queue[wp].r = r;         // 시작점 행
+				queue[wp++].c = c;       // 시작점 열, 삽입 위치 증가
 			}
 		}
 	}
 
 	// 3) 확산
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 한 칸 꺼낸다
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
 			// 격자 밖
 			if (nr < 1 || nc < 1 || nr > N || nc > M)
@@ -217,10 +217,10 @@ void BFS()
 			if (tmpMAP[nr][nc] != EMPTY)
 				continue;
 
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 이웃 행 기록
+			queue[wp++].c = nc;          // 이웃 열 기록, 삽입 위치 증가
 
-			tmpMAP[nr][nc] = FIRE;
+			tmpMAP[nr][nc] = FIRE;       // 불이 번진다
 		}
 	}
 }
@@ -238,18 +238,18 @@ void DFS(int depth, int start)
 	{
 		// printCases();
 
-		BFS();
+		BFS();                           // 벽 세우고 불 퍼뜨리기
 
-		int tmp = countEmpty();
-		if (maxAnswer < tmp)
-			maxAnswer = tmp;
+		int tmp = countEmpty();          // 안전 영역 수
+		if (maxAnswer < tmp)             // 더 크면
+			maxAnswer = tmp;             // 최댓값 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
-	for (int i = start; i < emptyCount; i++)
+	for (int i = start; i < emptyCount; i++)   // start부터 빈 칸 후보
 	{
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // i번 빈 칸을 고른다
 
 		// 조합이므로 다음은 i보다 뒤에서만 고른다 (같은 조합의 순서 바꾼 중복 제거)
 		DFS(depth + 1, i + 1);
@@ -262,19 +262,19 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		// 빈 칸 목록을 먼저 만들어 둔다
 		setEmptyCount();
 
-		maxAnswer = 0;
+		maxAnswer = 0;                   // 답 초기화
 
-		DFS(0, 0);
+		DFS(0, 0);                       // 조합 탐색 시작
 
-		printf("%d\n", maxAnswer);
+		printf("%d\n", maxAnswer);       // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

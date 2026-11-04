@@ -57,16 +57,16 @@
           else if (circle[r][c] * count > sum) circle[r][c]--;
 */
 
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf, putchar 사용
 
-#define MAX (50 + 5)
+#define MAX (50 + 5)               // N, M, Q 최대 50 + 여유
 
 // 회전 방향
-#define CLOCKWISE (0)
-#define COUNTER_CLOCKWISE (1)
+#define CLOCKWISE (0)              // 시계
+#define COUNTER_CLOCKWISE (1)      // 반시계
 
-int T;
-int N, M, Q;
+int T;                             // 테스트 케이스 수
+int N, M, Q;                       // 원판 수, 원판당 수의 개수, 명령 수
 
 // circle[r][c] : r번 원판의 c번 위치에 적힌 수 (0이면 지워진 자리)
 int circle[MAX][MAX];
@@ -75,44 +75,44 @@ int circle[MAX][MAX];
 int visit[MAX][MAX];
 
 // 회전 명령
-int X[MAX];
-int D[MAX];
-int K[MAX];
+int X[MAX];                        // 배수 기준
+int D[MAX];                        // 방향
+int K[MAX];                        // 칸 수
 
 // 좌표 한 쌍
 struct RC
 {
-    int r;
-    int c;
+    int r;                         // 원판 번호
+    int c;                         // 위치
 };
 
-typedef struct RC RC;
+typedef struct RC RC;              // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];   // BFS용 큐
 
 // 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };        // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };         // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-    scanf("%d %d %d", &N, &M, &Q);
+    scanf("%d %d %d", &N, &M, &Q);       // 원판 수, 수의 개수, 명령 수 입력
 
     // 배열 전체를 0으로 밀어 둔다.
     // 원판 범위 밖이 0이 되어 인접 판정에서 자동으로 걸러진다.
     for (int r = 0; r < MAX; r++)
         for (int c = 0; c < MAX; c++)
-            circle[r][c] = 0;
+            circle[r][c] = 0;            // 0으로 초기화
 
-    for (int r = 1; r <= N; r++)
-        for (int c = 1; c <= M; c++)
-            scanf("%d", &circle[r][c]);
+    for (int r = 1; r <= N; r++)         // 원판마다
+        for (int c = 1; c <= M; c++)     // 위치마다
+            scanf("%d", &circle[r][c]);  // 수 입력
 
-    for (int i = 1; i <= Q; i++)
-        scanf("%d %d %d", &X[i], &D[i], &K[i]);
+    for (int i = 1; i <= Q; i++)         // 명령마다
+        scanf("%d %d %d", &X[i], &D[i], &K[i]);   // 회전 명령 입력
 }
 
 // ---------------------------
@@ -120,13 +120,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 원판마다
     {
-        for (int c = 1; c <= M; c++)
-            printf("%d ", circle[r][c]);
-        putchar('\n');
+        for (int c = 1; c <= M; c++)     // 위치마다
+            printf("%d ", circle[r][c]); // 수 출력
+        putchar('\n');                   // 줄바꿈
     }
-    putchar('\n');
+    putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -136,27 +136,27 @@ void printMap()
 // ---------------------------
 void rotate(int x, int d, int k)
 {
-    int arr[MAX] = { 0 };
+    int arr[MAX] = { 0 };                // 원판 하나 복사본
 
     // 반시계는 시계의 반대이므로 부호만 뒤집으면 같은 식을 쓸 수 있다
     if (d == COUNTER_CLOCKWISE) k = -k;
 
-    for (int r = x; r <= N; r += x)
+    for (int r = x; r <= N; r += x)      // x의 배수 원판마다
     {
-        int index = 0;
+        int index = 0;                   // 복사한 칸 수
 
         // 회전 전 상태를 통째로 떠 놓는다 (덮어쓰기 사고 방지)
         for (int c = 1; c <= M; c++)
             arr[index++] = circle[r][c];
 
-        for (int i = 0; i < index; i++)
+        for (int i = 0; i < index; i++)  // 새 위치마다
         {
-            int newIndex = (i - k) % index;
+            int newIndex = (i - k) % index;   // 가져올 옛 위치
 
             // C의 %는 음수를 음수로 돌려주므로 보정이 필요하다
             newIndex = (newIndex < 0) ? newIndex + index : newIndex;
 
-            circle[r][i + 1] = arr[newIndex];
+            circle[r][i + 1] = arr[newIndex];   // 옛 값을 새 위치에
         }
     }
 }
@@ -168,23 +168,23 @@ void rotate(int x, int d, int k)
 // ---------------------------
 bool BFS(int r, int c)
 {
-    int rp, wp;
-    rp = wp = 0;
+    int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
+    rp = wp = 0;                         // 빈 큐
 
-    queue[wp].r = r;
-    queue[wp++].c = c;
+    queue[wp].r = r;                     // 시작 원판
+    queue[wp++].c = c;                   // 시작 위치, 삽입 위치 증가
 
-    visit[r][c] = true;
+    visit[r][c] = true;                  // 시작 칸 방문 표시
 
-    while (rp < wp)
+    while (rp < wp)                      // 처리할 칸이 남아 있는 동안
     {
-        RC out = queue[rp++];
+        RC out = queue[rp++];            // 한 칸 꺼낸다
 
         // 상하좌우. 원판 범위 밖은 값이 0이라 아래 조건에서 걸러진다.
         for (int i = 0; i < 4; i++)
         {
-            int nr = out.r + dr[i];
-            int nc = out.c + dc[i];
+            int nr = out.r + dr[i];      // 이웃 원판
+            int nc = out.c + dc[i];      // 이웃 위치
 
             // 이미 지워진 칸(또는 범위 밖)
             if (circle[nr][nc] == 0) continue;
@@ -193,31 +193,31 @@ bool BFS(int r, int c)
             // (덩어리 안의 값은 모두 같으므로 시작 칸의 값과 비교해도 된다)
             if (circle[nr][nc] != circle[r][c] || visit[nr][nc] == true) continue;
 
-            queue[wp].r = nr;
+            queue[wp].r = nr;            // 큐에 넣는다
             queue[wp++].c = nc;
 
-            visit[nr][nc] = true;
+            visit[nr][nc] = true;        // 방문 표시
         }
 
         // 원판은 원형이므로 1번과 M번도 이웃이다. 위 4방향으로는 잡히지 않아 따로 처리한다.
-        if (out.c == 1)
+        if (out.c == 1)                  // 1번 위치면
         {
-            if (circle[r][c] == circle[out.r][M] && visit[out.r][M] == false)
+            if (circle[r][c] == circle[out.r][M] && visit[out.r][M] == false)   // M번과 같은 값이면
             {
-                queue[wp].r = out.r;
+                queue[wp].r = out.r;     // M번 칸을 큐에
                 queue[wp++].c = M;
 
-                visit[out.r][M] = true;
+                visit[out.r][M] = true;  // 방문 표시
             }
         }
-        else if (out.c == M)
+        else if (out.c == M)             // M번 위치면
         {
-            if (circle[r][c] == circle[out.r][1] && visit[out.r][1] == false)
+            if (circle[r][c] == circle[out.r][1] && visit[out.r][1] == false)   // 1번과 같은 값이면
             {
-                queue[wp].r = out.r;
+                queue[wp].r = out.r;     // 1번 칸을 큐에
                 queue[wp++].c = 1;
 
-                visit[out.r][1] = true;
+                visit[out.r][1] = true;  // 방문 표시
             }
         }
     }
@@ -225,17 +225,17 @@ bool BFS(int r, int c)
     // 혼자면 지우지 않는다. 두 칸 이상 이어졌을 때만 삭제 대상이다.
     if (wp > 1)
     {
-        for (int i = 0; i < wp; i++)
+        for (int i = 0; i < wp; i++)     // 덩어리의 모든 칸
         {
-            int rr = queue[i].r;
-            int cc = queue[i].c;
+            int rr = queue[i].r;         // 원판
+            int cc = queue[i].c;         // 위치
 
-            circle[rr][cc] = 0;
+            circle[rr][cc] = 0;          // 지운다
         }
-        return true;
+        return true;                     // 지웠다
     }
 
-    return false;
+    return false;                        // 안 지웠다
 }
 
 // ---------------------------
@@ -248,18 +248,18 @@ bool BFS(int r, int c)
 // ---------------------------
 void makeAverage()
 {
-    int sum = 0;
-    int count = 0;
-    int avg;
+    int sum = 0;                         // 남은 수의 합
+    int count = 0;                       // 남은 수의 개수
+    int avg;                             // 평균 (정수)
 
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 모든 원판
     {
-        for (int c = 1; c <= M; c++)
+        for (int c = 1; c <= M; c++)     // 모든 위치
         {
-            if (circle[r][c] != 0)
+            if (circle[r][c] != 0)       // 남은 수면
             {
-                sum += circle[r][c];
-                count++;
+                sum += circle[r][c];     // 합에 더하고
+                count++;                 // 개수 증가
             }
         }
     }
@@ -267,16 +267,16 @@ void makeAverage()
     // 남은 수가 하나도 없으면 조정할 것도 없다 (0으로 나누는 것도 막아 준다)
     if (count == 0) return;
 
-    avg = sum / count;
+    avg = sum / count;                   // 정수 평균
 
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 모든 원판
     {
-        for (int c = 1; c <= M; c++)
+        for (int c = 1; c <= M; c++)     // 모든 위치
         {
-            if (circle[r][c] == 0) continue;
+            if (circle[r][c] == 0) continue;   // 지워진 칸은 건너뜀
 
-            if (circle[r][c] < avg) circle[r][c]++;
-            else if (circle[r][c] > avg) circle[r][c]--;
+            if (circle[r][c] < avg) circle[r][c]++;        // 평균보다 작으면 +1
+            else if (circle[r][c] > avg) circle[r][c]--;   // 평균보다 크면 -1
             // 평균과 같으면 그대로 둔다
         }
     }
@@ -289,21 +289,21 @@ void makeAverage()
 // ---------------------------
 void startGame()
 {
-    for (int r = 1; r <= N; r++)
-        for (int c = 1; c <= M; c++)
-            visit[r][c] = false;
+    for (int r = 1; r <= N; r++)         // 모든 원판
+        for (int c = 1; c <= M; c++)     // 모든 위치
+            visit[r][c] = false;         // 방문 기록 초기화
 
-    bool deleteCheck = false;
+    bool deleteCheck = false;            // 이번에 지운 적이 있는지
 
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 모든 원판
     {
-        for (int c = 1; c <= M; c++)
+        for (int c = 1; c <= M; c++)     // 모든 위치
         {
             // 이미 지워졌거나 다른 덩어리에 포함된 칸은 시작점이 될 수 없다
             if (circle[r][c] == 0 || visit[r][c] == true) continue;
 
-            bool check = BFS(r, c);
-            if (check == true) deleteCheck = true;
+            bool check = BFS(r, c);      // 덩어리 찾고 지우기
+            if (check == true) deleteCheck = true;   // 지웠으면 표시
         }
     }
 
@@ -316,10 +316,10 @@ void startGame()
 // ---------------------------
 void simulate()
 {
-    for (int q = 1; q <= Q; q++)
+    for (int q = 1; q <= Q; q++)         // 명령마다
     {
-        rotate(X[q], D[q], K[q]);
-        startGame();
+        rotate(X[q], D[q], K[q]);        // 회전
+        startGame();                     // 후처리
     }
 }
 
@@ -328,13 +328,13 @@ void simulate()
 // ---------------------------
 int getAnswer()
 {
-    int sum = 0;
+    int sum = 0;                         // 합
 
-    for (int r = 1; r <= N; r++)
-        for (int c = 1; c <= M; c++)
-            sum += circle[r][c];
+    for (int r = 1; r <= N; r++)         // 모든 원판
+        for (int c = 1; c <= M; c++)     // 모든 위치
+            sum += circle[r][c];         // 더한다
 
-    return sum;
+    return sum;                          // 합 반환
 }
 
 int main()
@@ -343,14 +343,14 @@ int main()
     //scanf("%d", &T);
     T = 1;
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
+        input();                         // 입력
 
-        simulate();
+        simulate();                      // 명령 수행
 
-        printf("%d\n", getAnswer());
+        printf("%d\n", getAnswer());     // 결과 출력
     }
 
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

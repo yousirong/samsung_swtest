@@ -47,13 +47,13 @@
       두 경우 모두 즉시 내리므로 position을 -1로 두고 칸도 비워 준다.
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX (100 + 20)
+#define MAX (100 + 20)           // N 최대 100 + 여유
 
-int T;
+int T;                           // 테스트 케이스 수
 
-int N, K;
+int N, K;                        // 무빙워크 길이 N, 종료 기준 K
 
 // 무빙워크 칸 하나
 struct MOVING
@@ -63,7 +63,7 @@ struct MOVING
     int stability;      // 남은 안정성
 };
 
-typedef struct MOVING MOVING;
+typedef struct MOVING MOVING;    // struct MOVING을 MOVING으로 줄여 쓰기
 
 // moving[i] : 지금 i번 위치에 놓인 칸. 실제 사용 범위는 1 ~ 2N.
 MOVING moving[MAX * 2];
@@ -74,24 +74,24 @@ int position[200000 + 5000];
 
 // 지금 무빙워크 위에 있는 사람들 (앞선 사람부터 순서대로)
 int livePeople[MAX];
-int lcnt;
+int lcnt;                        // 무빙워크 위 사람 수
 
 /*
     입력
 */
 void input()
 {
-    scanf("%d %d", &N, &K);
+    scanf("%d %d", &N, &K);              // N, K 입력
 
-    for (int i = 1; i <= 2 * N; i++)
+    for (int i = 1; i <= 2 * N; i++)     // 2N개 칸
     {
-        scanf("%d", &moving[i].stability);
+        scanf("%d", &moving[i].stability);   // 안정성 입력
 
         moving[i].index = i;        // 회전을 눈으로 따라가기 위한 표시
         moving[i].peopleNumber = 0; // 처음에는 아무도 없다
     }
 
-    lcnt = 0;
+    lcnt = 0;                            // 사람 수 0
 }
 
 /*
@@ -102,20 +102,20 @@ void input()
 */
 void printMoving()
 {
-    for (int i = 1; i <= N; i++)
-        printf("(%d, %d, %d) ",
+    for (int i = 1; i <= N; i++)         // 위쪽 N칸
+        printf("(%d, %d, %d) ",          // (칸 번호, 안정성, 사람)
             moving[i].index,
             moving[i].stability,
             moving[i].peopleNumber);
-    putchar('\n');
+    putchar('\n');                       // 줄바꿈
 
-    for (int i = 2 * N; i > N; i--)
-        printf("(%d, %d, %d)",
+    for (int i = 2 * N; i > N; i--)      // 아래쪽 N칸 (거꾸로)
+        printf("(%d, %d, %d)",           // (칸 번호, 안정성, 사람)
             moving[i].index,
             moving[i].stability,
             moving[i].peopleNumber);
-    putchar('\n');
-    putchar('\n');
+    putchar('\n');                       // 줄바꿈
+    putchar('\n');                       // 빈 줄
 }
 
 /*
@@ -127,12 +127,12 @@ void printMoving()
 */
 void rotate()
 {
-    MOVING tmp = moving[2 * N];
+    MOVING tmp = moving[2 * N];          // 마지막 칸 보관
 
-    for (int i = 2 * N - 1; i >= 1; i--)
-        moving[i + 1] = moving[i];
+    for (int i = 2 * N - 1; i >= 1; i--) // 뒤에서부터
+        moving[i + 1] = moving[i];       // 한 칸씩 민다
 
-    moving[1] = tmp;
+    moving[1] = tmp;                     // 마지막 칸이 1번 위치로
 }
 
 /*
@@ -144,9 +144,9 @@ int simulate()
     int crush = 0;    // 안정성이 0이 된 칸의 개수
     int pIndex = 1;   // 다음에 올라탈 사람 번호
 
-    while (1)
+    while (1)                            // 종료될 때까지
     {
-        step++;
+        step++;                          // 단계 증가
 
         // 1) 무빙워크 회전 (칸이 이동한다)
         rotate();
@@ -154,39 +154,39 @@ int simulate()
         // 1-2) 회전에 따라 사람의 위치도 한 칸 뒤로 밀린다
         for (int i = 0; i < lcnt; i++)
         {
-            int peopleNumber = livePeople[i];
-            position[peopleNumber] = position[peopleNumber] + 1;
+            int peopleNumber = livePeople[i];    // i번째 사람
+            position[peopleNumber] = position[peopleNumber] + 1;   // 위치 +1
         }
 
         // 2) 사람들이 스스로 한 칸씩 이동
         //    livePeople이 "앞선 사람부터" 순서라서 앞에서부터 훑으면 된다.
-        int nextlcnt = 0;
+        int nextlcnt = 0;                // 다음 단계에 남을 사람 수
 
-        for (int i = 0; i < lcnt; i++)
+        for (int i = 0; i < lcnt; i++)   // 앞선 사람부터
         {
-            int peopleNumber = livePeople[i];
-            int curPos = position[peopleNumber];
+            int peopleNumber = livePeople[i];    // 사람 번호
+            int curPos = position[peopleNumber]; // 현재 위치
 
             // 회전만으로 내리는 자리에 도착한 경우 -> 바로 내린다
             if (curPos == N)
             {
-                position[peopleNumber] = -1;
-                moving[curPos].peopleNumber = 0;
-                continue;
+                position[peopleNumber] = -1;     // 내림
+                moving[curPos].peopleNumber = 0; // 칸 비우기
+                continue;                        // 다음 사람
             }
 
-            int nextPos = curPos + 1;
+            int nextPos = curPos + 1;    // 한 칸 앞
 
             // 앞이 막혔거나(사람) 밟을 수 없으면(안정성 0) 제자리
             if (moving[nextPos].peopleNumber != 0 || moving[nextPos].stability == 0)
             {
                 livePeople[nextlcnt++] = peopleNumber;   // 그대로 남는다
-                continue;
+                continue;                                // 다음 사람
             }
 
             // 이동
-            moving[curPos].peopleNumber = 0;
-            moving[nextPos].peopleNumber = peopleNumber;
+            moving[curPos].peopleNumber = 0;             // 원래 칸 비우기
+            moving[nextPos].peopleNumber = peopleNumber; // 앞 칸 차지
 
             // 도착한 칸의 안정성이 줄어든다
             moving[nextPos].stability--;
@@ -194,34 +194,34 @@ int simulate()
             // 0이 "되는 순간"에만 세어야 중복으로 세지 않는다
             if (moving[nextPos].stability == 0) crush++;
 
-            position[peopleNumber] = nextPos;
+            position[peopleNumber] = nextPos;    // 위치 갱신
 
             // 걸어가서 내리는 자리에 닿았으면 바로 내린다
             if (nextPos == N)
             {
-                position[peopleNumber] = -1;
-                moving[nextPos].peopleNumber = 0;
+                position[peopleNumber] = -1;     // 내림
+                moving[nextPos].peopleNumber = 0;   // 칸 비우기
             }
             else
             {
-                livePeople[nextlcnt++] = peopleNumber;
+                livePeople[nextlcnt++] = peopleNumber;   // 계속 남는다
             }
         }
 
         // 3) 새 사람 탑승
-        if (moving[1].peopleNumber == 0 && moving[1].stability != 0)
+        if (moving[1].peopleNumber == 0 && moving[1].stability != 0)   // 1번 칸이 비어 있고 밟을 수 있으면
         {
-            position[pIndex] = 1;
+            position[pIndex] = 1;        // 새 사람 위치 1
             livePeople[nextlcnt++] = pIndex;   // 가장 뒤에 붙는다 (순서 유지)
 
-            moving[1].peopleNumber = pIndex++;
+            moving[1].peopleNumber = pIndex++;   // 칸에 사람 표시, 다음 번호
 
-            moving[1].stability--;
+            moving[1].stability--;       // 안정성 감소
 
-            if (moving[1].stability == 0) crush++;
+            if (moving[1].stability == 0) crush++;   // 0이 되면 센다
         }
 
-        lcnt = nextlcnt;
+        lcnt = nextlcnt;                 // 사람 수 갱신
 
         // 4) 종료 조건
         if (crush >= K) return step;
@@ -236,12 +236,12 @@ int main()
     // scanf("%d", &T);
     T = 1;
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
+        input();                         // 입력
 
-        printf("%d\n", simulate());
+        printf("%d\n", simulate());      // 종료 단계 출력
     }
 
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

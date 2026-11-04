@@ -50,105 +50,105 @@
 	  - 입력의 시간 이상 현상 좌표는 0-based로 들어오므로 +1 해서 저장한다.
 	  - 평지 좌표계와 면 좌표계의 크기가 다르다(N vs M). 경계 검사에서 어느 쪽인지 늘 구분해야 한다.
 */
-#include <stdio.h>
+#include <stdio.h>                       // scanf, printf, putchar 사용
 
-#define MAX (20+5)
+#define MAX (20+5)                       // N 최대 20 + 여유
 
-#define EAST (0)
-#define WEST (1)
-#define SOUTH (2)
-#define NORTH (3)
-#define TOP (4)
-#define BOTTOM (5)
+#define EAST (0)                         // 동쪽 면
+#define WEST (1)                         // 서쪽 면
+#define SOUTH (2)                        // 남쪽 면
+#define NORTH (3)                        // 북쪽 면
+#define TOP (4)                          // 윗면
+#define BOTTOM (5)                       // 평지
 
-#define EMPTY (0)
-#define WALL (1)
-#define TIME_MACHINE (2)
-#define CUBE (3)
-#define EXIT (4)
+#define EMPTY (0)                        // 빈칸
+#define WALL (1)                         // 장애물
+#define TIME_MACHINE (2)                 // 타임머신
+#define CUBE (3)                         // 정육면체가 놓인 칸
+#define EXIT (4)                         // 탈출구
 
-#define RIGHT (0)
-#define LEFT (1)
-#define DOWN (2)
-#define UP  (3)
+#define RIGHT (0)                        // →
+#define LEFT (1)                         // ←
+#define DOWN (2)                         // ↓
+#define UP  (3)                          // ↑
 
-int T;
+int T;                                   // 테스트 케이스 수
 
-int N, M, F;
-int MAP[6][MAX][MAX];
-int visit[6][MAX][MAX];
+int N, M, F;                             // 평지 크기, 정육면체 크기, 이상 현상 수
+int MAP[6][MAX][MAX];                    // 면별 격자
+int visit[6][MAX][MAX];                  // 면별 방문 (이동 횟수 + 1)
 
-int TIME_WALL[6][MAX][MAX];
+int TIME_WALL[6][MAX][MAX];              // 면별 막히는 시각 (0이면 현상 없음)
 
-struct RC
+struct RC                                // 좌표
 {
-	int r;
-	int c;
+	int r;                               // 행
+	int c;                               // 열
 };
 
-RC start, end;
+RC start, end;                           // 타임머신 위치, 탈출구 위치
 
-struct PRC
+struct PRC                               // 면 + 좌표
 {
 	int p; // plane
-	int r;
-	int c;
+	int r;                               // 행
+	int c;                               // 열
 };
 
-PRC queue[MAX * MAX * 6];
-PRC next[6][MAX][MAX][4];
+PRC queue[MAX * MAX * 6];                // BFS 큐
+PRC next[6][MAX][MAX][4];                // 경계를 넘을 때 도착하는 (면, 행, 열)
 
-struct TIME_INFO
+struct TIME_INFO                         // 시간 이상 현상 정보
 {
-	int p;
-	int r;
-	int c;
-	int d;
-	int v;
+	int p;                               // 면
+	int r;                               // 행
+	int c;                               // 열
+	int d;                               // 방향
+	int v;                               // 속도
 };
 
-TIME_INFO timeInfo[10 + 3];
+TIME_INFO timeInfo[10 + 3];              // 이상 현상 목록
 
 // 우, 좌, 하, 상
-int dr[] = { 0,0,1,-1 };
-int dc[] = { 1,-1,0,0 };
+int dr[] = { 0,0,1,-1 };                 // 방향별 행 변화량
+int dc[] = { 1,-1,0,0 };                 // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d %d", &N, &M, &F);
+	scanf("%d %d %d", &N, &M, &F);       // 평지 크기, 정육면체 크기, 현상 수 입력
 
 	//init
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)          // 모든 면
 		for (int r = 0; r < MAX; r++)
 			for (int c = 0; c < MAX; c++)
-				MAP[i][r][c] = visit[i][r][c] = TIME_WALL[i][r][c] = 0;
+				MAP[i][r][c] = visit[i][r][c] = TIME_WALL[i][r][c] = 0;   // 초기화
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 평지 입력
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			scanf("%d", &MAP[BOTTOM][r][c]);
+			scanf("%d", &MAP[BOTTOM][r][c]);   // 칸 값 입력
 
-			if (MAP[BOTTOM][r][c] == EXIT)
+			if (MAP[BOTTOM][r][c] == EXIT)     // 탈출구면
 			{
-				end.r = r;
+				end.r = r;               // 위치 저장
 				end.c = c;
 			}
 		}
 	}
-	
 
-	for (int i = 0; i < 5; i++)
+
+	for (int i = 0; i < 5; i++)          // 동, 서, 남, 북, 윗면 순서로
 	{
 		for (int r = 1; r <= M; r++)
 		{
 			for (int c = 1; c <= M; c++)
 			{
-				scanf("%d", &MAP[i][r][c]);
+				scanf("%d", &MAP[i][r][c]);   // 면 격자 입력
 
-				if (MAP[TOP][r][c] == TIME_MACHINE)
+				if (MAP[TOP][r][c] == TIME_MACHINE)   // 윗면의 타임머신이면
 				{
-					start.r = r;
+					start.r = r;         // 출발 위치 저장
 					start.c = c;
 				}
 			}
@@ -158,54 +158,54 @@ void input()
 	// 시간 이상 현상
 	for (int f = 0; f < F; f++)
 	{
-		int r, c, d, v;
+		int r, c, d, v;                  // 행, 열, 방향, 속도
 
-		scanf("%d %d %d %d", &r, &c, &d, &v);
+		scanf("%d %d %d %d", &r, &c, &d, &v);   // 입력
 
-		timeInfo[f].p = BOTTOM;
+		timeInfo[f].p = BOTTOM;          // 평지에서 시작
 		timeInfo[f].r = r + 1;
 		// 입력이 0-based라 1-based로 맞춘다.
 		timeInfo[f].c = c + 1;
-		timeInfo[f].d = d;
-		timeInfo[f].v = v;
+		timeInfo[f].d = d;               // 방향
+		timeInfo[f].v = v;               // 속도
 	}
 }
 
 void printMap(int map[MAX][MAX], int size)	// for debug
 {
-	for (int r = 1; r <= size; r++)
+	for (int r = 1; r <= size; r++)      // 모든 행
 	{
-		for (int c = 1; c <= size; c++)
-			printf("%2d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= size; c++)  // 모든 열
+			printf("%2d ", map[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 void printMapAll(int map[6][MAX][MAX]) // for debug
 {
-	printf("BOTTOM\n");
+	printf("BOTTOM\n");                  // 평지
 	printMap(map[BOTTOM], N);
 
-	printf("EAST\n");
+	printf("EAST\n");                    // 동쪽 면
 	printMap(map[EAST], N);
 
-	printf("WEST\n");
+	printf("WEST\n");                    // 서쪽 면
 	printMap(map[WEST], N);
 
-	printf("SOUTH\n");
+	printf("SOUTH\n");                   // 남쪽 면
 	printMap(map[SOUTH], N);
 
-	printf("NORTH\n");
+	printf("NORTH\n");                   // 북쪽 면
 	printMap(map[NORTH], N);
 
-	printf("TOP\n");
+	printf("TOP\n");                     // 윗면
 	printMap(map[TOP], N);
 }
 
-void preprocess()
+void preprocess()                        // 면 사이 연결 표(next) 만들기
 {
-	for (int i = 1; i <= M; i++)
+	for (int i = 1; i <= M; i++)         // 윗면과 옆면 연결
 	{
 		// TOP (1, i)에서 ↑ 가면 NORTH (1, M + 1 - i)
 		next[TOP][1][i][UP].p = NORTH;
@@ -217,7 +217,7 @@ void preprocess()
 		next[NORTH][1][i][UP].r = 1;
 		next[NORTH][1][i][UP].c = M+1-i;
 
-		// ------------------------------------- // 
+		// ------------------------------------- //
 
 		// TOP (M, i)에서 ↓ 가면 SOUTH (1, i)
 		next[TOP][M][i][DOWN].p = SOUTH;
@@ -229,7 +229,7 @@ void preprocess()
 		next[SOUTH][1][i][UP].r = M;
 		next[SOUTH][1][i][UP].c = i;
 
-		// ------------------------------------- // 
+		// ------------------------------------- //
 
 		// TOP (i, M)에서 → 가면 EAST (1, M + 1 - i)
 		next[TOP][i][M][RIGHT].p = EAST;
@@ -241,7 +241,7 @@ void preprocess()
 		next[EAST][1][i][UP].r = M + 1 - i;
 		next[EAST][1][i][UP].c = M;
 
-		// ------------------------------------- // 
+		// ------------------------------------- //
 
 		// TOP (i, 1)에서 ← 가면 WEST (1, i)
 		next[TOP][i][1][LEFT].p = WEST;
@@ -255,7 +255,7 @@ void preprocess()
 	}
 
 	// →
-	for (int i = 1; i <= M; i++)
+	for (int i = 1; i <= M; i++)         // 옆면끼리 오른쪽 연결
 	{
 		// SOUTH (i, M)에서 → 가면 EAST (i, 1)
 		next[SOUTH][i][M][RIGHT].p = EAST;
@@ -279,7 +279,7 @@ void preprocess()
 	}
 
 	// ←
-	for (int i = 1; i <= M; i++)
+	for (int i = 1; i <= M; i++)         // 옆면끼리 왼쪽 연결
 	{
 		// SOUTH (i, 1)에서 ← 가면 WEST (i, M)
 		next[SOUTH][i][1][LEFT].p = WEST;
@@ -302,15 +302,15 @@ void preprocess()
 		next[EAST][i][1][LEFT].c = M;
 	}
 
-	int index;
+	int index;                           // 옆면 아래 줄의 열 번호
 
 	// BOTTOM, WEST
-	index = 1;
-	for (int r = 1; r <= N; r++)
+	index = 1;                           // 서쪽 면은 1열부터
+	for (int r = 1; r <= N; r++)         // 위 행부터
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 왼쪽부터 정육면체 칸 찾기
 		{
-			if (MAP[BOTTOM][r][c] == CUBE)
+			if (MAP[BOTTOM][r][c] == CUBE)   // 행의 가장 왼쪽 정육면체 칸
 			{
 				// BOTTOM → WEST
 				next[BOTTOM][r][c - 1][RIGHT].p = WEST;
@@ -322,20 +322,20 @@ void preprocess()
 				next[WEST][M][index][DOWN].r = r;
 				next[WEST][M][index][DOWN].c = c - 1;
 
-				index++;
+				index++;                 // 다음 열
 
-				break;
+				break;                   // 다음 행으로
 			}
 		}
 	}
 
 	// BOTTOM, EAST
-	index = M;
-	for (int r = 1; r <= N; r++)
+	index = M;                           // 동쪽 면은 M열부터 거꾸로
+	for (int r = 1; r <= N; r++)         // 위 행부터
 	{
-		for (int c = N; c >= 1; c--)
+		for (int c = N; c >= 1; c--)     // 오른쪽부터 정육면체 칸 찾기
 		{
-			if (MAP[BOTTOM][r][c] == CUBE)
+			if (MAP[BOTTOM][r][c] == CUBE)   // 행의 가장 오른쪽 정육면체 칸
 			{
 				// EAST ← BOTTOM
 				next[BOTTOM][r][c + 1][LEFT].p = EAST;
@@ -347,75 +347,75 @@ void preprocess()
 				next[EAST][M][index][DOWN].r = r;
 				next[EAST][M][index][DOWN].c = c + 1;
 
-				index--;
+				index--;                 // 다음 열
 
-				break;
+				break;                   // 다음 행으로
 			}
 		}
 	}
 
 	// BOTTOM, NORTH
-	index = M;
-	for (int c = 1; c <= N; c++)
+	index = M;                           // 북쪽 면은 M열부터 거꾸로
+	for (int c = 1; c <= N; c++)         // 왼쪽 열부터
 	{
-		for (int r = 1; r <= N; r++)
+		for (int r = 1; r <= N; r++)     // 위쪽부터 정육면체 칸 찾기
 		{
-			if (MAP[BOTTOM][r][c] == CUBE)
+			if (MAP[BOTTOM][r][c] == CUBE)   // 열의 가장 위 정육면체 칸
 			{
-				// BOTTOM 
+				// BOTTOM
 				//   ↓
 				// NORTH = ↓
 				next[BOTTOM][r - 1][c][DOWN].p = NORTH;
 				next[BOTTOM][r - 1][c][DOWN].r = M;
 				next[BOTTOM][r - 1][c][DOWN].c = index;
 
-				// BOTTOM 
+				// BOTTOM
 				//   ↑
 				// NORTH = ↓
 				next[NORTH][M][index][DOWN].p = BOTTOM;
 				next[NORTH][M][index][DOWN].r = r - 1;
 				next[NORTH][M][index][DOWN].c = c;
 
-				index--;
-				break;
+				index--;                 // 다음 열
+				break;                   // 다음 열로
 			}
 		}
 	}
 
 	// BOTTOM, SOUTH
-	index = 1;
-	for (int c = 1; c <= N; c++)
+	index = 1;                           // 남쪽 면은 1열부터
+	for (int c = 1; c <= N; c++)         // 왼쪽 열부터
 	{
-		for (int r = N; r >= 1; r--)
+		for (int r = N; r >= 1; r--)     // 아래쪽부터 정육면체 칸 찾기
 		{
-			if (MAP[BOTTOM][r][c] == CUBE)
+			if (MAP[BOTTOM][r][c] == CUBE)   // 열의 가장 아래 정육면체 칸
 			{
-				// SOUTH 
+				// SOUTH
 				//   ↑
 				// BOTTOM = ↑
 				next[BOTTOM][r + 1][c][UP].p = SOUTH;
 				next[BOTTOM][r + 1][c][UP].r = M;
 				next[BOTTOM][r + 1][c][UP].c = index;
 
-				// SOUTH 
+				// SOUTH
 				//   ↓
 				// BOTTOM = ↓
 				next[SOUTH][M][index][DOWN].p = BOTTOM;
 				next[SOUTH][M][index][DOWN].r = r + 1;
 				next[SOUTH][M][index][DOWN].c = c;
 
-				index++;
-				break;
+				index++;                 // 다음 열
+				break;                   // 다음 열로
 			}
 		}
 	}
 }
 
-void makeTimeWall()
+void makeTimeWall()                      // 시간 이상 현상 퍼뜨리기
 {
-	for (int f = 0; f < F; f++)
+	for (int f = 0; f < F; f++)          // 현상별
 	{
-		int p, r, c, d, v;
+		int p, r, c, d, v;               // 면, 행, 열, 방향, 속도
 
 		p = timeInfo[f].p;
 		r = timeInfo[f].r;
@@ -426,12 +426,12 @@ void makeTimeWall()
 		TIME_WALL[p][r][c] = 1;
 		// 시작 칸은 1로 둔다 (0은 "현상 없음"을 뜻하므로).
 
-		while (1)
+		while (1)                        // 막힐 때까지 퍼짐
 		{
-			int np, nr, nc;
+			int np, nr, nc;              // 다음 칸
 
-			np = p;
-			nr = r + dr[d];
+			np = p;                      // 같은 면에서
+			nr = r + dr[d];              // 한 칸 진행
 			nc = c + dc[d];
 
 			if (p == BOTTOM && MAP[BOTTOM][nr][nc] == CUBE)
@@ -441,108 +441,108 @@ void makeTimeWall()
 				nr = next[BOTTOM][r][c][d].r;
 				nc = next[BOTTOM][r][c][d].c;
 			}
-			else if ((p != BOTTOM) && (nr<1 || nc<1 || nr>M || nc>M))
+			else if ((p != BOTTOM) && (nr<1 || nc<1 || nr>M || nc>M))   // 면의 경계를 넘으면
 			{
-				np = next[p][r][c][d].p;
+				np = next[p][r][c][d].p;     // 연결된 면으로
 				nr = next[p][r][c][d].r;
 				nc = next[p][r][c][d].c;
 			}
 
-			if((np== BOTTOM)&& (nr<1|| nc<1|| nr>N || nc>N)) break;
-			if (MAP[np][nr][nc] == WALL) break;
+			if((np== BOTTOM)&& (nr<1|| nc<1|| nr>N || nc>N)) break;   // 평지 밖이면 멈춤
+			if (MAP[np][nr][nc] == WALL) break;                       // 장애물이면 멈춤
 			if (nr == end.r && nc == end.c) break;
 			// 탈출구에는 시간 이상 현상이 퍼지지 않는다.
 
-			TIME_WALL[np][nr][nc] = TIME_WALL[p][r][c] + v;
+			TIME_WALL[np][nr][nc] = TIME_WALL[p][r][c] + v;   // v초 뒤에 막힘
 
-			p = np;
+			p = np;                      // 한 칸 진행
 			r = nr;
 			c = nc;
 		}
 	}
 }
 
-int BFS(int r, int c)
+int BFS(int r, int c)                    // 타임머신에서 탈출구까지 최소 이동
 {
-	int rp, wp;
-	rp = wp = 0;
+	int rp, wp;                          // 큐 위치
+	rp = wp = 0;                         // 큐 초기화
 
-	queue[wp].p = TOP;
+	queue[wp].p = TOP;                   // 윗면에서 시작
 	queue[wp].r = r;
 	queue[wp++].c = c;
 
-	visit[TOP][r][c] = 1;
+	visit[TOP][r][c] = 1;                // 시작 칸 방문 (이동 0 + 1)
 
-	while (rp < wp)
+	while (rp < wp)                      // 큐가 빌 때까지
 	{
-		PRC out = queue[rp++];
+		PRC out = queue[rp++];           // 하나 꺼내기
 
-		if (out.p == BOTTOM && out.r == end.r && out.c == end.c)
+		if (out.p == BOTTOM && out.r == end.r && out.c == end.c)   // 탈출구 도착
 			return visit[BOTTOM][out.r][out.c] - 1;
 			// visit은 "이동 횟수 + 1"이라 1을 빼면 실제 이동 횟수다.
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int np, nr, nc;
+			int np, nr, nc;              // 다음 칸
 
-			np = out.p;
-			nr = out.r +dr[i];
+			np = out.p;                  // 같은 면에서
+			nr = out.r +dr[i];           // 한 칸 진행
 			nc = out.c +dc[i];
 
-			if (out.p == BOTTOM && MAP[BOTTOM][nr][nc] == CUBE)
+			if (out.p == BOTTOM && MAP[BOTTOM][nr][nc] == CUBE)   // 평지에서 정육면체로 들어가면
 			{
-				np = next[BOTTOM][out.r][out.c][i].p;
+				np = next[BOTTOM][out.r][out.c][i].p;   // 옆면으로
 				nr = next[BOTTOM][out.r][out.c][i].r;
 				nc = next[BOTTOM][out.r][out.c][i].c;
 			}
-			else if ((out.p != BOTTOM) && (nr < 1 || nc < 1 || nr > M || nc > M))
+			else if ((out.p != BOTTOM) && (nr < 1 || nc < 1 || nr > M || nc > M))   // 면의 경계를 넘으면
 			{
-				np = next[out.p][out.r][out.c][i].p;
+				np = next[out.p][out.r][out.c][i].p;    // 연결된 면으로
 				nr = next[out.p][out.r][out.c][i].r;
 				nc = next[out.p][out.r][out.c][i].c;
 			}
 
-			if((np== BOTTOM) && (nr<1||nc<1|| nr>N|| nc>N)) continue;
+			if((np== BOTTOM) && (nr<1||nc<1|| nr>N|| nc>N)) continue;   // 평지 밖
 
-			if (MAP[np][nr][nc] == WALL || visit[np][nr][nc] != 0)	continue;
+			if (MAP[np][nr][nc] == WALL || visit[np][nr][nc] != 0)	continue;   // 장애물이거나 방문함
 
 			// 시간의 벽
 			if(TIME_WALL[np][nr][nc]!=0
 				&& visit[out.p][out.r][out.c] + 1 >= TIME_WALL[np][nr][nc]) continue;
 			// 그 칸이 막히는 시각보다 먼저 도착해야 지나갈 수 있다.
 
-			queue[wp].p = np;
+			queue[wp].p = np;            // 큐에 넣기
 			queue[wp].r = nr;
 			queue[wp++].c = nc;
 
-			visit[np][nr][nc] = visit[out.p][out.r][out.c] + 1;
+			visit[np][nr][nc] = visit[out.p][out.r][out.c] + 1;   // 이동 횟수 기록
 		}
 	}
 
-	return -1;
+	return -1;                           // 탈출 불가
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		preprocess();
+		preprocess();                    // 면 연결 표 만들기
 
-		makeTimeWall();
+		makeTimeWall();                  // 시간 이상 현상 퍼뜨리기
 
 		//printf("MAP\n"); printMapAll(MAP);
 
 		//printf("TIME WALL\n"); printMapAll(TIME_WALL);
 
 
-		printf("%d\n", BFS(start.r, start.c));
+		printf("%d\n", BFS(start.r, start.c));   // 결과 출력
 
 		//printf("visit\n"); printMapAll(visit);
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

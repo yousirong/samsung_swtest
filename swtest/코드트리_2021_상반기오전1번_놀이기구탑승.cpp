@@ -55,77 +55,77 @@
 	      board[5] = { 0, 1, 10, 100, 1000 }
 */
 
-#include <stdio.h>
+#include <stdio.h>                   // scanf, printf, putchar 사용
 
-#define MAX (20 +5)
-#define INF (0x7fff0000)
+#define MAX (20 +5)                  // N 최대 20 + 여유
+#define INF (0x7fff0000)             // 아주 큰 값
 
-#define WALL (-1)
+#define WALL (-1)                    // 격자 바깥 표시
 
-int T;
+int T;                               // 테스트 케이스 수
 
-int N;
+int N;                               // 자리표 크기
 int MAP[MAX][MAX];   // 자리표 (0: 빈자리, 양수: 학생 번호, WALL: 격자 바깥)
 
 int student[MAX * MAX];              // 앉는 순서대로의 학생 번호
 bool love[MAX * MAX][MAX * MAX];     // love[a][b] : a가 b를 좋아하는가
 
 // 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0,1,0,-1 };
+int dr[] = { -1, 0, 1, 0 };          // 방향별 행 변화량
+int dc[] = { 0,1,0,-1 };             // 방향별 열 변화량
 
 // 한 자리를 평가한 결과 (우선순위 비교에 필요한 값만 모아 둔다)
 struct SEAT
 {
 	int like;  // 인접한 칸 중 좋아하는 친구 수
 	int empty; // 인접한 빈 칸 수
-	int r;
-	int c;
+	int r;     // 행
+	int c;     // 열
 };
 
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 자리표 크기 입력
 
 	// 격자 안팎을 일단 전부 WALL로 채운 뒤, 실제 자리만 0(빈자리)으로 되돌린다.
 	// 그러면 바깥 테두리만 WALL로 남아 인접 검사에서 범위 검사가 필요 없어진다.
 	for (int r = 0; r <= N + 1; r++)
 		for (int c = 0; c <= N + 1; c++)
-			MAP[r][c] = WALL;
+			MAP[r][c] = WALL;            // 벽으로 채운다
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 실제 자리
 		for (int c = 1; c <= N; c++)
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 빈자리로
 
-	for (int r = 1; r <= N * N; r++)
+	for (int r = 1; r <= N * N; r++)     // 모든 학생 쌍
 		for (int c = 1; c <= N * N; c++)
-			love[r][c] = false;
+			love[r][c] = false;          // 좋아함 초기화
 
 	// 입력 순서가 곧 앉는 순서다
 	for (int i = 0; i < N * N; i++)
 	{
-		int num, one, two, three, four;
+		int num, one, two, three, four;  // 학생 번호와 좋아하는 친구 4명
 
-		scanf("%d %d %d %d %d", &num, &one, &two, &three, &four);
+		scanf("%d %d %d %d %d", &num, &one, &two, &three, &four);   // 입력
 
-		student[i] = num;
-		love[num][one] = true;
-		love[num][two] = true;
-		love[num][three] = true;
-		love[num][four] = true;
+		student[i] = num;                // 앉는 순서 기록
+		love[num][one] = true;           // 좋아하는 친구 1
+		love[num][two] = true;           // 좋아하는 친구 2
+		love[num][three] = true;         // 좋아하는 친구 3
+		love[num][four] = true;          // 좋아하는 친구 4
 	}
 }
 
 
 void printMap() // for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", MAP[r][c]);    // 학생 번호 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 
@@ -137,24 +137,24 @@ void printMap() // for debug
 */
 SEAT getSeatInfo(int index, int r, int c)
 {
-	int like, empty;
+	int like, empty;                     // 좋아하는 친구 수, 빈 칸 수
 
-	like = empty = 0;
-	for (int i = 0; i < 4; i++)
+	like = empty = 0;                    // 초기화
+	for (int i = 0; i < 4; i++)          // 4방향
 	{
-		int nr, nc;
+		int nr, nc;                      // 인접 칸
 
-		nr = r + dr[i];
-		nc = c + dc[i];
+		nr = r + dr[i];                  // 인접 행
+		nc = c + dc[i];                  // 인접 열
 
 		// 격자 바깥은 빈 칸이 아니다. 이 검사를 빼면 가장자리의 empty가 부풀려진다.
 		if (MAP[nr][nc] == WALL) continue;
 
-		if (MAP[nr][nc] == 0) empty++;
-		else if (love[index][MAP[nr][nc]] == true) like++;
+		if (MAP[nr][nc] == 0) empty++;                           // 빈 칸이면
+		else if (love[index][MAP[nr][nc]] == true) like++;       // 좋아하는 친구면
 	}
 
-	return { like, empty, r, c };
+	return { like, empty, r, c };        // 평가값 반환
 }
 
 /*
@@ -165,11 +165,11 @@ SEAT getSeatInfo(int index, int r, int c)
 */
 bool isPriority(SEAT a, SEAT b)
 {
-	if (a.like != b.like) return a.like > b.like;
-	if (a.empty != b.empty) return a.empty > b.empty;
-	if (a.r != b.r) return a.r < b.r;
+	if (a.like != b.like) return a.like > b.like;       // 좋아하는 친구 많은 쪽
+	if (a.empty != b.empty) return a.empty > b.empty;   // 빈 칸 많은 쪽
+	if (a.r != b.r) return a.r < b.r;                   // 행 작은 쪽
 
-	return a.c < b.c;
+	return a.c < b.c;                                   // 열 작은 쪽
 }
 
 void simulate()
@@ -177,27 +177,27 @@ void simulate()
 	// 정해진 순서대로 한 명씩 앉힌다
 	for (int i = 0; i < N * N; i++)
 	{
-		int index = student[i];
+		int index = student[i];          // 이번에 앉을 학생
 
-		SEAT wanted = { 0 };
+		SEAT wanted = { 0 };             // 가장 좋은 자리
 
 		// 행/열을 INF로 두면 첫 후보가 무조건 이겨서 자연스럽게 초기화된다
 		wanted.r = wanted.c = INF;
 
-		for (int r = 1; r <= N; r++)
+		for (int r = 1; r <= N; r++)     // 모든 행
 		{
-			for (int c = 1; c <= N; c++)
+			for (int c = 1; c <= N; c++) // 모든 열
 			{
 				if (MAP[r][c] != 0) continue;   // 이미 누가 앉은 자리
 
-				SEAT tmp = getSeatInfo(index, r, c);
+				SEAT tmp = getSeatInfo(index, r, c);   // 이 자리 평가
 
-				if (isPriority(tmp, wanted) == true)
-					wanted = tmp;
+				if (isPriority(tmp, wanted) == true)   // 더 좋으면
+					wanted = tmp;                      // 후보 갱신
 			}
 		}
 
-		MAP[wanted.r][wanted.c] = index;
+		MAP[wanted.r][wanted.c] = index; // 가장 좋은 자리에 앉힌다
 	}
 	//printMap();
 }
@@ -210,27 +210,27 @@ void simulate()
 */
 int getAnswer()
 {
-	int board[5] = { 0,1,10,100,1000 };
+	int board[5] = { 0,1,10,100,1000 };  // 친구 수별 점수
 
-	int score = 0;
-	for (int r = 1; r <= N; r++)
+	int score = 0;                       // 총 만족도
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			int index, count;
+			int index, count;            // 학생 번호, 인접한 좋아하는 친구 수
 
-			index = MAP[r][c];
-			count = 0;
-			for (int i = 0; i < 4; i++)
+			index = MAP[r][c];           // 이 자리 학생
+			count = 0;                   // 초기화
+			for (int i = 0; i < 4; i++)  // 4방향
 			{
-				int nr, nc;
+				int nr, nc;              // 인접 칸
 
-				nr = r + dr[i];
-				nc = c + dc[i];
+				nr = r + dr[i];          // 인접 행
+				nc = c + dc[i];          // 인접 열
 
-				if (MAP[nr][nc] == WALL) continue;
+				if (MAP[nr][nc] == WALL) continue;   // 바깥은 건너뜀
 
-				if (love[index][MAP[nr][nc]] == true) count++;
+				if (love[index][MAP[nr][nc]] == true) count++;   // 좋아하는 친구면 센다
 			}
 
 			// 아래 if 사슬과 같은 동작이다
@@ -239,11 +239,11 @@ int getAnswer()
 			//else if (count == 3) score += 100;
 			//else if (count == 4) score += 1000;
 
-			score += board[count];
+			score += board[count];       // 표에서 점수를 찾아 더한다
 		}
 	}
 
-	return score;
+	return score;                        // 총 만족도 반환
 }
 
 
@@ -252,14 +252,14 @@ int main()
 	// 이 문제는 테스트 케이스가 하나다
 	//scanf("%d", &T);
 	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // 자리 배정
 
-		printf("%d\n", getAnswer());
+		printf("%d\n", getAnswer());     // 만족도 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

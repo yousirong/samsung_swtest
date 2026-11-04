@@ -37,11 +37,11 @@
 	  - [확인 필요] AREA는 [22][MAX * MAX][MAX * MAX] int 라 약 34MB다.
 	    실제로 쓰는 범위는 [22][2 * 21][2 * 21] 정도라 [22][2 * MAX][2 * MAX] 면 충분하다.
 */
-#include <stdio.h>
+#include <stdio.h>                             // scanf, printf 사용
 
-#define MAX (20+5)
+#define MAX (20+5)                             // N 최대 20 + 여유
 
-int T;
+int T;                                 // 테스트 케이스 수
 
 int N, M;                              // 도시 크기, 집 하나가 내는 비용
 int MAP[MAX][MAX];                     // 1 = 집
@@ -52,11 +52,11 @@ int cost[22];                          // cost[K] : 운영 비용
 
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 도시 크기, 집당 비용 입력
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
+		for (int c = 1; c <= N; c++)     // 1열부터 N열까지
+			scanf("%d", &MAP[r][c]);     // 집 여부 입력
 
 	K = N + 1;   // 도시 전체를 덮는 크기부터 시작
 }
@@ -64,17 +64,17 @@ void input()
 // 크기 k 마름모를 AREA[k]의 (2k-1) x (2k-1) 상자에 그린다. 중심은 (k, k)
 void makeArea(int k)
 {
-	cost[k] = k * k + (k - 1) * (k - 1);
+	cost[k] = k * k + (k - 1) * (k - 1); // 운영 비용 계산
 
 	// 위쪽 절반 : r번째 줄은 좌우로 r - 1칸
 	for (int r = 1; r <= k; r++)
 		for (int c = k + 1 - r; c <= k + r - 1; c++)
-			AREA[k][r][c] = 1;
+			AREA[k][r][c] = 1;           // 서비스 영역 표시
 
 	// 아래쪽 절반 : 한 줄 내려갈 때마다 좌우로 한 칸씩 줄어든다
 	for (int r = k + 1; r <= 2 * k - 1; r++)
 		for (int c = r - k + 1; c <= 3 * k - r - 1; c++)
-			AREA[k][r][c] = 1;
+			AREA[k][r][c] = 1;           // 서비스 영역 표시
 }
 /*
 void makeArea(int k)
@@ -95,31 +95,31 @@ void makeArea(int k)
 // 상자의 왼쪽 위를 (sr + 1, sc + 1)에 놓았을 때 서비스 영역 안의 집 수
 int scan(int sr, int sc)
 {
-	int sum = 0;
-	for (int r = 1; r <= 2 * K - 1; r++)
+	int sum = 0;                                 // 덮는 집 수
+	for (int r = 1; r <= 2 * K - 1; r++)         // 상자의 모든 행
 	{
-		for (int c = 1; c <= 2 * K - 1; c++)
+		for (int c = 1; c <= 2 * K - 1; c++)     // 상자의 모든 열
 		{
 			if (sr + r<1 || sc + c<1 || sr + r>N || sc + c>N) continue;   // 도시 밖
-			sum += MAP[sr + r][sc + c] * AREA[K][r][c];
+			sum += MAP[sr + r][sc + c] * AREA[K][r][c];   // 집이면서 서비스 영역이면 1 더함
 		}
 	}
-	return sum;
+	return sum;                                  // 덮는 집 수 반환
 }
 
 int main()
 {
 	for (int i = 1; i <= 21; i++)makeArea(i);   // 마름모는 케이스와 상관없이 한 번만 만든다
 
-	scanf("%d", &T);
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 도시 입력
 
-		int areaNum, maxAreaNum;
+		int areaNum, maxAreaNum;         // 이번 배치의 집 수, 최대 집 수
 
-		areaNum = maxAreaNum = 0;
+		areaNum = maxAreaNum = 0;        // 초기화
 
 		// 손해 없는 배치를 하나라도 찾을 때까지 K를 줄인다
 		while (maxAreaNum <= 0)
@@ -133,14 +133,14 @@ int main()
 					// 손해가 아니면 (집 수 x M >= 운영 비용) 최댓값 후보
 					if (areaNum * M - cost[K] >= 0)
 					{
-						if (maxAreaNum < areaNum) maxAreaNum = areaNum;
+						if (maxAreaNum < areaNum) maxAreaNum = areaNum;   // 최대 집 수 갱신
 					}
 				}
 			}
-			K--;
+			K--;                         // 다음엔 한 단계 작은 영역
 		}
-		printf("#%d %d\n", tc, maxAreaNum);
+		printf("#%d %d\n", tc, maxAreaNum);   // 결과 출력
 	}
 
-	return 0;
-}
+	return 0;                            // 프로그램 정상 종료
+}

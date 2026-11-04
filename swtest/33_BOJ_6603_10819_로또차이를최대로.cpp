@@ -30,11 +30,11 @@
 //   입력이 이미 오름차순이라 별도 정렬 없이 사전순 출력이 된다.
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
-#define MAX (13 + 3)
+#define MAX (13 + 3)     // k 최대 12 + 여유
 
-int N, M;
+int N, M;                // N: 주어진 수의 개수 k (M은 사용하지 않음)
 
 int num_of_cases[MAX];   // 만들고 있는 조합 (6칸)
 int number[MAX];         // 입력으로 주어진 수들 (이미 오름차순)
@@ -42,18 +42,18 @@ int number[MAX];         // 입력으로 주어진 수들 (이미 오름차순)
 // 입력 (N == 0 이면 호출한 쪽에서 종료 판단)
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 수의 개수 k 입력
 
-	for (int i = 1; i <= N; i++)
-		scanf("%d", &number[i]);
+	for (int i = 1; i <= N; i++)         // k개의 수를
+		scanf("%d", &number[i]);         // 1번부터 입력
 }
 
 // 완성된 조합 한 줄 출력
 void printCases()
 {
-	for (int i = 0; i < 6; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < 6; i++)          // 6개 자리를
+		printf("%d ", num_of_cases[i]);  // 차례로 출력
+	putchar('\n');                       // 한 경우 끝 줄바꿈
 }
 
 // 재귀로 조합 생성
@@ -64,13 +64,13 @@ void DFS(int depth, int start)
 	// 6개를 다 뽑았으면 한 경우 완성
 	if (depth == 6)
 	{
-		printCases();
-		return;
+		printCases();                    // 완성된 조합 출력
+		return;                          // 되돌아간다
 	}
 
-	for (int i = start; i <= N; i++)
+	for (int i = start; i <= N; i++)     // start 인덱스부터 후보 확인
 	{
-		num_of_cases[depth] = number[i];
+		num_of_cases[depth] = number[i]; // 이 자리에 number[i]를 놓는다
 
 		// 다음은 반드시 i보다 뒤에서 -> 같은 조합이 순서만 바꿔 다시 나오지 않는다
 		DFS(depth + 1, i + 1);
@@ -82,15 +82,15 @@ int main()
 	// 입력이 여러 줄 들어오고 0으로 끝나는 형식
 	while (1)
 	{
-		input();
+		input();                         // 한 테스트 케이스 입력
 		if (N == 0) break;   // 0이면 종료
 
-		DFS(0, 1);
+		DFS(0, 1);                       // 조합 생성 + 출력
 
 		putchar('\n');       // 테스트 케이스 사이 빈 줄
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }
 
 // ====================================================================
@@ -107,9 +107,9 @@ int main()
 //   순열이 하나 완성될 때마다 점수를 계산해 최댓값만 갱신한다.
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
-#define MAX (8 + 3)
+#define MAX (8 + 3)      // N 최대 8 + 여유
 
 int N;                   // 수의 개수
 
@@ -124,9 +124,9 @@ int maxAnswer;           // 지금까지의 최댓값
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < N; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < N; i++)          // N개 자리를
+		printf("%d ", num_of_cases[i]);  // 차례로 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -134,7 +134,7 @@ void printCases()
 // ---------------------------
 int abs(int x)
 {
-	return (x > 0) ? x : -x;
+	return (x > 0) ? x : -x;             // 양수면 그대로, 아니면 부호 반전
 }
 
 // ---------------------------
@@ -144,12 +144,12 @@ int abs(int x)
 // ---------------------------
 int calculate()
 {
-	int sum = 0;
+	int sum = 0;                         // 점수 합
 
-	for (int i = 0; i < N - 1; i++)
-		sum += abs(num_of_cases[i] - num_of_cases[i + 1]);
+	for (int i = 0; i < N - 1; i++)      // 이웃한 쌍마다
+		sum += abs(num_of_cases[i] - num_of_cases[i + 1]);   // 차이의 절댓값을 더한다
 
-	return sum;
+	return sum;                          // 점수 반환
 }
 
 // ---------------------------
@@ -164,23 +164,23 @@ void DFS(int depth)
 		// 완성된 배열의 점수를 재고 최댓값만 남긴다
 		int tmp = calculate();
 
-		if (maxAnswer < tmp)
-			maxAnswer = tmp;
+		if (maxAnswer < tmp)             // 더 큰 점수면
+			maxAnswer = tmp;             // 최댓값 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
 	// 아직 배치하지 않은 수 중 하나를 이 자리에 놓는다
 	for (int i = 0; i < N; i++)
 	{
-		if (visit[i] == true)
-			continue;
+		if (visit[i] == true)            // 이미 배치한 수면
+			continue;                    // 건너뛴다
 
-		num_of_cases[depth] = number[i];
+		num_of_cases[depth] = number[i]; // 이 자리에 number[i]를 놓는다
 
 		visit[i] = true;     // 사용 중
 
-		DFS(depth + 1);
+		DFS(depth + 1);      // 다음 자리로
 
 		visit[i] = false;    // 반납 (백트래킹)
 	}
@@ -191,18 +191,18 @@ void DFS(int depth)
 // ---------------------------
 int main()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 수의 개수 입력
 
 	// 수 입력 (0-based)
 	for (int i = 0; i < N; i++)
-		scanf("%d", &number[i]);
+		scanf("%d", &number[i]);         // i번째 수 입력
 
 	// 식의 값은 항상 0 이상이므로 -1로 시작하면 반드시 갱신된다
 	maxAnswer = -1;
 
-	DFS(0);
+	DFS(0);                              // 모든 순열 탐색
 
-	printf("%d\n", maxAnswer);
+	printf("%d\n", maxAnswer);           // 최댓값 출력
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

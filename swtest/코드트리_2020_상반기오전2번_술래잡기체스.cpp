@@ -52,9 +52,9 @@
       그래서 실제로는 갇히지 않는다.
 */
 
-#include <stdio.h>
+#include <stdio.h>          // scanf, printf, putchar 사용
 
-#define MAX (4 + 2)
+#define MAX (4 + 2)         // 판 4 + 여유
 #define MAX_H (16 + 5)   // 말 번호 1 ~ 16
 
 // 말 하나의 상태 (술래도 같은 구조체를 쓴다)
@@ -66,9 +66,9 @@ struct CHESS
     bool dead;   // 먹혔는지
 };
 
-typedef struct CHESS CHESS;
+typedef struct CHESS CHESS;   // struct CHESS를 CHESS로 줄여 쓰기
 
-int T;
+int T;                        // 테스트 케이스 수
 
 // MAP[r][c] : 그 칸에 있는 말의 번호 (죽은 말의 번호면 그 칸은 빈칸이라는 뜻)
 int MAP[MAX][MAX];
@@ -79,12 +79,12 @@ CHESS chess[MAX_H];
 // 술래
 CHESS tagger;
 
-int maxAnswer;
+int maxAnswer;                // 먹은 번호 합의 최댓값
 
 // 방향 배열 (인덱스 0은 더미)
 //   -, ↑, ↖, ←, ↙, ↓, ↘, →, ↗
-int dr[] = { 0,-1,-1,0,1,1,1,0,-1 };
-int dc[] = { 0, 0,-1,-1,-1,0,1,1,1 };
+int dr[] = { 0,-1,-1,0,1,1,1,0,-1 };   // 방향별 행 변화량
+int dc[] = { 0, 0,-1,-1,-1,0,1,1,1 };  // 방향별 열 변화량
 
 /*
     입력
@@ -94,20 +94,20 @@ int dc[] = { 0, 0,-1,-1,-1,0,1,1,1 };
 */
 void input()
 {
-    for (int r = 0; r < 4; r++)
+    for (int r = 0; r < 4; r++)          // 4행
     {
-        for (int c = 0; c < 4; c++)
+        for (int c = 0; c < 4; c++)      // 4열
         {
-            int index, dir;
+            int index, dir;              // 말 번호, 방향
 
-            scanf("%d %d", &index, &dir);
+            scanf("%d %d", &index, &dir);   // 입력
 
-            MAP[r][c] = index;
+            MAP[r][c] = index;           // 판에 번호 기록
 
-            chess[index].r = r;
-            chess[index].c = c;
-            chess[index].dir = dir;
-            chess[index].dead = false;
+            chess[index].r = r;          // 말의 행
+            chess[index].c = c;          // 말의 열
+            chess[index].dir = dir;      // 말의 방향
+            chess[index].dead = false;   // 살아 있음
         }
     }
 }
@@ -117,31 +117,31 @@ void input()
 */
 void printStatus(CHESS tagger, int map[MAX][MAX], CHESS chess[MAX_H], int score)
 {
-    printf("score : %d\n", score);
-    printf("tagger : r %d, c %d, dir %d\n", tagger.r, tagger.c, tagger.dir);
+    printf("score : %d\n", score);       // 점수
+    printf("tagger : r %d, c %d, dir %d\n", tagger.r, tagger.c, tagger.dir);   // 술래 상태
 
-    printf("live chess : ");
+    printf("live chess : ");             // 살아 있는 말 목록
     for (int i = 1; i <= 16; i++)
-        if (chess[i].dead == false) printf("%d ", i);
-    putchar('\n');
+        if (chess[i].dead == false) printf("%d ", i);   // 산 말 번호 출력
+    putchar('\n');                       // 줄바꿈
 
-    for (int r = 0; r < 4; r++)
+    for (int r = 0; r < 4; r++)          // 4행
     {
-        for (int c = 0; c < 4; c++)
+        for (int c = 0; c < 4; c++)      // 4열
         {
-            if (r == tagger.r && c == tagger.c)
+            if (r == tagger.r && c == tagger.c)   // 술래 칸이면
             {
-                printf("(%d, %d) ", -1, tagger.dir);
+                printf("(%d, %d) ", -1, tagger.dir);   // -1과 술래 방향
             }
-            else
+            else                         // 말 칸이면
             {
-                int idx = map[r][c];
-                printf("(%d, %d) ", idx, chess[idx].dir);
+                int idx = map[r][c];     // 말 번호
+                printf("(%d, %d) ", idx, chess[idx].dir);   // 번호와 방향
             }
         }
-        putchar('\n');
+        putchar('\n');                   // 행 끝 줄바꿈
     }
-    putchar('\n');
+    putchar('\n');                       // 빈 줄
 }
 
 /*
@@ -152,20 +152,20 @@ void printStatus(CHESS tagger, int map[MAX][MAX], CHESS chess[MAX_H], int score)
 */
 void DFS(CHESS prevTagger, int prevMap[MAX][MAX], CHESS prevChess[MAX_H], int score)
 {
-    int tmpMAP[MAX][MAX] = { 0 };
-    CHESS tmpChess[MAX_H] = { 0 };
-    CHESS pt = prevTagger;
+    int tmpMAP[MAX][MAX] = { 0 };        // 이 가지의 판
+    CHESS tmpChess[MAX_H] = { 0 };       // 이 가지의 말 상태
+    CHESS pt = prevTagger;               // 이 가지의 술래
 
     // 부모 상태를 통째로 복사한다.
     // 이 가지에서 판을 아무리 뒤섞어도 부모에게는 영향이 없다 (되돌리기 불필요).
     for (int r = 0; r < 4; r++)
         for (int c = 0; c < 4; c++)
-            tmpMAP[r][c] = prevMap[r][c];
+            tmpMAP[r][c] = prevMap[r][c];   // 판 복사
 
     for (int i = 1; i <= 16; i++)
-        tmpChess[i] = prevChess[i];
+        tmpChess[i] = prevChess[i];      // 말 상태 복사
 
-    int deadIndex = tmpMAP[pt.r][pt.c];
+    int deadIndex = tmpMAP[pt.r][pt.c];  // 술래 칸의 말 번호
 
     // 술래는 말이 있는 칸으로만 오므로 정상 흐름에서는 걸리지 않는 안전장치
     if (tmpChess[deadIndex].dead == true) return;
@@ -175,23 +175,23 @@ void DFS(CHESS prevTagger, int prevMap[MAX][MAX], CHESS prevChess[MAX_H], int sc
     // -------------------------
     pt.dir = tmpChess[deadIndex].dir;   // 먹은 말의 방향을 물려받는다
     tmpChess[deadIndex].dead = true;    // 그 칸은 이제 빈칸 취급이 된다
-    score += deadIndex;
+    score += deadIndex;                 // 먹은 번호를 점수에 더한다
 
     // -------------------------
     // 2) 살아 있는 말들이 번호 순서대로 이동
     // -------------------------
     for (int i = 1; i <= 16; i++)
     {
-        CHESS horse = tmpChess[i];
+        CHESS horse = tmpChess[i];       // i번 말
 
-        if (horse.dead == true) continue;
+        if (horse.dead == true) continue;   // 죽은 말은 건너뜀
 
         // 갈 수 있는 방향이 나올 때까지 반시계로 45도씩 돌린다
         while (1)
         {
-            int dir = horse.dir;
-            int nr = horse.r + dr[dir];
-            int nc = horse.c + dc[dir];
+            int dir = horse.dir;         // 현재 방향
+            int nr = horse.r + dr[dir];  // 갈 행
+            int nc = horse.c + dc[dir];  // 갈 열
 
             // 막히는 경우는 두 가지뿐이다 : 술래가 있는 칸, 판 밖
             // (다른 말이 있는 칸은 자리를 바꿔 주므로 막히지 않는다)
@@ -199,27 +199,27 @@ void DFS(CHESS prevTagger, int prevMap[MAX][MAX], CHESS prevChess[MAX_H], int sc
             {
                 // 방향 번호가 반시계 순서라 +1 이 곧 45도 반시계 회전이다 (8 다음은 1)
                 int changeDir[9] = { 0, 2, 3, 4, 5, 6, 7, 8, 1 };
-                int nextDir = changeDir[dir];
+                int nextDir = changeDir[dir];   // 다음 방향
 
-                horse.dir = nextDir;
+                horse.dir = nextDir;            // 복사본 방향 갱신
                 tmpChess[i].dir = nextDir;   // 회전은 실제 상태에도 남는다
 
-                continue;
+                continue;                // 다시 시도
             }
             else
             {
                 // 대상 칸의 말과 자리를 맞바꾼다.
                 // 상대가 죽은 말(= 빈칸)이어도 같은 코드로 처리되고,
                 // 죽은 말의 좌표도 함께 갱신되어 빈칸 위치가 정확히 따라 움직인다.
-                int changeIndex = tmpMAP[nr][nc];
-                int tmp;
+                int changeIndex = tmpMAP[nr][nc];   // 대상 칸의 말 번호
+                int tmp;                            // 교환용
 
                 // 말 배열에서 좌표 교환
-                tmp = tmpChess[i].r;
+                tmp = tmpChess[i].r;                        // 행 교환
                 tmpChess[i].r = tmpChess[changeIndex].r;
                 tmpChess[changeIndex].r = tmp;
 
-                tmp = tmpChess[i].c;
+                tmp = tmpChess[i].c;                        // 열 교환
                 tmpChess[i].c = tmpChess[changeIndex].c;
                 tmpChess[changeIndex].c = tmp;
 
@@ -228,7 +228,7 @@ void DFS(CHESS prevTagger, int prevMap[MAX][MAX], CHESS prevChess[MAX_H], int sc
                 tmpMAP[nr][nc] = tmpMAP[horse.r][horse.c];
                 tmpMAP[horse.r][horse.c] = tmp;
 
-                break;
+                break;                   // 이동 끝
             }
         }
     }
@@ -236,15 +236,15 @@ void DFS(CHESS prevTagger, int prevMap[MAX][MAX], CHESS prevChess[MAX_H], int sc
     // -------------------------
     // 3) 술래 이동 : 현재 방향으로 1 ~ 3칸
     // -------------------------
-    int sr = pt.r;
-    int sc = pt.c;
+    int sr = pt.r;                       // 술래 현재 행
+    int sc = pt.c;                       // 술래 현재 열
 
-    bool canMove = false;
+    bool canMove = false;                // 갈 수 있는 곳이 있었는지
 
-    for (int i = 1; i <= 3; i++)
+    for (int i = 1; i <= 3; i++)         // 1 ~ 3칸
     {
-        int nr = sr + dr[pt.dir] * i;
-        int nc = sc + dc[pt.dir] * i;
+        int nr = sr + dr[pt.dir] * i;    // i칸 앞 행
+        int nc = sc + dc[pt.dir] * i;    // i칸 앞 열
 
         // 판 밖으로 나가면 더 먼 거리도 볼 필요가 없다
         if (nr < 0 || nc < 0 || nr > 3 || nc > 3)
@@ -255,19 +255,19 @@ void DFS(CHESS prevTagger, int prevMap[MAX][MAX], CHESS prevChess[MAX_H], int sc
         if (tmpChess[tmpMAP[nr][nc]].dead == true)
             continue;
 
-        canMove = true;
+        canMove = true;                  // 갈 곳이 있다
 
-        CHESS nextTagger = pt;
-        nextTagger.r = nr;
-        nextTagger.c = nc;
+        CHESS nextTagger = pt;           // 다음 술래 상태
+        nextTagger.r = nr;               // 새 행
+        nextTagger.c = nc;               // 새 열
 
-        DFS(nextTagger, tmpMAP, tmpChess, score);
+        DFS(nextTagger, tmpMAP, tmpChess, score);   // 그 칸으로 가서 다음 턴
     }
 
     // 4) 갈 곳이 없으면 여기서 게임이 끝난다. 그때의 점수로 정답을 갱신한다.
     if (canMove == false)
     {
-        if (maxAnswer < score) maxAnswer = score;
+        if (maxAnswer < score) maxAnswer = score;   // 최댓값 갱신
     }
 }
 
@@ -277,11 +277,11 @@ int main()
     // scanf("%d", &T);
     T = 1;
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
+        input();                         // 입력
 
-        maxAnswer = 0;
+        maxAnswer = 0;                   // 답 초기화
 
         // 술래는 (0, 0)에서 시작한다. 방향은 첫 말을 먹으면서 정해지므로 아무 값이나 무방.
         tagger.r = 0;
@@ -289,10 +289,10 @@ int main()
         tagger.dir = 0;
         tagger.dead = false;
 
-        DFS(tagger, MAP, chess, 0);
+        DFS(tagger, MAP, chess, 0);      // 탐색 시작
 
-        printf("%d\n", maxAnswer);
+        printf("%d\n", maxAnswer);       // 결과 출력
     }
 
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

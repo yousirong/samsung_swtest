@@ -43,12 +43,12 @@
 	  원래 구조체의 dir을 그대로 두면 다음 턴의 이동이 틀어진다.
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (100 + 20)
+#define MAX (100 + 20)         // N, M 최대 100 + 여유
 
-int T;
-int N, M, K;
+int T;                         // 테스트 케이스 수
+int N, M, K;                   // 격자 크기, 곰팡이 수
 
 // 곰팡이 한 마리
 struct MOLD
@@ -58,36 +58,36 @@ struct MOLD
 	int size;     // 크기 b (0이면 그 칸은 비어 있다는 뜻)
 };
 
-typedef struct MOLD MOLD;
+typedef struct MOLD MOLD;      // struct MOLD를 MOLD로 줄여 쓰기
 
 MOLD mold[MAX][MAX];     // 현재 상태
 MOLD tmpMold[MAX][MAX];  // 이동 결과를 쌓는 곳
 
 // 방향 배열. 방향 번호 1~4를 그대로 인덱스로 쓰기 위해 0번은 더미다.
 //   1: 위, 2: 아래, 3: 오른쪽, 4: 왼쪽
-int dr[] = { 0, -1, 1, 0, 0 };
-int dc[] = { 0,  0, 0, 1,-1 };
+int dr[] = { 0, -1, 1, 0, 0 };   // 방향별 행 변화량
+int dc[] = { 0,  0, 0, 1,-1 };   // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d", &N, &M, &K);
+	scanf("%d %d %d", &N, &M, &K);       // 격자 크기, 곰팡이 수 입력
 
 	// size가 0이면 빈칸이라는 약속이므로 전부 0으로 밀어 둔다
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= M; c++)
-			mold[r][c].distance = mold[r][c].dir = mold[r][c].size = 0;
+			mold[r][c].distance = mold[r][c].dir = mold[r][c].size = 0;   // 빈칸
 
-	for (int k = 0; k < K; k++)
+	for (int k = 0; k < K; k++)          // 곰팡이마다
 	{
-		int r, c, s, d, b;
-		scanf("%d %d %d %d %d", &r, &c, &s, &d, &b);
+		int r, c, s, d, b;               // 위치, 거리, 방향, 크기
+		scanf("%d %d %d %d %d", &r, &c, &s, &d, &b);   // 곰팡이 정보 입력
 
-		mold[r][c].distance = s;
-		mold[r][c].dir = d;
-		mold[r][c].size = b;
+		mold[r][c].distance = s;         // 이동 거리
+		mold[r][c].dir = d;              // 방향
+		mold[r][c].size = b;             // 크기
 	}
 }
 
@@ -96,13 +96,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", mold[r][c].size);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%d ", mold[r][c].size);   // 크기 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -115,20 +115,20 @@ int catchMold(int sc)
 	// 위에서부터 내려오며 처음 만나는 것이 답이다
 	for (int r = 1; r <= N; r++)
 	{
-		if (mold[r][sc].size != 0)
+		if (mold[r][sc].size != 0)       // 곰팡이가 있으면
 		{
-			int ret = mold[r][sc].size;
+			int ret = mold[r][sc].size;  // 크기 기억
 
 			// 잡은 자리는 완전히 비운다
 			mold[r][sc].size = 0;
 			mold[r][sc].dir = 0;
 			mold[r][sc].distance = 0;
 
-			return ret;
+			return ret;                  // 잡은 크기 반환
 		}
 	}
 
-	return 0;
+	return 0;                            // 그 열이 비어 있음
 }
 
 // ---------------------------
@@ -139,25 +139,25 @@ void moveMold()
 	// 결과를 쌓을 배열을 비운다
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= M; c++)
-			tmpMold[r][c].distance = tmpMold[r][c].dir = tmpMold[r][c].size = 0;
+			tmpMold[r][c].distance = tmpMold[r][c].dir = tmpMold[r][c].size = 0;   // 빈칸
 
 	// 방향 반전표 : 1(위) <-> 2(아래), 3(오른쪽) <-> 4(왼쪽)
 	int changeDir[5] = { 0, 2, 1, 4, 3 };
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 모든 열
 		{
-			if (mold[r][c].size == 0) continue;
+			if (mold[r][c].size == 0) continue;   // 빈칸은 건너뛴다
 
-			MOLD md = mold[r][c];
-			int sr, sc, dir;
+			MOLD md = mold[r][c];        // 이 곰팡이
+			int sr, sc, dir;             // 이동 중 위치와 방향
 
-			sr = r;
-			sc = c;
-			dir = md.dir;
+			sr = r;                      // 시작 행
+			sc = c;                      // 시작 열
+			dir = md.dir;                // 시작 방향
 
-			int move = md.distance;
+			int move = md.distance;      // 실제로 움직일 칸 수
 
 			// 왕복 주기로 나눈 나머지만 움직이면 결과가 같다.
 			//   세로 이동 주기 = (N-1)*2, 가로 이동 주기 = (M-1)*2
@@ -167,26 +167,26 @@ void moveMold()
 			// 남은 거리만큼 한 칸씩 이동하며, 벽에 부딪히면 방향을 뒤집는다
 			for (int m = 0; m < move; m++)
 			{
-				int nr = sr + dr[dir];
-				int nc = sc + dc[dir];
+				int nr = sr + dr[dir];   // 다음 행
+				int nc = sc + dc[dir];   // 다음 열
 
 				// 다음 칸이 격자 밖이면 방향을 반대로 바꿔 다시 계산한다
 				if (nr < 1 || nc < 1 || nr > N || nc > M)
 				{
-					dir = changeDir[dir];
+					dir = changeDir[dir];    // 방향 반전
 
-					nr = sr + dr[dir];
-					nc = sc + dc[dir];
+					nr = sr + dr[dir];       // 반대 방향 다음 행
+					nc = sc + dc[dir];       // 반대 방향 다음 열
 				}
 
-				sr = nr;
-				sc = nc;
+				sr = nr;                 // 위치 갱신 (행)
+				sc = nc;                 // 위치 갱신 (열)
 			}
 
 			// 도착 칸에 이미 다른 곰팡이가 있으면 더 큰 쪽만 남는다
 			if (tmpMold[sr][sc].size < mold[r][c].size)
 			{
-				tmpMold[sr][sc] = mold[r][c];
+				tmpMold[sr][sc] = mold[r][c];   // 덮어쓴다
 
 				// 이동 중에 뒤집힌 방향을 반드시 반영해야 다음 턴이 맞는다
 				tmpMold[sr][sc].dir = dir;
@@ -197,7 +197,7 @@ void moveMold()
 	// 전부 옮긴 뒤 한꺼번에 교체 (= 동시 이동)
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= M; c++)
-			mold[r][c] = tmpMold[r][c];
+			mold[r][c] = tmpMold[r][c];  // 결과 반영
 }
 
 // ---------------------------
@@ -205,17 +205,17 @@ void moveMold()
 // ---------------------------
 int simulate()
 {
-	int sum = 0;
+	int sum = 0;                         // 채취한 크기 합
 
-	for (int c = 1; c <= M; c++)
+	for (int c = 1; c <= M; c++)         // 1열부터 M열까지
 	{
 		// 채취가 먼저, 이동이 나중이다. 순서를 바꾸면 답이 달라진다.
 		sum += catchMold(c);
 
-		moveMold();
+		moveMold();                      // 곰팡이 이동
 	}
 
-	return sum;
+	return sum;                          // 합 반환
 }
 
 int main()
@@ -224,12 +224,12 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

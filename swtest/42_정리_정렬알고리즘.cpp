@@ -37,23 +37,24 @@
 	  - 내림차순이 필요하면 비교 부호(>, <)만 뒤집는다.
 	  - 두 칸 바꾸기는 swap()으로 통일했다.
 */
-#include <stdio.h>
+#include <stdio.h>                  // scanf, printf, putchar 사용
 
-#define MAX_N (100000 + 10)
+#define MAX_N (100000 + 10)         // 원소 최대 10만 개 + 여유
 #define MAX_VALUE (1000)        // 계수 정렬이 다룰 수 있는 최댓값 (0 ~ MAX_VALUE)
 
-int T;
-int N;
+int T;                          // 테스트케이스 수
+int N;                          // 원소 개수
 int origin[MAX_N];              // 입력 원본 (정렬마다 여기서 복사해 온다)
 int arr[MAX_N];                 // 정렬할 배열
 int tmp[MAX_N];                 // 병합 정렬용 임시 배열
 int cnt[MAX_VALUE + 1];         // 계수 정렬용
 
+// arr[i]와 arr[j]를 맞바꾼다
 void swap(int i, int j)
 {
-	int t = arr[i];
-	arr[i] = arr[j];
-	arr[j] = t;
+	int t = arr[i];                 // arr[i]를 잠시 보관
+	arr[i] = arr[j];                // arr[i] 자리에 arr[j]
+	arr[j] = t;                     // arr[j] 자리에 보관한 값
 }
 
 /* ─────────────────────────────────────────────
@@ -67,9 +68,9 @@ void swap(int i, int j)
    ───────────────────────────────────────────── */
 void selectionSort()
 {
-	for (int i = 0; i < N - 1; i++)
-		for (int k = i + 1; k < N; k++)
-			if (arr[i] > arr[k]) swap(i, k);
+	for (int i = 0; i < N - 1; i++)              // 채울 자리 i
+		for (int k = i + 1; k < N; k++)          // i 뒤의 모든 원소와 비교
+			if (arr[i] > arr[k]) swap(i, k);     // 더 작은 값이 있으면 i 자리로 가져온다
 }
 
 /* ─────────────────────────────────────────────
@@ -79,16 +80,16 @@ void selectionSort()
    ───────────────────────────────────────────── */
 void bubbleSort()
 {
-	for (int end = N - 1; end > 0; end--)
+	for (int end = N - 1; end > 0; end--)        // 이번 바퀴에서 확정될 맨 뒤 위치
 	{
-		int changed = 0;
+		int changed = 0;                         // 이번 바퀴에 바꾼 적이 있는지
 
-		for (int i = 0; i < end; i++)
+		for (int i = 0; i < end; i++)            // 앞에서부터 이웃한 두 칸 비교
 		{
-			if (arr[i] > arr[i + 1])
+			if (arr[i] > arr[i + 1])             // 앞이 더 크면
 			{
-				swap(i, i + 1);
-				changed = 1;
+				swap(i, i + 1);                  // 큰 값을 뒤로 보낸다
+				changed = 1;                     // 바꿨다고 표시
 			}
 		}
 
@@ -106,17 +107,17 @@ void bubbleSort()
    ───────────────────────────────────────────── */
 void insertionSort()
 {
-	for (int i = 1; i < N; i++)
+	for (int i = 1; i < N; i++)                  // 1번부터 하나씩 끼워 넣는다
 	{
 		int value = arr[i];   // 끼워 넣을 값
-		int k = i - 1;
+		int k = i - 1;        // 정렬된 구간의 맨 뒤부터 비교
 
 		while (k >= 0 && arr[k] > value)   // 큰 값을 뒤로 민다
 		{
-			arr[k + 1] = arr[k];
-			k--;
+			arr[k + 1] = arr[k];           // 한 칸 뒤로 밀기
+			k--;                           // 한 칸 앞으로 이동
 		}
-		arr[k + 1] = value;
+		arr[k + 1] = value;                // 빈 자리에 값을 넣는다
 	}
 }
 
@@ -136,20 +137,20 @@ void mergeSort(int s, int e)
 {
 	if (s >= e) return;   // 한 칸 이하는 이미 정렬
 
-	int m = (s + e) / 2;
-	mergeSort(s, m);
-	mergeSort(m + 1, e);
+	int m = (s + e) / 2;                         // 구간의 가운데
+	mergeSort(s, m);                             // 왼쪽 절반 정렬
+	mergeSort(m + 1, e);                         // 오른쪽 절반 정렬
 
-	int i = s, j = m + 1, k = s;
-	while (i <= m && j <= e)
+	int i = s, j = m + 1, k = s;                 // i: 왼쪽 위치, j: 오른쪽 위치, k: tmp에 쓸 위치
+	while (i <= m && j <= e)                     // 양쪽에 원소가 남아 있는 동안
 	{
 		if (arr[i] <= arr[j]) tmp[k++] = arr[i++];   // 같으면 왼쪽 먼저 -> 안정
-		else tmp[k++] = arr[j++];
+		else tmp[k++] = arr[j++];                    // 오른쪽이 더 작으면 오른쪽을 옮긴다
 	}
-	while (i <= m) tmp[k++] = arr[i++];
-	while (j <= e) tmp[k++] = arr[j++];
+	while (i <= m) tmp[k++] = arr[i++];          // 왼쪽에 남은 원소를 옮긴다
+	while (j <= e) tmp[k++] = arr[j++];          // 오른쪽에 남은 원소를 옮긴다
 
-	for (int t = s; t <= e; t++) arr[t] = tmp[t];
+	for (int t = s; t <= e; t++) arr[t] = tmp[t];   // 합친 결과를 arr로 복사
 }
 
 /* ─────────────────────────────────────────────
@@ -167,24 +168,24 @@ void mergeSort(int s, int e)
    ───────────────────────────────────────────── */
 void quickSort(int s, int e)
 {
-	if (s >= e) return;
+	if (s >= e) return;                          // 한 칸 이하는 이미 정렬
 
 	swap((s + e) / 2, e);   // 가운데 값을 기준으로 (맨 끝에 둔다)
-	int pivot = arr[e];
+	int pivot = arr[e];     // 기준값
 
-	int store = s;
-	for (int i = s; i < e; i++)
+	int store = s;                               // 기준보다 작은 값을 모을 다음 자리
+	for (int i = s; i < e; i++)                  // 기준을 뺀 구간을 훑는다
 	{
-		if (arr[i] < pivot)
+		if (arr[i] < pivot)                      // 기준보다 작으면
 		{
-			swap(i, store);
-			store++;
+			swap(i, store);                      // 왼쪽 모음 자리로 보낸다
+			store++;                             // 다음 모음 자리
 		}
 	}
 	swap(store, e);   // 기준을 제자리에
 
-	quickSort(s, store - 1);
-	quickSort(store + 1, e);
+	quickSort(s, store - 1);                     // 기준 왼쪽 정렬
+	quickSort(store + 1, e);                     // 기준 오른쪽 정렬
 }
 
 /* ─────────────────────────────────────────────
@@ -200,18 +201,18 @@ void quickSort(int s, int e)
    ───────────────────────────────────────────── */
 void heapify(int i, int size)
 {
-	while (1)
+	while (1)                                    // 더 내려갈 수 없을 때까지
 	{
-		int largest = i;
-		int l = 2 * i + 1;
-		int r = 2 * i + 2;
+		int largest = i;                         // 부모와 자식 중 가장 큰 위치
+		int l = 2 * i + 1;                       // 왼쪽 자식
+		int r = 2 * i + 2;                       // 오른쪽 자식
 
-		if (l < size && arr[l] > arr[largest]) largest = l;
-		if (r < size && arr[r] > arr[largest]) largest = r;
+		if (l < size && arr[l] > arr[largest]) largest = l;   // 왼쪽 자식이 더 크면
+		if (r < size && arr[r] > arr[largest]) largest = r;   // 오른쪽 자식이 더 크면
 
 		if (largest == i) break;   // 부모가 가장 크다 -> 끝
 
-		swap(i, largest);
+		swap(i, largest);          // 큰 자식과 자리를 바꾼다
 		i = largest;               // 바뀐 자식 자리에서 계속 내려간다
 	}
 }
@@ -224,8 +225,8 @@ void heapSort()
 	// 2) 최댓값(맨 앞)을 뒤로 보내고, 남은 범위를 다시 힙으로
 	for (int end = N - 1; end > 0; end--)
 	{
-		swap(0, end);
-		heapify(0, end);
+		swap(0, end);                            // 최댓값을 맨 뒤로
+		heapify(0, end);                         // 남은 범위를 다시 최대 힙으로
 	}
 }
 
@@ -238,13 +239,13 @@ void heapSort()
    ───────────────────────────────────────────── */
 void countingSort()
 {
-	for (int v = 0; v <= MAX_VALUE; v++) cnt[v] = 0;
+	for (int v = 0; v <= MAX_VALUE; v++) cnt[v] = 0;   // 개수 초기화
 
-	for (int i = 0; i < N; i++) cnt[arr[i]]++;
+	for (int i = 0; i < N; i++) cnt[arr[i]]++;         // 값마다 등장 횟수 세기
 
-	int k = 0;
-	for (int v = 0; v <= MAX_VALUE; v++)
-		while (cnt[v]-- > 0) arr[k++] = v;
+	int k = 0;                                         // arr에 다시 쓸 위치
+	for (int v = 0; v <= MAX_VALUE; v++)               // 작은 값부터
+		while (cnt[v]-- > 0) arr[k++] = v;             // 센 개수만큼 써 넣는다
 }
 
 /* ─────────────────────────────────────────────
@@ -258,14 +259,14 @@ void countingSort()
    ───────────────────────────────────────────── */
 struct STUDENT
 {
-	int id;
-	int score;
-	int age;
+	int id;                     // 번호
+	int score;                  // 점수
+	int age;                    // 나이
 };
 
-STUDENT student[MAX_N];
-STUDENT stmp[MAX_N];
-int scnt;
+STUDENT student[MAX_N];         // 정렬할 학생 배열
+STUDENT stmp[MAX_N];            // 병합 정렬용 임시 배열
+int scnt;                       // 학생 수
 
 // a가 b보다 앞에 와야 하면 1
 int isPriority(STUDENT a, STUDENT b)
@@ -277,23 +278,23 @@ int isPriority(STUDENT a, STUDENT b)
 
 void mergeSortStudent(int s, int e)
 {
-	if (s >= e) return;
+	if (s >= e) return;                          // 한 명 이하는 이미 정렬
 
-	int m = (s + e) / 2;
-	mergeSortStudent(s, m);
-	mergeSortStudent(m + 1, e);
+	int m = (s + e) / 2;                         // 구간의 가운데
+	mergeSortStudent(s, m);                      // 왼쪽 절반 정렬
+	mergeSortStudent(m + 1, e);                  // 오른쪽 절반 정렬
 
-	int i = s, j = m + 1, k = s;
-	while (i <= m && j <= e)
+	int i = s, j = m + 1, k = s;                 // i: 왼쪽 위치, j: 오른쪽 위치, k: stmp에 쓸 위치
+	while (i <= m && j <= e)                     // 양쪽에 원소가 남아 있는 동안
 	{
 		// 오른쪽이 "더 우선"일 때만 오른쪽을 먼저 -> 같으면 왼쪽 먼저 (안정)
 		if (isPriority(student[j], student[i])) stmp[k++] = student[j++];
-		else stmp[k++] = student[i++];
+		else stmp[k++] = student[i++];           // 아니면 왼쪽을 옮긴다
 	}
-	while (i <= m) stmp[k++] = student[i++];
-	while (j <= e) stmp[k++] = student[j++];
+	while (i <= m) stmp[k++] = student[i++];     // 왼쪽에 남은 원소를 옮긴다
+	while (j <= e) stmp[k++] = student[j++];     // 오른쪽에 남은 원소를 옮긴다
 
-	for (int t = s; t <= e; t++) student[t] = stmp[t];
+	for (int t = s; t <= e; t++) student[t] = stmp[t];   // 합친 결과를 student로 복사
 }
 
 void demoStudent()
@@ -303,59 +304,59 @@ void demoStudent()
 		{ 1, 80, 20 }, { 2, 95, 22 }, { 3, 80, 19 },
 		{ 4, 95, 22 }, { 5, 70, 21 }, { 6, 80, 19 },
 	};
-	scnt = 6;
+	scnt = 6;                                    // 예제 학생 수
 
-	for (int i = 0; i < scnt; i++) student[i] = data[i];
+	for (int i = 0; i < scnt; i++) student[i] = data[i];   // 예제 데이터 복사
 
-	mergeSortStudent(0, scnt - 1);
+	mergeSortStudent(0, scnt - 1);               // 우선순위대로 정렬
 
 	// 기대 : 2(95,22) 4(95,22) 3(80,19) 6(80,19) 1(80,20) 5(70,21)
-	printf("student   :");
-	for (int i = 0; i < scnt; i++)
-		printf(" %d(%d,%d)", student[i].id, student[i].score, student[i].age);
-	putchar('\n');
+	printf("student   :");                       // 결과 제목
+	for (int i = 0; i < scnt; i++)               // 정렬된 순서대로
+		printf(" %d(%d,%d)", student[i].id, student[i].score, student[i].age);   // 번호(점수,나이) 출력
+	putchar('\n');                               // 줄바꿈
 }
 
 /* ───────────────────────────────────────────── */
 
 void input()
 {
-	scanf("%d", &N);
-	for (int i = 0; i < N; i++)
-		scanf("%d", &origin[i]);
+	scanf("%d", &N);                             // 원소 개수 입력
+	for (int i = 0; i < N; i++)                  // N개의 값을
+		scanf("%d", &origin[i]);                 // 원본 배열에 입력
 }
 
 void copyInput()
 {
-	for (int i = 0; i < N; i++) arr[i] = origin[i];
+	for (int i = 0; i < N; i++) arr[i] = origin[i];   // 원본을 정렬용 배열로 복사
 }
 
 void printArr(const char* name)
 {
-	printf("%-10s:", name);
-	for (int i = 0; i < N; i++) printf(" %d", arr[i]);
-	putchar('\n');
+	printf("%-10s:", name);                      // 정렬 이름 출력 (왼쪽 정렬 10칸)
+	for (int i = 0; i < N; i++) printf(" %d", arr[i]);   // 정렬 결과 출력
+	putchar('\n');                               // 줄바꿈
 }
 
 int main()
 {
-	scanf("%d", &T);
-	for (int tc = 1; tc <= T; tc++)
+	scanf("%d", &T);                             // 테스트케이스 수 입력
+	for (int tc = 1; tc <= T; tc++)              // 테스트케이스 반복
 	{
-		input();
+		input();                                 // 원소 입력
 
-		printf("#%d\n", tc);
+		printf("#%d\n", tc);                     // 케이스 번호 출력
 
-		copyInput(); selectionSort();      printArr("selection");
-		copyInput(); bubbleSort();         printArr("bubble");
-		copyInput(); insertionSort();      printArr("insertion");
-		copyInput(); mergeSort(0, N - 1);  printArr("merge");
-		copyInput(); quickSort(0, N - 1);  printArr("quick");
-		copyInput(); heapSort();           printArr("heap");
+		copyInput(); selectionSort();      printArr("selection");   // 선택 정렬
+		copyInput(); bubbleSort();         printArr("bubble");      // 버블 정렬
+		copyInput(); insertionSort();      printArr("insertion");   // 삽입 정렬
+		copyInput(); mergeSort(0, N - 1);  printArr("merge");       // 병합 정렬
+		copyInput(); quickSort(0, N - 1);  printArr("quick");       // 퀵 정렬
+		copyInput(); heapSort();           printArr("heap");        // 힙 정렬
 		copyInput(); countingSort();       printArr("counting");   // 값이 0 ~ MAX_VALUE 일 때만
 	}
 
-	demoStudent();
+	demoStudent();                               // 구조체 우선순위 정렬 예제
 
-	return 0;
+	return 0;                                    // 프로그램 정상 종료
 }

@@ -32,48 +32,48 @@
 	           -> continue 전에 MAP[liveAtom[i].r][liveAtom[i].c] = 0; 을 해 주면 된다.
 	  - MAP은 int [4100][4100] = 약 67MB다. 전역이라 스택 문제는 없다.
 */
-#include <stdio.h>
+#include <stdio.h>           // scanf, printf 사용
 
-#define MAX (4000+100)
-#define OFFSET (2000)
+#define MAX (4000+100)       // 2배 좌표 범위 0 ~ 4000 + 여유
+#define OFFSET (2000)        // 음수 좌표를 0 이상으로 옮기는 값
 
-int T;
-int N;
+int T;               // 테스트 케이스 수
+int N;               // 원자 수
 int MAP[MAX][MAX];   // 칸에 있는 원자 에너지 합 (2배 좌표)
 
 struct ATOM
 {
-	int r;
-	int c;
-	int dir;
-	int energy;
+	int r;           // 행 (2배 좌표)
+	int c;           // 열 (2배 좌표)
+	int dir;         // 이동 방향
+	int energy;      // 에너지
 };
 
-ATOM atom[1000 + 100];
+ATOM atom[1000 + 100];       // 입력된 원자들
 
 // 상(y+1), 하(y-1), 좌(x-1), 우(x+1)  ->  r = y, c = x 로 놓았으므로 상이 r + 1
-int dr[] = { 1,-1,0,0 };
-int dc[] = { 0,0,-1,1 };
+int dr[] = { 1,-1,0,0 };     // 방향별 행 변화량
+int dc[] = { 0,0,-1,1 };     // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 원자 수 입력
 
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N; i++)          // 원자 N개
 	{
-		int r, c, dir, energy;
+		int r, c, dir, energy;           // 행, 열, 방향, 에너지
 		scanf("%d %d %d %d", &c, &r, &dir, &energy);   // (x, y) = (열, 행)
 
 		// 2배 + OFFSET : 0.5초 충돌도 정수 칸으로, 음수 좌표는 0 이상으로
 		r = r * 2 + OFFSET;
 		c = c * 2 + OFFSET;
 
-		atom[i].r = r;
-		atom[i].c = c;
-		atom[i].dir = dir;
-		atom[i].energy = energy;
+		atom[i].r = r;                   // 행 저장
+		atom[i].c = c;                   // 열 저장
+		atom[i].dir = dir;               // 방향 저장
+		atom[i].energy = energy;         // 에너지 저장
 
-		MAP[r][c] = energy;
+		MAP[r][c] = energy;              // 칸에 에너지 기록
 	}
 }
 
@@ -82,57 +82,57 @@ int simulate()
 	ATOM liveAtom[1000 + 10] = { 0 };   // 살아 있는 원자
 	int lcnt, tcnt, sum;                // lcnt : 이번 단계 수, tcnt : 다음 단계로 남는 수
 
-	lcnt = sum = 0;
+	lcnt = sum = 0;                     // 초기화
 
-	for (int i = 0; i < N; i++) liveAtom[lcnt++] = atom[i];
+	for (int i = 0; i < N; i++) liveAtom[lcnt++] = atom[i];   // 처음엔 모두 살아 있다
 
-	while (1)
+	while (1)                           // 살아 있는 원자가 없을 때까지
 	{
-		tcnt = 0;
-		for (int i = 0; i < lcnt; i++)
+		tcnt = 0;                       // 다음 단계 수 초기화
+		for (int i = 0; i < lcnt; i++)  // 살아 있는 원자마다
 		{
 			// 1) 내 칸에 다른 원자도 있다 -> 충돌. 칸의 합을 더하고 비운다
 			if (liveAtom[i].energy != MAP[liveAtom[i].r][liveAtom[i].c])
 			{
-				sum += MAP[liveAtom[i].r][liveAtom[i].c];
-				MAP[liveAtom[i].r][liveAtom[i].c] = 0;
+				sum += MAP[liveAtom[i].r][liveAtom[i].c];   // 칸의 에너지 합을 방출
+				MAP[liveAtom[i].r][liveAtom[i].c] = 0;      // 칸 비우기
 
-				continue;
+				continue;               // 이 원자는 소멸
 			}
 
 			// 2) 혼자다 -> 한 칸 움직인다
-			int nr, nc;
+			int nr, nc;                 // 다음 칸
 
-			nr = liveAtom[i].r + dr[liveAtom[i].dir];
-			nc = liveAtom[i].c + dc[liveAtom[i].dir];
+			nr = liveAtom[i].r + dr[liveAtom[i].dir];   // 다음 행
+			nc = liveAtom[i].c + dc[liveAtom[i].dir];   // 다음 열
 
 			if (nr < 0 || nc < 0 || nr>4000 || nc>4000)continue;   // 범위 밖 -> 버림 ([버그] 내 칸을 안 비운다)
 
-			MAP[liveAtom[i].r][liveAtom[i].c] = 0;
+			MAP[liveAtom[i].r][liveAtom[i].c] = 0;      // 떠난 칸 비우기
 
-			liveAtom[i].r = nr;
-			liveAtom[i].c = nc;
+			liveAtom[i].r = nr;         // 위치 갱신 (행)
+			liveAtom[i].c = nc;         // 위치 갱신 (열)
 
 			// 다음 칸이 비어 있었을 때만 목록에 남긴다 (먼저 온 원자가 충돌을 처리한다)
 			if (MAP[nr][nc] == 0) liveAtom[tcnt++] = liveAtom[i];
 
-			MAP[nr][nc] += liveAtom[i].energy;
+			MAP[nr][nc] += liveAtom[i].energy;          // 다음 칸에 내 에너지 더하기
 		}
-		lcnt = tcnt;
+		lcnt = tcnt;                    // 다음 단계 원자 수
 
-		if (lcnt == 0) break;
+		if (lcnt == 0) break;           // 모두 소멸하거나 나갔으면 끝
 	}
-	return sum;
+	return sum;                         // 방출 에너지 총합
 }
 
 int main()
 {
-	scanf("%d", &T);
-	for (int tc = 1; tc <= T; tc++)
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 원자 입력
 
-		printf("#%d %d\n", tc, simulate());
+		printf("#%d %d\n", tc, simulate());   // 결과 출력
 	}
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

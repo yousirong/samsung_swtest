@@ -54,51 +54,51 @@
 	              다만 2로 바꿔 랜덤 입력 1,500개를 돌려도 답이 달라진 경우는 없었다.
 	              (그 턴까지 도망자가 그 두 줄에 남아 있는 경우가 드물기 때문으로 보인다)
 */
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (100+50)
+#define MAX (100+50)           // N 최대 99 + 여유
 
-int T;
+int T;                         // 테스트 케이스 수
 
-int N, M, H, K;
+int N, M, H, K;                // 격자 크기, 도망자 수, 나무 수, 턴 수
 
 int MAP[MAX][MAX]; // 나무 (1 = 나무)
 int snail[MAX][MAX]; // 달팽이 순서 번호 (디버그 출력용, 풀이에는 쓰지 않는다)
 
-struct PERSON
+struct PERSON                  // 도망자 / 술래 정보
 {
-	int r;
-	int c;
-	int dir;
-	bool dead;
+	int r;                     // 행
+	int c;                     // 열
+	int dir;                   // 방향
+	bool dead;                 // 잡혔는지
 };
 
-PERSON runner[MAX * MAX];
-int rcnt;
+PERSON runner[MAX * MAX];      // 도망자 목록
+int rcnt;                      // 도망자 수
 
 // 술래의 한 주기 경로 : (위치, 그 칸에서 바라보는 방향)
 PERSON taggerInfo[MAX * MAX * 2];
-int tcnt;
+int tcnt;                      // 주기 길이
 
 // 상, 우, 하, 좌
-int dr[] = { -1,0,1,0 };
-int dc[] = { 0,1,0,-1 };
+int dr[] = { -1,0,1,0 };       // 방향별 행 변화량
+int dc[] = { 0,1,0,-1 };       // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d %d %d", &N, &M, &H, &K);
+	scanf("%d %d %d %d", &N, &M, &H, &K);   // 격자 크기, 도망자 수, 나무 수, 턴 수 입력
 
-	rcnt = tcnt = 0;
+	rcnt = tcnt = 0;                     // 개수 초기화
 
-	for (int m = 0; m < M; m++)
+	for (int m = 0; m < M; m++)          // 도망자마다
 	{
-		int r, c, d;
-		scanf("%d %d %d", &r, &c, &d);
+		int r, c, d;                     // 위치, 방향
+		scanf("%d %d %d", &r, &c, &d);   // 입력
 
-		runner[rcnt].dead = false;
+		runner[rcnt].dead = false;       // 살아 있음
 
-		runner[rcnt].r = r;
-		runner[rcnt].c = c;
+		runner[rcnt].r = r;              // 행
+		runner[rcnt].c = c;              // 열
 
 		// d = 1(우), 2(하)가 dr/dc 인덱스와 그대로 맞는다.
 		runner[rcnt++].dir = d;
@@ -107,71 +107,71 @@ void input()
 	// MAP init
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= N; c++)
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 나무 없음
 
 	// MAP
-	for (int h = 0; h < H; h++)
+	for (int h = 0; h < H; h++)          // 나무마다
 	{
-		int r, c;
-		scanf("%d %d", &r, &c);
+		int r, c;                        // 나무 위치
+		scanf("%d %d", &r, &c);          // 입력
 
-		MAP[r][c] = 1;
+		MAP[r][c] = 1;                   // 나무 표시
 	}
 }
 
 void printMap(int map[MAX][MAX]) //for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", map[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // 술래의 한 주기 경로(taggerInfo)를 만든다.
 void makeSnail()
 {
-	int sr, sc, direction;
-	int index, size;
+	int sr, sc, direction;               // 현재 위치, 방향
+	int index, size;                     // 순서 번호, 구간 길이
 
 	// 가운데에서 위쪽을 보고 시작한다.
 	sr = sc = (N + 1) / 2;
-	direction = 0;
-	index = 1;
-	size = 0;
+	direction = 0;                       // 위쪽
+	index = 1;                           // 순서 번호 1부터
+	size = 0;                            // 구간 길이 0부터
 
-	snail[sr][sc] = index++;
+	snail[sr][sc] = index++;             // 시작 칸 번호
 
-	taggerInfo[tcnt].r = sr;
+	taggerInfo[tcnt].r = sr;             // 경로에 시작 칸 추가
 	taggerInfo[tcnt++].c = sc;
 
 	// 달팽이 : 1, 1, 2, 2, 3, 3, ... 칸씩 가며 상 -> 우 -> 하 -> 좌로 꺾는다.
 	// 2N-1번 꺾으면 마지막 줄(N-1칸)까지 끝나 (1, 1)에 닿는다.
 	for (int i = 0; i < 2 * N - 1; i++)
 	{
-		if (i % 2 == 0) size++;
+		if (i % 2 == 0) size++;          // 두 구간마다 길이 1 증가
 
-		for (int s = 0; s < size; s++)
+		for (int s = 0; s < size; s++)   // 구간 길이만큼
 		{
-			int nr, nc;
+			int nr, nc;                  // 다음 칸
 
-			nr = sr + dr[direction];
-			nc = sc + dc[direction];
+			nr = sr + dr[direction];     // 다음 행
+			nc = sc + dc[direction];     // 다음 열
 
-			snail[nr][nc] = index++;
+			snail[nr][nc] = index++;     // 순서 번호 기록
 
-			sr = nr;
+			sr = nr;                     // 위치 갱신
 			sc = nc;
 
-			taggerInfo[tcnt].r = nr;
+			taggerInfo[tcnt].r = nr;     // 경로에 추가
 			taggerInfo[tcnt++].c = nc;
 		}
 
-		direction++;
+		direction++;                     // 다음 방향
 
-		if (direction == 4) direction = 0;
+		if (direction == 4) direction = 0;   // 좌 다음은 상
 	}
 
 	// 되감기 : taggerInfo[N*N + i] = taggerInfo[N*N - 2 - i]
@@ -179,7 +179,7 @@ void makeSnail()
 	// [확인 필요] i = N*N-1이면 taggerInfo[-1]을 읽는다. 쓰는 칸은 주기 밖이라 결과엔 영향 없음.
 	tcnt = N * N;
 	for (int i = 0; i < tcnt; i++)
-		taggerInfo[tcnt + i] = taggerInfo[tcnt - i - 2];
+		taggerInfo[tcnt + i] = taggerInfo[tcnt - i - 2];   // 거꾸로 붙이기
 
 	// 가운데(0번)는 다음 주기의 시작으로 다시 쓰므로 뒤에 붙이지 않는다.
 	tcnt = 2 * N * N - 2;
@@ -188,12 +188,12 @@ void makeSnail()
 	// 꺾이는 칸에서는 이미 다음 방향이 들어가 "이동 직후 방향 전환" 규칙과 맞는다.
 	for (int i = 0; i < tcnt - 1; i++)
 	{
-		int r, c, nr, nc;
+		int r, c, nr, nc;                // 현재 칸, 다음 칸
 
-		r = taggerInfo[i].r;
-		c = taggerInfo[i].c;
-		nr = taggerInfo[i + 1].r;
-		nc = taggerInfo[i + 1].c;
+		r = taggerInfo[i].r;             // 현재 행
+		c = taggerInfo[i].c;             // 현재 열
+		nr = taggerInfo[i + 1].r;        // 다음 행
+		nc = taggerInfo[i + 1].c;        // 다음 열
 
 		if (nr - r == -1) taggerInfo[i].dir = 0; // 위
 		else if (nr - r  == 1) taggerInfo[i].dir = 2; // 아래
@@ -215,57 +215,57 @@ void makeSnail()
 // <cstdlib>를 include하지 않았으므로 직접 만든 절댓값
 int abs(int x)
 {
-	return (x > 0) ? x : -x;
+	return (x > 0) ? x : -x;             // 양수면 그대로, 아니면 부호 반전
 }
 
 int getDistance(int r1, int c1, int r2, int c2)
 {
-	return abs(r1 - r2) + abs(c1 - c2);
+	return abs(r1 - r2) + abs(c1 - c2);  // 맨해튼 거리
 }
 
 // 1) 도망자 이동 (k턴, 술래는 아직 움직이기 전 위치)
 void moveRunner(int k)
 {
-	PERSON tagger = taggerInfo[k % tcnt];
+	PERSON tagger = taggerInfo[k % tcnt];    // 이번 턴 술래 위치
 	int changeDir[4] = { 2,3,0,1 }; // 반대 방향
 
-	for (int i = 0; i < rcnt; i++)
+	for (int i = 0; i < rcnt; i++)       // 도망자마다
 	{
-		if (runner[i].dead == true)continue;
+		if (runner[i].dead == true)continue;   // 잡힌 도망자는 건너뜀
 
-		int sr, sc;
+		int sr, sc;                      // 현재 위치
 
-		sr = runner[i].r;
-		sc = runner[i].c;
+		sr = runner[i].r;                // 행
+		sc = runner[i].c;                // 열
 
-		int distance = getDistance(tagger.r, tagger.c, sr, sc);
+		int distance = getDistance(tagger.r, tagger.c, sr, sc);   // 술래와 거리
 
 		// 술래와 거리 3 초과면 움직이지 않는다.
 		if (distance > 3) continue;
 
-		int dir;
-		int nr, nc;
+		int dir;                         // 방향
+		int nr, nc;                      // 다음 칸
 
-		dir = runner[i].dir;
+		dir = runner[i].dir;             // 현재 방향
 
-		nr = sr + dr[dir];
-		nc = sc + dc[dir];
+		nr = sr + dr[dir];               // 다음 행
+		nc = sc + dc[dir];               // 다음 열
 
 		// 격자 밖이면 방향을 반대로 바꾸고(저장까지 한다) 그 방향으로 다시 계산한다.
 		// 술래 칸이라 못 움직이더라도 바뀐 방향은 유지된다.
 		if (nr < 1 || nc<1 || nr > N || nc > N)
 		{
-			dir = changeDir[dir];
-			runner[i].dir = dir;
+			dir = changeDir[dir];        // 반대 방향
+			runner[i].dir = dir;         // 저장
 
-			nr = sr + dr[dir];
-			nc = sc + dc[dir];
+			nr = sr + dr[dir];           // 반대 방향 다음 행
+			nc = sc + dc[dir];           // 반대 방향 다음 열
 		}
 
 		// 술래가 있는 칸으로는 가지 않는다. 나무는 막지 않는다.
 		if (nr == tagger.r && nc == tagger.c) continue;
 
-		runner[i].r = nr;
+		runner[i].r = nr;                // 이동
 		runner[i].c = nc;
 	}
 }
@@ -276,27 +276,27 @@ int moveTagger(int k)
 	// 한 칸 이동한 뒤의 위치와 방향
 	PERSON tagger = taggerInfo[(k + 1) % tcnt];
 
-	int catchCount = 0;
+	int catchCount = 0;                  // 잡은 수
 	// 자기 칸(d = 0)부터 바라보는 방향으로 3칸
 	for (int d = 0; d < 3; d++)
 	{
-		int nr, nc;
-		nr = tagger.r + dr[tagger.dir] * d;
-		nc = tagger.c + dc[tagger.dir] * d;
+		int nr, nc;                      // 시야 칸
+		nr = tagger.r + dr[tagger.dir] * d;   // d칸 앞 행
+		nc = tagger.c + dc[tagger.dir] * d;   // d칸 앞 열
 
-		if (nr<1 || nc<1 || nr>N || nc>N) break;
+		if (nr<1 || nc<1 || nr>N || nc>N) break;   // 격자 밖이면 끝
 		// 나무 칸의 도망자는 잡히지 않는다. 시야는 가리지 않으므로 break가 아니라 continue.
 		if (MAP[nr][nc] == 1) continue;
 
 		// 한 칸에 여러 명이 있을 수 있으므로 전부 확인한다.
 		for (int i = 0; i < rcnt; i++)
 		{
-			if (runner[i].dead == true) continue;
+			if (runner[i].dead == true) continue;   // 이미 잡힌 도망자
 
-			if (runner[i].r == nr && runner[i].c == nc)
+			if (runner[i].r == nr && runner[i].c == nc)   // 그 칸에 있으면
 			{
-				runner[i].dead = true;
-				catchCount++;
+				runner[i].dead = true;   // 잡는다
+				catchCount++;            // 잡은 수 증가
 			}
 		}
 	}
@@ -307,29 +307,29 @@ int moveTagger(int k)
 
 int simulate()
 {
-	int score = 0;
-	for (int k = 0; k < K; k++)
+	int score = 0;                       // 총점
+	for (int k = 0; k < K; k++)          // K턴
 	{
-		moveRunner(k);
+		moveRunner(k);                   // 도망자 이동
 
-		score += moveTagger(k);
+		score += moveTagger(k);          // 술래 이동 + 잡기
 	}
 
-	return score;
+	return score;                        // 총점 반환
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		makeSnail();
+		makeSnail();                     // 술래 경로 만들기
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

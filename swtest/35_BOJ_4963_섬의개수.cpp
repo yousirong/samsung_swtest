@@ -27,9 +27,9 @@
 	  input()을 호출한 다음에 break를 검사하는 순서로 되어 있다.
 */
 
-#include <stdio.h>
+#include <stdio.h>      // scanf, printf, putchar 사용
 
-#define MAX (50 + 5)
+#define MAX (50 + 5)    // W, H 최대 50 + 여유
 
 int W, H;               // W: 가로(열 개수), H: 세로(행 개수)
 
@@ -43,26 +43,26 @@ struct RC
 	int c;   // col (열)
 };
 
-typedef struct RC RC;
+typedef struct RC RC;   // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];    // BFS용 큐 (한 칸이 최대 한 번 들어간다)
 
 // 8방향 : ↑, ↗, →, ↘, ↓, ↙, ←, ↖
-int dr[] = { -1, -1, 0, 1, 1, 1, 0, -1 };
-int dc[] = {  0,  1, 1, 1, 0,-1,-1, -1 };
+int dr[] = { -1, -1, 0, 1, 1, 1, 0, -1 };   // 방향별 행 변화량
+int dc[] = {  0,  1, 1, 1, 0,-1,-1, -1 };   // 방향별 열 변화량
 
 // ---------------------------
 // 디버그용: visit 배열 출력
 // ---------------------------
 void printVisit()
 {
-	for (int r = 1; r <= H; r++)
+	for (int r = 1; r <= H; r++)         // 모든 행
 	{
-		for (int c = 1; c <= W; c++)
-			printf("%d ", visit[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= W; c++)     // 모든 열
+			printf("%d ", visit[r][c]);  // 방문 여부 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 출력 끝 빈 줄
 }
 
 // ---------------------------
@@ -70,26 +70,26 @@ void printVisit()
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &W, &H);
+	scanf("%d %d", &W, &H);              // 가로 W, 세로 H 입력
 
 	// 테스트 케이스마다 초기화.
 	// 바깥 한 줄까지 함께 0으로 밀어 두면 경계 밖이 항상 바다로 취급되어
 	// BFS에서 좌표 범위 검사를 하지 않아도 된다.
-	for (int r = 0; r <= H + 1; r++)
+	for (int r = 0; r <= H + 1; r++)     // 바깥 줄 포함 모든 행
 	{
-		for (int c = 0; c <= W + 1; c++)
+		for (int c = 0; c <= W + 1; c++) // 바깥 줄 포함 모든 열
 		{
-			MAP[r][c] = 0;
-			visit[r][c] = false;
+			MAP[r][c] = 0;               // 바다로 초기화
+			visit[r][c] = false;         // 방문 안 함으로 초기화
 		}
 	}
 
 	// 실제 지도 입력
-	for (int r = 1; r <= H; r++)
+	for (int r = 1; r <= H; r++)         // 1행부터 H행까지
 	{
-		for (int c = 1; c <= W; c++)
+		for (int c = 1; c <= W; c++)     // 1열부터 W열까지
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 땅(1)/바다(0) 입력
 		}
 	}
 }
@@ -101,33 +101,33 @@ void BFS(int r, int c)
 {
 	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;  // 빈 큐
 
 	// 시작 칸을 큐에 넣고 바로 방문 표시
-	queue[wp].r = r;
-	queue[wp++].c = c;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp++].c = c;                   // 시작 열, 삽입 위치 증가
 
-	visit[r][c] = true;
+	visit[r][c] = true;                  // 시작 칸 방문 표시
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 한 칸 꺼낸다
 
 		// 대각선을 포함한 8방향
 		for (int i = 0; i < 8; i++)
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸 좌표
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
 			// 바다이거나 이미 방문한 칸이면 건너뛴다 (경계 밖도 0이라 여기서 걸린다)
 			if (MAP[nr][nc] == 0 || visit[nr][nc] == true)
 				continue;
 
 			// 같은 섬이므로 큐에 넣는다
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 이웃 행 기록
+			queue[wp++].c = nc;          // 이웃 열 기록, 삽입 위치 증가
 
 			// 넣는 즉시 방문 표시 (중복 삽입 방지)
 			visit[nr][nc] = true;
@@ -143,11 +143,11 @@ int main()
 	// 테스트 케이스를 계속 처리
 	while (1)
 	{
-		input();
+		input();                         // 한 테스트 케이스 입력
 
 		// 종료 조건은 W, H를 읽어 봐야 알 수 있으므로 입력 뒤에 검사한다
 		if (W == 0 && H == 0)
-			break;
+			break;                       // "0 0"이면 종료
 
 		int ansCount = 0;   // 섬의 개수
 
@@ -156,7 +156,7 @@ int main()
 		{
 			for (int c = 1; c <= W; c++)
 			{
-				if (MAP[r][c] == 1 && visit[r][c] == false)
+				if (MAP[r][c] == 1 && visit[r][c] == false)   // 방문 안 한 땅이면
 				{
 					BFS(r, c);   // 이 섬 전체를 방문 처리
 					ansCount++;  // BFS를 시작한 횟수 = 섬 개수
@@ -164,8 +164,8 @@ int main()
 			}
 		}
 
-		printf("%d\n", ansCount);
+		printf("%d\n", ansCount);        // 섬의 개수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

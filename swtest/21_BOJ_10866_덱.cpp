@@ -47,9 +47,9 @@
 	     (배열 자체는 MAX*2 크기라 그렇게 잡아도 양쪽 모두 여유가 있다)
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf 사용
 
-#define MAX (10000 + 500)
+#define MAX (10000 + 500)      // 명령 최대 10000개 + 여유
 #define OFFSET (MAX / 2)   // 덱이 시작하는 배열 중앙 위치
 
 int N;                 // 명령 개수
@@ -62,13 +62,13 @@ int front, back;       // front: 맨 앞 원소 위치, back: 뒤쪽 다음 삽�
 // ---------------------------
 int strcmp(const char* a, const char* b)
 {
-	while (*a && *a == *b)
+	while (*a && *a == *b)               // a가 끝나지 않았고 두 문자가 같은 동안
 	{
-		++a;
-		++b;
+		++a;                             // a의 다음 문자로
+		++b;                             // b의 다음 문자로
 	}
 
-	return *a - *b;
+	return *a - *b;                      // 멈춘 지점의 문자 차이 (같으면 0)
 }
 
 // ---------------------------
@@ -79,21 +79,21 @@ int main()
 	// 배열 중앙에서 시작해야 앞/뒤 어느 쪽으로도 늘어날 수 있다
 	front = back = OFFSET;
 
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 명령 개수 입력
 
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N; i++)          // 명령을 N번 처리
 	{
-		char command[100];
+		char command[100];               // 명령어 문자열 버퍼
 
-		scanf("%s", command);
+		scanf("%s", command);            // 명령어 입력
 
 		// ---------------------------
 		// push_front X : 앞쪽에 삽입
 		// ---------------------------
 		if (strcmp(command, "push_front") == 0)
 		{
-			int value;
-			scanf("%d", &value);
+			int value;                   // 넣을 정수
+			scanf("%d", &value);         // 정수 X 입력
 
 			// front는 실제 원소를 가리키므로, 먼저 한 칸 물러난 뒤 그 자리에 쓴다
 			deque[--front] = value;
@@ -104,8 +104,8 @@ int main()
 		// ---------------------------
 		else if (strcmp(command, "push_back") == 0)
 		{
-			int value;
-			scanf("%d", &value);
+			int value;                   // 넣을 정수
+			scanf("%d", &value);         // 정수 X 입력
 
 			// back은 빈 다음 자리를 가리키므로, 그 자리에 쓰고 한 칸 전진
 			deque[back++] = value;
@@ -116,7 +116,7 @@ int main()
 		// ---------------------------
 		else if (strcmp(command, "pop_front") == 0)
 		{
-			if (back == front)
+			if (back == front)           // 덱이 비어 있으면
 				printf("-1\n");   // 비어 있음
 			else
 				// 현재 front를 출력하고 한 칸 전진
@@ -128,8 +128,8 @@ int main()
 		// ---------------------------
 		else if (strcmp(command, "pop_back") == 0)
 		{
-			if (back == front)
-				printf("-1\n");
+			if (back == front)           // 덱이 비어 있으면
+				printf("-1\n");          // -1 출력
 			else
 				// 한 칸 물러난 자리가 곧 마지막 원소다
 				printf("%d\n", deque[--back]);
@@ -140,7 +140,7 @@ int main()
 		// ---------------------------
 		else if (strcmp(command, "size") == 0)
 		{
-			printf("%d\n", back - front);
+			printf("%d\n", back - front); // 원소 개수 출력
 		}
 
 		// ---------------------------
@@ -148,7 +148,7 @@ int main()
 		// ---------------------------
 		else if (strcmp(command, "empty") == 0)
 		{
-			printf("%d\n", (back == front) ? 1 : 0);
+			printf("%d\n", (back == front) ? 1 : 0);   // 비었으면 1, 아니면 0 출력
 		}
 
 		// ---------------------------
@@ -156,10 +156,10 @@ int main()
 		// ---------------------------
 		else if (strcmp(command, "front") == 0)
 		{
-			if (back == front)
-				printf("-1\n");
+			if (back == front)           // 덱이 비어 있으면
+				printf("-1\n");          // -1 출력
 			else
-				printf("%d\n", deque[front]);
+				printf("%d\n", deque[front]);   // 맨 앞 원소 출력
 		}
 
 		// ---------------------------
@@ -167,12 +167,12 @@ int main()
 		// ---------------------------
 		else if (strcmp(command, "back") == 0)
 		{
-			if (back == front)
-				printf("-1\n");
+			if (back == front)           // 덱이 비어 있으면
+				printf("-1\n");          // -1 출력
 			else
-				printf("%d\n", deque[back - 1]);
+				printf("%d\n", deque[back - 1]);   // 맨 뒤 원소 출력 (back은 다음 자리)
 		}
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

@@ -34,12 +34,12 @@
 	  morning과 dinner의 합을 한 번에 구할 수 있다.
 */
 
-#include <stdio.h>
+#include <stdio.h>           // scanf, printf, putchar 사용
 
-#define MAX (20 + 5)
-#define INF (0x7fff0000)
+#define MAX (20 + 5)         // N 최대 20 + 여유
+#define INF (0x7fff0000)     // 아주 큰 값 (최솟값 초기화용)
 
-int T;
+int T;               // 테스트 케이스 수
 
 int N;               // 전체 사람 수 (짝수)
 int halfN;           // 한 팀의 인원 수 = N / 2
@@ -54,13 +54,13 @@ int minAnswer;       // 두 팀 능력치 차이의 최솟값
 // ---------------------------
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 사람 수 입력
 
-	halfN = N / 2;
+	halfN = N / 2;                       // 한 팀 인원
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 1번부터 N번까지
+		for (int c = 1; c <= N; c++)     // 1번부터 N번까지
+			scanf("%d", &MAP[r][c]);     // 궁합 값 입력
 }
 
 // ---------------------------
@@ -68,9 +68,9 @@ void input()
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < halfN; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < halfN; i++)      // 고른 인원만큼
+		printf("%d ", num_of_cases[i]);  // 번호 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -78,7 +78,7 @@ void printCases()
 // ---------------------------
 int abs(int x)
 {
-	return (x > 0) ? x : -x;
+	return (x > 0) ? x : -x;             // 양수면 그대로, 아니면 부호 반전
 }
 
 // ---------------------------
@@ -102,13 +102,13 @@ int calculate()
 		isMorning[num_of_cases[i]] = true;
 
 	// 표시 여부로 두 팀을 실제 목록으로 분리
-	mcnt = dcnt = 0;
-	for (int i = 1; i <= N; i++)
+	mcnt = dcnt = 0;                     // 인원 초기화
+	for (int i = 1; i <= N; i++)         // 모든 사람
 	{
-		if (isMorning[i] == true)
-			morning[mcnt++] = i;
-		else
-			dinner[dcnt++] = i;
+		if (isMorning[i] == true)        // morning 팀이면
+			morning[mcnt++] = i;         // morning 목록에
+		else                             // 아니면
+			dinner[dcnt++] = i;          // dinner 목록에
 	}
 
 	// 디버그용
@@ -119,7 +119,7 @@ int calculate()
 	// for (int i = 0; i < dcnt; i++) printf("%d ", dinner[i]);
 	// putchar('\n'); putchar('\n');
 
-	sum1 = sum2 = 0;
+	sum1 = sum2 = 0;                     // 능력치 초기화
 
 	// 팀 안의 서로 다른 두 사람 쌍을 모두 훑는다 (i < k).
 	// 두 팀의 인원이 같으므로 같은 루프에서 둘 다 계산할 수 있다.
@@ -130,11 +130,11 @@ int calculate()
 			int mr, mc; // morning 팀의 두 사람
 			int dr, dc; // dinner 팀의 두 사람
 
-			mr = morning[i];
-			mc = morning[k];
+			mr = morning[i];             // morning 첫째 사람
+			mc = morning[k];             // morning 둘째 사람
 
-			dr = dinner[i];
-			dc = dinner[k];
+			dr = dinner[i];              // dinner 첫째 사람
+			dc = dinner[k];              // dinner 둘째 사람
 
 			// MAP이 대칭이 아니므로 양방향을 모두 더한다
 			sum1 += (MAP[mr][mc] + MAP[mc][mr]);
@@ -142,7 +142,7 @@ int calculate()
 		}
 	}
 
-	return abs(sum1 - sum2);
+	return abs(sum1 - sum2);             // 두 팀 차이의 절댓값
 }
 
 // ---------------------------
@@ -158,16 +158,16 @@ void DFS(int depth, int start)
 	{
 		// printCases();
 
-		int tmp = calculate();
-		if (tmp < minAnswer)
-			minAnswer = tmp;
+		int tmp = calculate();           // 이 분할의 차이
+		if (tmp < minAnswer)             // 더 작으면
+			minAnswer = tmp;             // 최솟값 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
-	for (int i = start; i <= N; i++)
+	for (int i = start; i <= N; i++)     // start부터 후보
 	{
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // i번을 morning 팀으로
 
 		// 조합이므로 다음은 i보다 뒤에서만 고른다
 		DFS(depth + 1, i + 1);
@@ -180,16 +180,16 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		minAnswer = INF;
+		minAnswer = INF;                 // 최솟값 초기화
 
-		DFS(0, 1);
+		DFS(0, 1);                       // 0명 고른 상태, 1번부터
 
-		printf("%d\n", minAnswer);
+		printf("%d\n", minAnswer);       // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

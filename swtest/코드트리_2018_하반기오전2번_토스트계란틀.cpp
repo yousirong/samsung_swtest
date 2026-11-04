@@ -41,11 +41,11 @@
 	  덕분에 연합 목록을 따로 만들 필요 없이 큐를 그대로 다시 훑어 평균을 적용할 수 있다.
 */
 
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf, putchar 사용
 
-#define MAX (100 + 10)
+#define MAX (100 + 10)             // N 최대 100 + 여유
 
-int T;
+int T;                     // 테스트 케이스 수
 
 int N, L, R;               // N: 격자 크기, 연합 조건은 차이가 L 이상 R 이하
 int MAP[MAX][MAX];         // 현재 격자 상태
@@ -54,30 +54,30 @@ bool visit[MAX][MAX];      // 이번 날 이미 어떤 연합에 들어갔는지
 // 좌표 한 쌍
 struct RC
 {
-	int r;
-	int c;
+	int r;                 // 행
+	int c;                 // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;      // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];       // BFS용 큐 (그날의 한 연합을 담는다)
 
 // 방향 배열: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d", &N, &L, &R);
+	scanf("%d %d %d", &N, &L, &R);       // 격자 크기, L, R 입력
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 칸 값 입력
 		}
 	}
 }
@@ -87,11 +87,11 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%2d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%2d ", MAP[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
 }
 
@@ -100,7 +100,7 @@ void printMap()
 // ---------------------------
 int abs(int x)
 {
-	return (x > 0) ? x : -x;
+	return (x > 0) ? x : -x;             // 양수면 그대로, 아니면 부호 반전
 }
 
 // ---------------------------
@@ -110,27 +110,27 @@ int abs(int x)
 // ---------------------------
 int BFS(int r, int c)
 {
-	int rp, wp;
-	int sum;
+	int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
+	int sum;                             // 연합 전체 합
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 빈 큐
 
-	queue[wp].r = r;
-	queue[wp++].c = c;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp++].c = c;                   // 시작 열, 삽입 위치 증가
 
-	visit[r][c] = true;
+	visit[r][c] = true;                  // 시작 칸 방문 표시
 
 	// 연합 전체 합. 시작 칸의 값부터 담아 둔다.
 	sum = MAP[r][c];
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 한 칸 꺼낸다
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr = out.r + dr[i];
-			int nc = out.c + dc[i];
+			int nr = out.r + dr[i];      // 이웃 행
+			int nc = out.c + dc[i];      // 이웃 열
 
 			// 격자 밖
 			if (nr < 1 || nc < 1 || nr > N || nc > N)
@@ -143,11 +143,11 @@ int BFS(int r, int c)
 			if (visit[nr][nc] == true || (L <= diff && diff <= R) == false)
 				continue;
 
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 이웃 행 기록
+			queue[wp++].c = nc;          // 이웃 열 기록, 삽입 위치 증가
 
 			visit[nr][nc] = true;   // 넣는 즉시 표시 (중복 삽입 방지)
-			sum += MAP[nr][nc];
+			sum += MAP[nr][nc];     // 연합 합에 더한다
 		}
 	}
 
@@ -156,11 +156,11 @@ int BFS(int r, int c)
 	// (정수 나눗셈이라 소수점은 자동으로 버려진다)
 	for (int i = 0; i < wp; i++)
 	{
-		RC tmp = queue[i];
-		MAP[tmp.r][tmp.c] = sum / wp;
+		RC tmp = queue[i];               // 연합의 i번째 칸
+		MAP[tmp.r][tmp.c] = sum / wp;    // 평균값으로 갱신
 	}
 
-	return wp;
+	return wp;                           // 연합 크기 반환
 }
 
 // ---------------------------
@@ -175,21 +175,21 @@ bool simulate()
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			visit[r][c] = false;
+			visit[r][c] = false;         // 방문 기록 초기화
 		}
 	}
 
-	bool result = false;
+	bool result = false;                 // 이번 날 이동 여부
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
 			// 이미 어떤 연합에 속한 칸은 새 연합의 시작점이 될 수 없다
 			if (visit[r][c] == true)
 				continue;
 
-			int moveEggCount = BFS(r, c);
+			int moveEggCount = BFS(r, c);   // 연합 만들고 크기 받기
 
 			// 혼자인 연합(크기 1)은 아무 값도 바뀌지 않으므로 이동으로 치지 않는다
 			if (moveEggCount != 1)
@@ -197,7 +197,7 @@ bool simulate()
 		}
 	}
 
-	return result;
+	return result;                       // 이동 여부 반환
 }
 
 int main()
@@ -206,25 +206,25 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		int answer = 0; // 이동이 일어난 날 수
 
-		while (1)
+		while (1)                        // 이동이 없을 때까지
 		{
-			bool result = simulate();
+			bool result = simulate();    // 하루 처리
 
 			// 이동이 없는 날이 오면 그대로 끝난다 (그날은 세지 않는다)
 			if (result == false)
 				break;
 
-			answer++;
+			answer++;                    // 이동한 날 수 증가
 		}
 
-		printf("%d\n", answer);
+		printf("%d\n", answer);          // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

@@ -30,7 +30,7 @@
       개수가 부풀려진다.
 */
 
-#include <stdio.h>
+#include <stdio.h>      // scanf, printf, putchar 사용
 
 #define MAX (100 + 10)  // 최대 정점 수 (문제 조건 100 + 여유)
 
@@ -45,16 +45,16 @@ bool visit[MAX];        // 방문(감염) 여부
 // ---------------------------
 void input()
 {
-    scanf("%d %d", &V, &E);
+    scanf("%d %d", &V, &E);              // 정점 수와 간선 수 입력
 
-    for (int i = 0; i < E; i++)
+    for (int i = 0; i < E; i++)          // 간선 E개 입력
     {
-        int n1, n2;
-        scanf("%d %d", &n1, &n2);
+        int n1, n2;                      // 연결된 두 컴퓨터 번호
+        scanf("%d %d", &n1, &n2);        // 간선 양 끝 입력
 
         // 무방향 그래프이므로 양방향 모두 표시
-        MAP[n1][n2] = 1;
-        MAP[n2][n1] = 1;
+        MAP[n1][n2] = 1;                 // n1 -> n2 연결
+        MAP[n2][n1] = 1;                 // n2 -> n1 연결
     }
 }
 
@@ -63,13 +63,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-    for (int r = 1; r <= V; r++)
+    for (int r = 1; r <= V; r++)         // 모든 행
     {
-        for (int c = 1; c <= V; c++)
-            printf("%d ", MAP[r][c]);
-        putchar('\n');
+        for (int c = 1; c <= V; c++)     // 모든 열
+            printf("%d ", MAP[r][c]);    // 연결 여부 출력
+        putchar('\n');                   // 행 끝 줄바꿈
     }
-    putchar('\n');
+    putchar('\n');                       // 행렬 끝 빈 줄
 }
 
 // ---------------------------
@@ -85,10 +85,10 @@ void BFS(int node)
     rp = wp = 0;  // 빈 큐
 
     // 시작 정점을 큐에 넣고 방문 표시
-    queue[wp++] = node;
-    visit[node] = true;
+    queue[wp++] = node;                  // 시작 정점 삽입
+    visit[node] = true;                  // 시작 정점 방문 표시
 
-    count = 0;
+    count = 0;                           // 감염 수 0부터
 
     // 큐가 빌 때까지 (처리할 원소가 남아 있는 동안)
     while (rp < wp)
@@ -122,9 +122,9 @@ void BFS(int node)
 // ---------------------------
 int main()
 {
-    input();
+    input();   // 그래프 입력
 
     BFS(1);    // 1번 컴퓨터에서 감염 시작
 
-    return 0;
+    return 0;  // 프로그램 정상 종료
 }

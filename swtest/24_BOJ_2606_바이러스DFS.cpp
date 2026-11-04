@@ -29,7 +29,7 @@
 	     문제가 요구하는 "1번 제외" 조건이 자동으로 맞춰진다.
 */
 
-#include <stdio.h>
+#include <stdio.h>      // scanf, printf, putchar 사용
 
 #define MAX (100 + 10)  // 최대 정점 수 (문제 조건 100 + 여유)
 
@@ -44,16 +44,16 @@ int count;              // 새로 감염된 컴퓨터 수 (1번 제외)
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &V, &E);
+	scanf("%d %d", &V, &E);              // 정점 수와 간선 수 입력
 
-	for (int i = 0; i < E; i++)
+	for (int i = 0; i < E; i++)          // 간선 E개 입력
 	{
-		int n1, n2;
-		scanf("%d %d", &n1, &n2);
+		int n1, n2;                      // 연결된 두 컴퓨터 번호
+		scanf("%d %d", &n1, &n2);        // 간선 양 끝 입력
 
 		// 무방향 그래프이므로 양방향 모두 표시
-		MAP[n1][n2] = 1;
-		MAP[n2][n1] = 1;
+		MAP[n1][n2] = 1;                 // n1 -> n2 연결
+		MAP[n2][n1] = 1;                 // n2 -> n1 연결
 	}
 }
 
@@ -62,13 +62,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= V; r++)
+	for (int r = 1; r <= V; r++)         // 모든 행
 	{
-		for (int c = 1; c <= V; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= V; c++)     // 모든 열
+			printf("%d ", MAP[r][c]);    // 연결 여부 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 행렬 끝 빈 줄
 }
 
 // ---------------------------
@@ -101,12 +101,12 @@ void DFS(int node)
 // ---------------------------
 int main()
 {
-	input();
+	input();   // 그래프 입력
 
 	DFS(1);    // 1번 컴퓨터에서 감염 시작
 
 	// 1번을 제외한 감염된 컴퓨터 수
 	printf("%d\n", count);
 
-	return 0;
+	return 0;  // 프로그램 정상 종료
 }

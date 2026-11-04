@@ -51,13 +51,13 @@
 	  - 번들 가격이 0일 수도 있다 (그룹 #2). 그래도 "산다/안 산다" 둘 다 보므로 문제없다.
 	  - 힌트권이 n - 1장보다 많이 모여도 n - 1장까지만 쓴다.
 */
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf 사용
 
 #define MAX_cost (16+4)   // 스테이지 수 최대 16
 #define MAX_hint (20+4)   // 번들 한 줄 길이(가격 + 힌트권 k장) 최대 20
-#define INF (0x7fffffff)
+#define INF (0x7fffffff)  // int 최댓값 (답 초기값)
 
-int T;
+int T;                             // 테스트 케이스 수
 
 int N;                             // 스테이지 수
 int COST[MAX_cost][MAX_cost];      // COST[i][j] : i번 스테이지에서 힌트권 j장을 썼을 때 비용
@@ -66,32 +66,32 @@ int bundle[MAX_cost][MAX_hint];    // i번 스테이지 번들에 든 힌트권 
 int bundleSize[MAX_cost];          // 번들에 든 힌트권 장수 (k)
 
 int ticket[MAX_cost];              // 지금 들고 있는 i번 힌트권 장수
-int answer;
+int answer;                        // 최소 비용
 
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 스테이지 수 입력
 
-	for (int i = 1; i <= N; i++)
-		for (int j = 0; j < N; j++)
-			scanf("%d", &COST[i][j]);
+	for (int i = 1; i <= N; i++)         // 스테이지마다
+		for (int j = 0; j < N; j++)      // 힌트권 0 ~ N-1장
+			scanf("%d", &COST[i][j]);    // 비용 입력
 
-	int k;
+	int k;                               // 번들 하나의 힌트권 장수
 	scanf("%d", &k);   // 번들 하나에 든 힌트권 장수
 
-	for (int i = 1; i <= N - 1; i++)
+	for (int i = 1; i <= N - 1; i++)     // 마지막을 뺀 스테이지마다
 	{
-		scanf("%d", &price[i]);
+		scanf("%d", &price[i]);          // 번들 가격 입력
 
-		bundleSize[i] = k;
-		for (int j = 0; j < k; j++)
-			scanf("%d", &bundle[i][j]);
+		bundleSize[i] = k;               // 번들 장수
+		for (int j = 0; j < k; j++)      // 번들에 든 힌트권
+			scanf("%d", &bundle[i][j]);  // 힌트권 번호 입력
 	}
 
-	for (int i = 0; i <= N; i++)
-		ticket[i] = 0;
+	for (int i = 0; i <= N; i++)         // 모든 힌트권 번호
+		ticket[i] = 0;                   // 처음엔 0장
 
-	answer = INF;
+	answer = INF;                        // 답 초기화
 }
 
 // stage번 스테이지를 풀 차례이고, 지금까지 쓴 비용이 sum이다
@@ -101,16 +101,16 @@ void DFS(int stage, int sum)
 	if (sum >= answer) return;
 
 	// 1) 가진 힌트권을 최대 n - 1장까지 전부 쓴다 (쓸수록 싸고, 남겨도 쓸 곳이 없다)
-	int use = ticket[stage];
-	if (use > N - 1) use = N - 1;
+	int use = ticket[stage];             // 가진 장수
+	if (use > N - 1) use = N - 1;        // 최대 N-1장까지만
 
-	sum += COST[stage][use];
+	sum += COST[stage][use];             // 이 스테이지 비용 더하기
 
 	// 2) 마지막 스테이지면 끝
 	if (stage == N)
 	{
-		if (sum < answer) answer = sum;
-		return;
+		if (sum < answer) answer = sum;  // 최솟값 갱신
+		return;                          // 되돌아간다
 	}
 
 	// 3) 이 스테이지의 번들을 사지 않는다
@@ -118,26 +118,26 @@ void DFS(int stage, int sum)
 
 	// 4) 번들을 산다 : 힌트권을 더하고 내려갔다가, 돌아오면 되돌린다
 	for (int j = 0; j < bundleSize[stage]; j++)
-		ticket[bundle[stage][j]]++;
+		ticket[bundle[stage][j]]++;      // 번들의 힌트권 추가
 
-	DFS(stage + 1, sum + price[stage]);
+	DFS(stage + 1, sum + price[stage]);  // 번들 가격을 더해 다음 스테이지
 
 	for (int j = 0; j < bundleSize[stage]; j++)
-		ticket[bundle[stage][j]]--;
+		ticket[bundle[stage][j]]--;      // 힌트권 되돌리기
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		DFS(1, 0);
+		DFS(1, 0);                       // 1번 스테이지부터, 비용 0
 
-		printf("%d\n", answer);
+		printf("%d\n", answer);          // 최소 비용 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

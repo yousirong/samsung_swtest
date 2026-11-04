@@ -61,66 +61,66 @@
 	  - 전역 이름 end 는 std::end 와 겹친다. 지금은 stdio.h만 써서 괜찮지만
 	    프로그래머스 제출용으로 옮길 때는 이름을 바꿔야 한다.
 */
-#include <stdio.h>
+#include <stdio.h>                       // scanf, printf, putchar 사용
 
-#define MAX_N (50+5)
-#define MAX_M (300+30)
+#define MAX_N (50+5)                     // N 최대 50 + 여유
+#define MAX_M (300+30)                   // M 최대 300 + 여유
 
-#define WALL (1)
+#define WALL (1)                         // 비도로
 
-#define UP (0)
-#define DOWN (1)
-#define LEFT (2)
-#define RIGHT (3)
+#define UP (0)                           // 상
+#define DOWN (1)                         // 하
+#define LEFT (2)                         // 좌 (scope 값으로는 왼쪽 부채꼴)
+#define RIGHT (3)                        // 우 (scope 값으로는 오른쪽 부채꼴)
 
-#define STRAIGHT (1)
+#define STRAIGHT (1)                     // scope 값 : 일직선 시야
 
-int T;
+int T;                                   // 테스트 케이스 수
 
-int N, M;
-int MAP[MAX_N][MAX_N];
+int N, M;                                // 마을 크기, 전사 수
+int MAP[MAX_N][MAX_N];                   // 도로(0) / 비도로(1)
 bool visit[MAX_N][MAX_N]; // BFS 방문 체크
 int scope[MAX_N][MAX_N]; // 메두사의 시선 처리
 
-struct RC
+struct RC                                // 좌표
 {
-	int r;
-	int c;
+	int r;                               // 행
+	int c;                               // 열
 };
 
-RC start, end, medusa;
-RC queue[MAX_N * MAX_N];
-RC before[MAX_N][MAX_N];
+RC start, end, medusa;                   // 집, 공원, 메두사 현재 위치
+RC queue[MAX_N * MAX_N];                 // BFS 큐
+RC before[MAX_N][MAX_N];                 // BFS 앞 칸
 RC position[MAX_N * MAX_N]; // 메두사의 경로
 int pcnt; // 메두사의 경로 길이
 
-struct RCD
+struct RCD                               // 전사 정보
 {
-	int r;
-	int c;
+	int r;                               // 행
+	int c;                               // 열
 	bool dead; // 사망 처리
 };
 
-RCD warrior[MAX_M];
+RCD warrior[MAX_M];                      // 전사 배열
 
-struct ANSWER
+struct ANSWER                            // 턴별 출력 값
 {
 	int distance; // 모든 전사가 이동한 거리의 합
 	int stone; // 메두사로 인해 돌이 된 전사의 수
 	int attack; // 메두사로 공격한 전사의 수
 };
 
-ANSWER answer;
+ANSWER answer;                           // 이번 턴 결과
 
 // ↑, ↓, ←, → (상, 하, 좌, 우)
-int dr[] = { -1,1,0,0 };
-int dc[] = { 0,0,-1,1 };
+int dr[] = { -1,1,0,0 };                 // 방향별 행 변화량
+int dc[] = { 0,0,-1,1 };                 // 방향별 열 변화량
 
 void input()
 {
-	int sr, sc, er, ec;
+	int sr, sc, er, ec;                  // 집, 공원 좌표
 
-	scanf("%d %d %d %d %d %d", &N, &M, &sr, &sc, &er, &ec);
+	scanf("%d %d %d %d %d %d", &N, &M, &sr, &sc, &er, &ec);   // 기본 정보 입력
 
 	start.r = sr + 1;
 	// 입력은 0-based, 내부는 1-based로 쓴다.
@@ -128,45 +128,45 @@ void input()
 	end.r = er + 1;
 	end.c = ec + 1;
 
-	pcnt = 0;
+	pcnt = 0;                            // 경로 길이 초기화
 
-	for (int m = 0; m < M; m++)
+	for (int m = 0; m < M; m++)          // 전사별
 	{
-		int r, c;
+		int r, c;                        // 전사 좌표
 
-		scanf("%d %d", &r, &c);
+		scanf("%d %d", &r, &c);          // 입력
 
-		warrior[m].r = r + 1;
+		warrior[m].r = r + 1;            // 1-based로 저장
 		warrior[m].c = c + 1;
-		warrior[m].dead = false;
+		warrior[m].dead = false;         // 살아 있음
 	}
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 마을 입력
 		for (int c = 1; c <= N; c++)
 			scanf("%d", &MAP[r][c]);
 }
 
 void printMap(int map[MAX_N][MAX_N]) // for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%2d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%2d ", map[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 void printStatus() // for debug
 {
-	int tmpMAP[MAX_N][MAX_N] = { 0 };
+	int tmpMAP[MAX_N][MAX_N] = { 0 };    // 출력용 격자
 
-	tmpMAP[medusa.r][medusa.c] = -1;
+	tmpMAP[medusa.r][medusa.c] = -1;     // 메두사 표시
 
-	for (int m = 0; m < M; m++)
+	for (int m = 0; m < M; m++)          // 전사 표시
 	{
 		if (warrior[m].dead == true) continue;
-		
+
 		int r, c;
 
 		r = warrior[m].r;
@@ -175,39 +175,39 @@ void printStatus() // for debug
 		tmpMAP[r][c] = m;
 	}
 
-	printMap(tmpMAP);
+	printMap(tmpMAP);                    // 출력
 }
 
-void BFS()
+void BFS()                               // 메두사 경로 구하기
 {
-	int rp, wp;
-	int sr, sc, er, ec;
+	int rp, wp;                          // 큐 위치
+	int sr, sc, er, ec;                  // 출발, 도착
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 큐 초기화
 
 	sr = start.r;
 	sc = start.c;
 	er = end.r;
 	ec = end.c;
 
-	queue[wp].r = sr;
+	queue[wp].r = sr;                    // 집 큐에 넣기
 	queue[wp++].c = sc;
 
-	visit[sr][sc] = 1;
+	visit[sr][sc] = 1;                   // 방문 표시
 
-	before[sr][sc].r = -1;
+	before[sr][sc].r = -1;               // 앞 칸 없음
 	before[sr][sc].c = -1;
 
-	while (rp < wp)
+	while (rp < wp)                      // 큐가 빌 때까지
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 하나 꺼내기
 
-		if (er == out.r && ec == out.c)
+		if (er == out.r && ec == out.c)  // 공원 도착
 		{
-			int tr = er;
+			int tr = er;                 // 되짚는 현재 칸
 			int tc = ec;
 
-			position[pcnt].r = er;
+			position[pcnt].r = er;       // 공원부터 경로에 쌓기
 			position[pcnt++].c = ec;
 
 			while (1)
@@ -217,12 +217,12 @@ void BFS()
 				br = before[tr][tc].r;
 				bc = before[tr][tc].c;
 
-				if (br == sr && bc == sc) break;
+				if (br == sr && bc == sc) break;   // 집까지 오면 멈춤
 
-				position[pcnt].r = br;
+				position[pcnt].r = br;   // 경로에 추가
 				position[pcnt++].c = bc;
 
-				tr = br;
+				tr = br;                 // 한 칸 거슬러 올라감
 				tc = bc;
 			}
 
@@ -235,33 +235,33 @@ void BFS()
 			}
 		}
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 상하좌우 순서로
 		{
-			int nr = out.r + dr[i];
-			int nc = out.c + dc[i];
+			int nr = out.r + dr[i];      // 이웃 행
+			int nc = out.c + dc[i];      // 이웃 열
 
-			if (nr<1 || nc<1 || nr>N || nc>N) continue;
-			if (visit[nr][nc] != 0 || MAP[nr][nc] == WALL) continue;
+			if (nr<1 || nc<1 || nr>N || nc>N) continue;                  // 격자 밖
+			if (visit[nr][nc] != 0 || MAP[nr][nc] == WALL) continue;     // 방문했거나 비도로
 
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣기
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = visit[out.r][out.c] + 1;
+			visit[nr][nc] = visit[out.r][out.c] + 1;   // 방문 표시 (bool이라 true)
 
-			before[nr][nc] = out;
+			before[nr][nc] = out;        // 앞 칸 기록
 		}
 	}
 }
 
-void moveMedusa(int index)
+void moveMedusa(int index)               // 메두사 한 칸 이동
 {
-	medusa = position[index];
+	medusa = position[index];            // 경로의 index번째 칸으로
 
-	for (int m = 0; m < M; m++)
+	for (int m = 0; m < M; m++)          // 전사별
 	{
 		if (warrior[m].dead == true) continue;
 
-		int wr, wc;
+		int wr, wc;                      // 전사 좌표
 
 		wr = warrior[m].r;
 		wc = warrior[m].c;
@@ -272,141 +272,141 @@ void moveMedusa(int index)
 	}
 }
 
-void straight(int r, int c, int dir, int value)
+void straight(int r, int c, int dir, int value)   // (r, c) 다음 칸부터 dir 방향 끝까지 value로 칠하기
 {
-	int sr, sc;
+	int sr, sc;                          // 현재 칸
 
 	sr = r;
 	sc = c;
 
 	while (1)
 	{
-		int nr, nc;
+		int nr, nc;                      // 다음 칸
 
 		nr = sr + dr[dir];
 		nc = sc + dc[dir];
 
-		if (nr <1 || nc<1 || nr>N || nc>N) break;
+		if (nr <1 || nc<1 || nr>N || nc>N) break;   // 격자 밖이면 멈춤
 
-		scope[nr][nc] = value;
+		scope[nr][nc] = value;           // 칠하기
 
-		sr = nr;
+		sr = nr;                         // 한 칸 진행
 		sc = nc;
 	}
 }
 
-void diagonal(int r, int c, int dir, int nDir, int value)
+void diagonal(int r, int c, int dir, int nDir, int value)   // 부채꼴 한쪽 칠하기
 {
-	int step = 1;
+	int step = 1;                        // 대각선 칸 수
 	while (1)
 	{
-		int sr, sc;
+		int sr, sc;                      // 대각선으로 step칸 간 점
 
 		sr = r + (dr[dir] + dr[nDir]) * step;
 		// 대각선으로 step칸 간 점 -> 거기서 바라보는 방향으로 끝까지 칠한다.
 		sc = c + (dc[dir] + dc[nDir]) * step;
 
-		if (sr<1 || sc<1 || sr>N || sc>N) break;
+		if (sr<1 || sc<1 || sr>N || sc>N) break;   // 대각선이 격자 밖이면 끝
 
-		scope[sr][sc] = value;
+		scope[sr][sc] = value;           // 대각선 칸 칠하기
 
-		while (1)
+		while (1)                        // 바라보는 방향으로 직진
 		{
-			int nr, nc;
+			int nr, nc;                  // 다음 칸
 
 			nr = sr + dr[dir];
 			nc = sc + dc[dir];
 
-			if (nr<1 || nc<1 || nr>N || nc>N) break;
+			if (nr<1 || nc<1 || nr>N || nc>N) break;   // 격자 밖이면 멈춤
 
-			scope[nr][nc] = value;
+			scope[nr][nc] = value;       // 칠하기
 
-			sr = nr;
+			sr = nr;                     // 한 칸 진행
 			sc = nc;
 		}
-		step++;
+		step++;                          // 다음 대각선
 	}
 }
 
 // ↑, ↓, ←, → (상, 하, 좌, 우 / 0, 1, 2, 3)
-void leftLook(int r, int c, int dir, int value)
+void leftLook(int r, int c, int dir, int value)   // 왼쪽 부채꼴
 {
-	int changeDir[4] = { 2,3,1,0 };
-	int leftDir = changeDir[dir];
+	int changeDir[4] = { 2,3,1,0 };      // 바라보는 방향별 왼쪽 방향
+	int leftDir = changeDir[dir];        // 왼쪽 방향
 
-	diagonal(r, c, dir, leftDir, value);
+	diagonal(r, c, dir, leftDir, value); // 칠하기
 }
 
-void rightLook(int r, int c, int dir, int value)
+void rightLook(int r, int c, int dir, int value)  // 오른쪽 부채꼴
 {
-	int changeDir[4] = { 3,2,0,1 };
-	int rightDir = changeDir[dir];
+	int changeDir[4] = { 3,2,0,1 };      // 바라보는 방향별 오른쪽 방향
+	int rightDir = changeDir[dir];       // 오른쪽 방향
 
-	diagonal(r, c, dir, rightDir, value);
+	diagonal(r, c, dir, rightDir, value);   // 칠하기
 }
 
-int countStoneWarrior(int dir)
+int countStoneWarrior(int dir)           // dir 방향을 볼 때 돌이 되는 전사 수 (scope도 그려 둔다)
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // scope 초기화
 		for (int c = 1; c <= N; c++)
 			scope[r][c] = 0;
 
-	int mr, mc;
+	int mr, mc;                          // 메두사 위치
 
 	mr = medusa.r;
 	mc = medusa.c;
 
-	straight(mr, mc, dir, STRAIGHT);
-	leftLook(mr, mc, dir, LEFT);
-	rightLook(mr, mc, dir, RIGHT);
+	straight(mr, mc, dir, STRAIGHT);     // 일직선 시야
+	leftLook(mr, mc, dir, LEFT);         // 왼쪽 부채꼴
+	rightLook(mr, mc, dir, RIGHT);       // 오른쪽 부채꼴
 
-	for (int m = 0; m < M; m++)
+	for (int m = 0; m < M; m++)          // 전사별 그림자 지우기
 	{
 		if (warrior[m].dead == true) continue;
 
-		int wr = warrior[m].r;
-		int wc = warrior[m].c;
+		int wr = warrior[m].r;           // 전사 행
+		int wc = warrior[m].c;           // 전사 열
 
 		if (scope[wr][wc] == STRAIGHT) straight(wr, wc, dir, 0);
 		// 시야 안의 전사 뒤쪽(그림자)을 0으로 지운다. 전사 자기 칸은 그대로 둔다.
-		else if (scope[wr][wc] == LEFT)
+		else if (scope[wr][wc] == LEFT)  // 왼쪽 부채꼴 위의 전사
 		{
-			straight(wr, wc, dir, 0);
-			leftLook(wr, wc, dir, 0);
+			straight(wr, wc, dir, 0);    // 일직선 그림자
+			leftLook(wr, wc, dir, 0);    // 왼쪽 그림자
 		}
-		else if (scope[wr][wc] == RIGHT)
+		else if (scope[wr][wc] == RIGHT) // 오른쪽 부채꼴 위의 전사
 		{
-			straight(wr, wc, dir, 0);
-			rightLook(wr, wc, dir, 0);
+			straight(wr, wc, dir, 0);    // 일직선 그림자
+			rightLook(wr, wc, dir, 0);   // 오른쪽 그림자
 		}
 	}
 
-	int count = 0;
+	int count = 0;                       // 돌이 되는 전사 수
 
-	for (int m = 0; m < M; m++)
+	for (int m = 0; m < M; m++)          // 전사별
 	{
 		if (warrior[m].dead == true) continue;
 
-		int wr, wc;
+		int wr, wc;                      // 전사 좌표
 
 		wr = warrior[m].r;
 		wc = warrior[m].c;
 
-		if (scope[wr][wc] != 0) count++;
+		if (scope[wr][wc] != 0) count++; // 시야 안이면 돌
 	}
 
-	return count;
+	return count;                        // 반환
 }
 
-void lookAt()
+void lookAt()                            // 메두사가 볼 방향 정하기
 {
-	int maxCount, maxDir;
+	int maxCount, maxDir;                // 최대 돌 수, 그 방향
 
-	maxCount = maxDir = 0;
+	maxCount = maxDir = 0;               // 초기화
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)          // 상하좌우
 	{
-		int tmp = countStoneWarrior(i);
+		int tmp = countStoneWarrior(i);  // 돌이 되는 수
 		if (maxCount < tmp)
 			// "더 클 때만" 갱신 -> 동점이면 상 하 좌 우 순으로 앞선 방향이 남는다.
 		{
@@ -418,13 +418,13 @@ void lookAt()
 	countStoneWarrior(maxDir);
 	// 고른 방향으로 scope를 다시 그려 둔다 (전사 이동 때 이 시야를 쓴다).
 
-	answer.stone = maxCount;
+	answer.stone = maxCount;             // 돌이 된 전사 수 기록
 }
 
-int checkRow(RCD w)
+int checkRow(RCD w)                      // 메두사와의 행 차이
 {
-	int mr = medusa.r;
-	int wr = w.r;
+	int mr = medusa.r;                   // 메두사 행
+	int wr = w.r;                        // 전사 행
 
 	// mr > wr -> 메두사는 아래에
 	// mr = wr -> 같은 행, 상하로 움직일 수 없음.
@@ -432,10 +432,10 @@ int checkRow(RCD w)
 	return mr - wr;
 }
 
-int checkCol(RCD w)
+int checkCol(RCD w)                      // 메두사와의 열 차이
 {
-	int mc = medusa.c;
-	int wc = w.c;
+	int mc = medusa.c;                   // 메두사 열
+	int wc = w.c;                        // 전사 열
 
 	// mc > wc -> 메두사는 오른쪽에
 	// mc = wc -> 같은 열, 좌우로 움직일 수 없음.
@@ -443,9 +443,9 @@ int checkCol(RCD w)
 	return mc - wc;
 }
 
-bool checkScope(RCD w, int dir)
+bool checkScope(RCD w, int dir)          // dir로 한 칸 간 칸이 시야 밖인가
 {
-	int nr, nc;
+	int nr, nc;                          // 다음 칸
 
 	nr = w.r + dr[dir];
 	nc = w.c + dc[dir];
@@ -453,33 +453,33 @@ bool checkScope(RCD w, int dir)
 	if (scope[nr][nc] != 0) return false;
 	// 메두사 시야 안으로는 들어갈 수 없다.
 
-	return true;
+	return true;                         // 갈 수 있음
 }
 
-void moveWarrior(bool first)
+void moveWarrior(bool first)             // 전사 한 번 이동 (first : 첫 번째 이동인가)
 {
-	for (int m = 0; m < M; m++)
+	for (int m = 0; m < M; m++)          // 전사별
 	{
-		RCD w = warrior[m];
+		RCD w = warrior[m];              // 전사 정보
 
-		if (w.dead == true) continue;
+		if (w.dead == true) continue;    // 사라진 전사 제외
 		if (scope[w.r][w.c] != 0) continue;
 		// 돌이 된 전사는 이번 턴에 움직이지 않는다.
 
-		int upDown = checkRow(w);
-		int leftRight = checkCol(w);
+		int upDown = checkRow(w);        // 행 차이
+		int leftRight = checkCol(w);     // 열 차이
 
-		int direction = -1;
+		int direction = -1;              // 이동 방향
 
 		// 메두사를 향해서 이동하므로 격자의 바깥으로 나가지 않는다.
-		if (first == true)
+		if (first == true)               // 첫 이동 : 상 하 좌 우
 		{
 			if (upDown < 0 && checkScope(w, UP) == true) direction = UP;
 			else if (upDown > 0 && checkScope(w, DOWN) == true) direction = DOWN;
 			else if (leftRight < 0 && checkScope(w, LEFT) == true) direction = LEFT;
 			else if (leftRight > 0 && checkScope(w, RIGHT) == true) direction = RIGHT;
 		}
-		else
+		else                             // 두 번째 이동 : 좌 우 상 하
 		{
 			if (leftRight < 0 && checkScope(w, LEFT) == true) direction = LEFT;
 			else if (leftRight > 0 && checkScope(w, RIGHT) == true) direction = RIGHT;
@@ -487,64 +487,64 @@ void moveWarrior(bool first)
 			else if (upDown > 0 && checkScope(w, DOWN) == true) direction = DOWN;
 		}
 
-		if (direction == -1) continue;
+		if (direction == -1) continue;   // 갈 곳이 없으면 제자리
 
-		int nr, nc;
+		int nr, nc;                      // 다음 칸
 
 		nr = w.r + dr[direction];
 		nc = w.c + dc[direction];
 
-		warrior[m].r = nr;
+		warrior[m].r = nr;               // 이동
 		warrior[m].c = nc;
 
-		answer.distance++;
+		answer.distance++;               // 이동 거리 증가
 
-		if (nr == medusa.r && nc == medusa.c)
+		if (nr == medusa.r && nc == medusa.c)   // 메두사에게 도착
 		{
-			answer.attack++;
-			warrior[m].dead = true;
+			answer.attack++;             // 공격 수 증가
+			warrior[m].dead = true;      // 사라짐
 		}
 	}
 }
 
 void simulate()
 {
-	if (pcnt == 0)
+	if (pcnt == 0)                       // 경로가 없으면
 	{
-		printf("-1\n");
+		printf("-1\n");                  // -1 출력
 		return;
 	}
 
 	for (int p = 0; p < pcnt - 1; p++)
 		// 마지막 칸(공원)에 도착하는 턴은 0만 출력하므로 pcnt - 1 까지만 돈다.
 	{
-		answer.distance = answer.stone = answer.attack = 0;
+		answer.distance = answer.stone = answer.attack = 0;   // 턴 결과 초기화
 
-		moveMedusa(p);
+		moveMedusa(p);                   // 1) 메두사 이동
 
-		lookAt();
+		lookAt();                        // 2) 시선
 
-		moveWarrior(true);
-		moveWarrior(false);
+		moveWarrior(true);               // 3) 전사 첫 이동
+		moveWarrior(false);              //    전사 두 번째 이동
 
-		printf("%d %d %d\n", answer.distance, answer.stone, answer.attack);
+		printf("%d %d %d\n", answer.distance, answer.stone, answer.attack);   // 턴 결과 출력
 	}
 
-	printf("%d\n", 0);
+	printf("%d\n", 0);                   // 공원 도착
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		BFS();
+		BFS();                           // 메두사 경로 구하기
 
-		simulate();
+		simulate();                      // 시뮬레이션 + 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

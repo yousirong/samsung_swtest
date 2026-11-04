@@ -33,11 +33,11 @@
 	    함수 안에서는 지역 이름이 전역을 가린다. 동작은 맞지만 읽을 때 헷갈리기 쉽다.
 	  - printStatus()는 디버그 출력용이다 (main()에서 주석 처리).
 */
-#include <stdio.h>
+#include <stdio.h>        // scanf, printf, putchar 사용
 
-#define MAX (100+20)
+#define MAX (100+20)      // 명령 수 여유 있게
 
-int T;
+int T;            // 테스트 케이스 수
 int wheel[5][10]; /* wheel[번호 1~4][각 톱니 1~8] */
 int list[6];      // list[k] : 이번 명령에서 k번 자석이 돌 방향 (0 = 안 돎)
 int number[MAX];  // 명령마다 돌릴 자석 번호
@@ -46,81 +46,81 @@ int N;            // 명령 수 (문제의 K)
 
 void input()
 {
-	scanf("%d", &N);
-	for (int number = 1; number <= 4; number++)
+	scanf("%d", &N);                             // 명령 수 입력
+	for (int number = 1; number <= 4; number++)  // 1번 ~ 4번 자석
 	{
-		for (int index = 1; index <= 8; index++)
+		for (int index = 1; index <= 8; index++) // 1번 ~ 8번 톱니
 		{
-			scanf("%d", &wheel[number][index]);
+			scanf("%d", &wheel[number][index]);  // 톱니 극 입력
 		}
 	}
 
-	for (int i = 0; i < N; i++)
-		scanf("%d %d", &number[i], &direct[i]);
+	for (int i = 0; i < N; i++)                  // 명령 N개
+		scanf("%d %d", &number[i], &direct[i]);  // 자석 번호와 방향 입력
 
-	return;
+	return;                                      // 입력 끝
 }
 
 void printStatus(int step, const char* when)   // for debug
 {
-	printf("=== %d번째 명령 %s ===\n", step + 1, when);
+	printf("=== %d번째 명령 %s ===\n", step + 1, when);   // 단계 제목
 
-	for (int k = 1; k <= 4; k++)
+	for (int k = 1; k <= 4; k++)                 // 자석 1 ~ 4
 	{
-		printf("자석%d (회전 %2d) : ", k, list[k]);
-		for (int i = 1; i <= 8; i++)
+		printf("자석%d (회전 %2d) : ", k, list[k]);   // 자석 번호와 정해진 회전 방향
+		for (int i = 1; i <= 8; i++)             // 톱니 1 ~ 8
 		{
 			if (i == 1) printf("[%d]", wheel[k][i]);                 // 화살표 위치
 			else if (i == 3 || i == 7) printf("<%d>", wheel[k][i]);  // 맞닿는 날
-			else printf(" %d ", wheel[k][i]);
+			else printf(" %d ", wheel[k][i]);                        // 나머지 톱니
 		}
-		putchar('\n');
+		putchar('\n');                           // 자석 하나 끝
 	}
 
-	for (int k = 1; k <= 3; k++)
-		printf("  %d-%d 맞닿은 극: %d vs %d -> %s\n",
+	for (int k = 1; k <= 3; k++)                 // 이웃한 자석 쌍마다
+		printf("  %d-%d 맞닿은 극: %d vs %d -> %s\n",              // 맞닿은 극 비교 출력
 			k, k + 1, wheel[k][3], wheel[k + 1][7],
 			wheel[k][3] != wheel[k + 1][7] ? "다름(전파)" : "같음");
 
-	putchar('\n');
+	putchar('\n');                               // 빈 줄
 }
 
 // number번 자석을 dir 방향으로 한 칸 돌린다
 void rotate(int number, int dir)
 {
-	int temp;
+	int temp;                                    // 밀려 나가는 톱니 임시 보관
 
 	if (dir == -1)   // 반시계 : 1번 톱니가 8번 자리로
 	{
-		temp = wheel[number][1];
-		for (int index = 1; index <= 7; index++)
+		temp = wheel[number][1];                 // 1번 톱니 보관
+		for (int index = 1; index <= 7; index++) // 앞으로 한 칸씩 당긴다
 		{
 			wheel[number][index] = wheel[number][index + 1];
 		}
-		wheel[number][8] = temp;
+		wheel[number][8] = temp;                 // 보관한 톱니를 8번 자리에
 	}
 	else             // 시계 : 8번 톱니가 1번 자리로
 	{
-		temp = wheel[number][8];
-		for (int index = 8; index >= 2; index--)
+		temp = wheel[number][8];                 // 8번 톱니 보관
+		for (int index = 8; index >= 2; index--) // 뒤로 한 칸씩 민다
 		{
 			wheel[number][index] = wheel[number][index - 1];
 		}
-		wheel[number][1] = temp;
+		wheel[number][1] = temp;                 // 보관한 톱니를 1번 자리에
 	}
-	return;
+	return;                                      // 회전 끝
 }
 
 // number와 그 이웃 compare가 맞닿은 극이 다르면 1 (compare가 범위 밖이면 0)
 int check(int compare, int number)
 {
-	if (compare < 1 || compare>4) return 0;
-	if (number < 1 || number>4) return 0;
+	if (compare < 1 || compare>4) return 0;      // 이웃이 범위 밖
+	if (number < 1 || number>4) return 0;        // 자신이 범위 밖
 
 	if (compare < number && wheel[number][7] != wheel[compare][3]) return 1;   // 왼쪽 이웃
 	if (compare > number && wheel[number][3] != wheel[compare][7]) return 1;   // 오른쪽 이웃
 
-	return 0;
+	return 0;                                    // 극이 같으면 전파 없음
 }
 
 // number번이 dir 방향으로 돈다고 정해졌다 -> 양옆으로 퍼뜨린다
@@ -131,65 +131,65 @@ void DFS(int number, int dir)
 	// number를 기준으로 왼쪽 바퀴가 움직여야 하는지 체크
 	if (check(number - 1, number) == 1 && list[number - 1] == 0)
 	{
-		list[number - 1] = dir * (-1);
-		DFS(number - 1, dir * (-1));
+		list[number - 1] = dir * (-1);           // 왼쪽 자석은 반대 방향
+		DFS(number - 1, dir * (-1));             // 왼쪽 자석에서 계속 퍼뜨린다
 	}
 
 	// number를 기준으로 오른쪽 바퀴가 움직여야 하는지 체크
 	if (check(number + 1, number) == 1 && list[number + 1] == 0)
 	{
-		list[number + 1] = dir * (-1);
-		DFS(number + 1, dir * (-1));
+		list[number + 1] = dir * (-1);           // 오른쪽 자석은 반대 방향
+		DFS(number + 1, dir * (-1));             // 오른쪽 자석에서 계속 퍼뜨린다
 	}
 
-	return;
+	return;                                      // 전파 끝
 }
 
 // 화살표 위치(1번 톱니)가 S극(1)인 자석마다 1, 2, 4, 8점
 int calculate()
 {
-	int sum, mul;
+	int sum, mul;                                // 점수 합, 자석별 점수
 
-	sum = 0;
-	mul = 1;
-	for (int i = 1; i <= 4; i++)
+	sum = 0;                                     // 합 초기화
+	mul = 1;                                     // 1번 자석은 1점
+	for (int i = 1; i <= 4; i++)                 // 자석 1 ~ 4
 	{
-		sum += mul * wheel[i][1];
-		mul *= 2;
+		sum += mul * wheel[i][1];                // S극(1)이면 점수 더함
+		mul *= 2;                                // 다음 자석은 2배
 	}
 
-	return sum;
+	return sum;                                  // 점수 합 반환
 }
 
 int main()
 {
-	scanf("%d", &T);
+	scanf("%d", &T);                             // 테스트 케이스 수 입력
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)              // 테스트 케이스 반복
 	{
-		int ans;
+		int ans;                                 // 정답
 
-		input();
+		input();                                 // 입력
 
-		for (int i = 0; i < N; i++)
+		for (int i = 0; i < N; i++)              // 명령을 차례로 처리
 		{
 			// 1) 누가 어느 방향으로 돌지 먼저 다 정한다 (돌리기 전 상태로 비교)
-			list[number[i]] = direct[i];
-			DFS(number[i], direct[i]);
+			list[number[i]] = direct[i];         // 명령받은 자석의 방향
+			DFS(number[i], direct[i]);           // 양옆으로 전파
 			//printStatus(i, "회전 전");   // 어떤 자석이 어느 방향으로 돌기로 했는지 확인
 
 			// 2) 정해진 자석만 한꺼번에 돌린다
 			for (int k = 1; k <= 4; k++)
-				if (list[k] != 0) rotate(k, list[k]);
+				if (list[k] != 0) rotate(k, list[k]);   // 돌기로 한 자석만 회전
 			//printStatus(i, "회전 후");   // 실제 회전 결과 확인
 
 			// 3) 다음 명령을 위해 비운다
 			for (int k = 1; k <= 4; k++) list[k] = 0;
 		}
 
-		ans = calculate();
+		ans = calculate();                       // 점수 계산
 
-		printf("#%d %d\n", tc, ans);
+		printf("#%d %d\n", tc, ans);             // 결과 출력
 	}
-	return 0;
-}
+	return 0;                                    // 프로그램 정상 종료
+}

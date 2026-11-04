@@ -35,9 +35,9 @@
 	    - 장애물 개수의 2차원 누적합을 미리 만들어 두면 직사각형 판정이 O(1)이 된다
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (500 + 50)
+#define MAX (500 + 50)         // N, M 최대 500 + 여유
 
 int N, M;              // 격자 크기 (행, 열)
 int A, B;              // 유닛의 세로 크기 A, 가로 크기 B
@@ -54,29 +54,29 @@ struct RC
 	int c;   // col
 };
 
-typedef struct RC RC;
+typedef struct RC RC;          // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];   // BFS용 큐 (한 상태가 최대 한 번 들어간다)
 
 // 방향 배열: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = {  0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };    // 방향별 행 변화량
+int dc[] = {  0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d %d %d", &N, &M, &A, &B, &K);
+	scanf("%d %d %d %d %d", &N, &M, &A, &B, &K);   // 격자 크기, 유닛 크기, 장애물 수 입력
 
 	// 장애물 위치
 	for (int k = 0; k < K; k++)
 	{
-		int r, c;
+		int r, c;                        // 장애물 좌표
 
-		scanf("%d %d", &r, &c);
+		scanf("%d %d", &r, &c);          // 장애물 좌표 입력
 
-		MAP[r][c] = 1;
+		MAP[r][c] = 1;                   // 장애물 표시
 	}
 
 	// 시작/도착 좌표 (유닛의 왼쪽 위 칸)
@@ -88,13 +88,13 @@ void input()
 // ---------------------------
 void printMap(int map[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%d ", MAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -105,16 +105,16 @@ void printMap(int map[MAX][MAX])
 // ---------------------------
 bool isEmpty(int sr, int sc)
 {
-	for (int r = sr; r <= sr + A - 1; r++)
+	for (int r = sr; r <= sr + A - 1; r++)       // 유닛이 덮는 모든 행
 	{
-		for (int c = sc; c <= sc + B - 1; c++)
+		for (int c = sc; c <= sc + B - 1; c++)   // 유닛이 덮는 모든 열
 		{
-			if (MAP[r][c] == 1)
-				return false;
+			if (MAP[r][c] == 1)                  // 장애물이 하나라도 있으면
+				return false;                    // 놓을 수 없다
 		}
 	}
 
-	return true;
+	return true;                                 // 장애물이 없으면 놓을 수 있다
 }
 
 // ---------------------------
@@ -124,17 +124,17 @@ int BFS(int r, int c)
 {
 	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;  // 빈 큐
 
 	// 시작 상태. 0이 미방문이므로 거리를 1부터 센다.
 	visit[r][c] = 1;
 
-	queue[wp].r = r;
-	queue[wp++].c = c;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp++].c = c;                   // 시작 열, 삽입 위치 증가
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 상태가 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 상태 하나를 꺼낸다
 
 		// 처음 꺼낸 도착 상태가 최단이다 (1부터 셌으므로 -1)
 		if (out.r == er && out.c == ec)
@@ -143,11 +143,11 @@ int BFS(int r, int c)
 		// 상, 우, 하, 좌
 		for (int i = 0; i < 4; i++)
 		{
-			int nr, nc;
+			int nr, nc;                  // 옮긴 뒤의 왼쪽 위 좌표
 
 			// 옮긴 뒤의 왼쪽 위 좌표
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 새 행
+			nc = out.c + dc[i];          // 새 열
 
 			// (1) 유닛 전체가 격자 안에 들어와야 한다.
 			//     왼쪽 위가 (nr, nc)면 오른쪽 아래는 (nr + A - 1, nc + B - 1).
@@ -159,8 +159,8 @@ int BFS(int r, int c)
 			if (isEmpty(nr, nc) == false || visit[nr][nc] != 0)
 				continue;
 
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 새 행 기록
+			queue[wp++].c = nc;          // 새 열 기록, 삽입 위치 증가
 
 			// 값을 넣는 순간이 방문 표시이자 거리 기록
 			visit[nr][nc] = visit[out.r][out.c] + 1;
@@ -176,9 +176,9 @@ int BFS(int r, int c)
 // ---------------------------
 int main()
 {
-	input();
+	input();                             // 입력
 
-	printf("%d\n", BFS(sr, sc));
+	printf("%d\n", BFS(sr, sc));         // 최소 이동 횟수 출력
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

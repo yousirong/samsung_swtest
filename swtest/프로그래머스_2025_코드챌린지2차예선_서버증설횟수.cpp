@@ -37,38 +37,38 @@
 	  - 필요한 서버 수는 이용자 / m 을 내림한 값이다. m - 1명까지는 서버가 필요 없다.
 	  - expire[]와 running은 케이스마다 비운다.
 */
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf 사용
 
-#define HOUR (24)
+#define HOUR (24)                  // 하루 24시간
 #define MAX_TIME (24 + 24 + 5)   // 반납 시각은 최대 23 + 24
 
-int T;
+int T;               // 테스트 케이스 수
 
 int players[HOUR];   // 시간대별 이용자 수
 int M, K;            // 서버 한 대가 감당하는 이용자 수, 서버 운영 시간
 
 int expire[MAX_TIME];   // expire[t] : t시에 반납되는 서버 수
 
-int answer;
+int answer;             // 총 증설 횟수
 
 void input()
 {
-	for (int i = 0; i < HOUR; i++)
-		scanf("%d", &players[i]);
+	for (int i = 0; i < HOUR; i++)       // 0 ~ 23시
+		scanf("%d", &players[i]);        // 이용자 수 입력
 
-	scanf("%d %d", &M, &K);
+	scanf("%d %d", &M, &K);              // m, k 입력
 
-	for (int t = 0; t < MAX_TIME; t++)
-		expire[t] = 0;
+	for (int t = 0; t < MAX_TIME; t++)   // 모든 시각
+		expire[t] = 0;                   // 반납 예정 0으로
 
-	answer = 0;
+	answer = 0;                          // 증설 횟수 초기화
 }
 
 void simulate()
 {
 	int running = 0;   // 지금 돌아가는 증설 서버 수
 
-	for (int i = 0; i < HOUR; i++)
+	for (int i = 0; i < HOUR; i++)       // 0시부터 23시까지
 	{
 		// 1) i시에 반납되는 서버를 뺀다
 		running -= expire[i];
@@ -79,10 +79,10 @@ void simulate()
 		// 3) 모자라면 모자란 만큼만 늘린다
 		if (running < need)
 		{
-			int add = need - running;
+			int add = need - running;    // 모자란 대수
 
-			answer += add;
-			running += add;
+			answer += add;               // 증설 횟수에 더함
+			running += add;              // 돌아가는 서버 수 증가
 			expire[i + K] += add;   // k시간 뒤에 반납
 		}
 	}
@@ -91,15 +91,15 @@ void simulate()
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // 시뮬레이션
 
-		printf("%d\n", answer);
+		printf("%d\n", answer);          // 증설 횟수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

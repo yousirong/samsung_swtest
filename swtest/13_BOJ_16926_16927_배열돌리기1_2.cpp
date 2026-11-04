@@ -32,7 +32,7 @@
 	  3) 테두리 개수는 min(N, M) / 2 이다. 짧은 변 기준으로 층이 몇 겹인지 정해진다.
 */
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
 #define MAX (300 + 50)   // N, M 최대보다 여유 있게 선언
 
@@ -47,7 +47,7 @@ struct RC
 	int c;   // col (열)
 };
 
-typedef struct RC RC;
+typedef struct RC RC;    // struct RC를 RC로 줄여 쓰기
 
 // 현재 처리 중인 테두리의 좌표를 "시계 방향 순서"로 담아 두는 배열.
 // 한 테두리의 둘레는 최대 2*(N+M) 정도지만 넉넉하게 잡았다.
@@ -58,14 +58,14 @@ RC arr[MAX * MAX];
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d", &N, &M, &R);
+	scanf("%d %d %d", &N, &M, &R);       // 행 수, 열 수, 회전 횟수 입력
 
 	// N x M 배열 입력
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 1열부터 M열까지
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // (r, c) 칸의 값 입력
 		}
 	}
 }
@@ -75,11 +75,11 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행에 대해
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 한 행의 모든 칸을
+			printf("%d ", MAP[r][c]);    // 공백으로 구분해 출력
+		putchar('\n');                   // 한 행이 끝나면 줄바꿈
 	}
 }
 
@@ -90,11 +90,11 @@ void printMap()
 // ---------------------------
 void copyMap(int copymap[MAX][MAX], int original[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 모든 열
 		{
-			copymap[r][c] = original[r][c];
+			copymap[r][c] = original[r][c];   // 한 칸씩 그대로 복사
 		}
 	}
 }
@@ -114,8 +114,8 @@ void rotatestep(int sr, int sc, int n, int m, int rotateCount)
 {
 	int er, ec;   // 끝(오른쪽 아래) 좌표
 
-	er = sr + n - 1;
-	ec = sc + m - 1;
+	er = sr + n - 1;                     // 끝 행 = 시작 행 + 세로 길이 - 1
+	ec = sc + m - 1;                     // 끝 열 = 시작 열 + 가로 길이 - 1
 
 	// 회전 전 상태 스냅샷. 아래에서 값을 읽을 때는 항상 temp를 본다.
 	copyMap(temp, MAP);
@@ -126,40 +126,40 @@ void rotatestep(int sr, int sc, int n, int m, int rotateCount)
 	// 모서리가 중복해서 들어가지 않도록 각 변의 시작점을 한 칸씩 비켜서 잡는다.
 
 	// 1) 윗변 : (sr, sc) -> (sr, ec)
-	for (int c = sc; c <= ec; c++)
+	for (int c = sc; c <= ec; c++)       // 왼쪽에서 오른쪽으로
 	{
-		arr[index].r = sr;
-		arr[index++].c = c;
+		arr[index].r = sr;               // 행은 윗변 sr 고정
+		arr[index++].c = c;              // 열을 기록하고 개수 증가
 	}
 
 	// 2) 오른쪽 변 : (sr+1, ec) -> (er, ec)
 	//    오른쪽 위 모서리는 윗변에서 이미 넣었으므로 sr+1부터 시작
-	for (int r = sr + 1; r <= er; r++)
+	for (int r = sr + 1; r <= er; r++)   // 위에서 아래로
 	{
-		arr[index].r = r;
-		arr[index++].c = ec;
+		arr[index].r = r;                // 행을 기록
+		arr[index++].c = ec;             // 열은 오른쪽 변 ec 고정, 개수 증가
 	}
 
 	// 3) 아랫변 : (er, ec-1) -> (er, sc)
 	//    오른쪽 아래 모서리는 이미 넣었으므로 ec-1부터 시작
-	for (int c = ec - 1; c >= sc; c--)
+	for (int c = ec - 1; c >= sc; c--)   // 오른쪽에서 왼쪽으로
 	{
-		arr[index].r = er;
-		arr[index++].c = c;
+		arr[index].r = er;               // 행은 아랫변 er 고정
+		arr[index++].c = c;              // 열을 기록하고 개수 증가
 	}
 
 	// 4) 왼쪽 변 : (er-1, sc) -> (sr+1, sc)
 	//    위/아래 왼쪽 모서리는 이미 넣었으므로 그 사이만 채운다
-	for (int r = er - 1; r >= sr + 1; r--)
+	for (int r = er - 1; r >= sr + 1; r--)   // 아래에서 위로
 	{
-		arr[index].r = r;
-		arr[index++].c = sc;
+		arr[index].r = r;                // 행을 기록
+		arr[index++].c = sc;             // 열은 왼쪽 변 sc 고정, 개수 증가
 	}
 
 	// 이제 arr[0..index-1]에 이 테두리의 좌표가 시계 방향 순서로 들어 있다.
 	// 반시계로 rotateCount칸 민다는 것은
 	// "시계 방향 순서에서 인덱스를 rotateCount만큼 뒤로 당긴다"는 뜻이다.
-	for (int i = 0; i < index; i++)
+	for (int i = 0; i < index; i++)      // 테두리의 모든 칸에 대해
 	{
 		// arr[i]에 있던 값이 이동할 목적지 인덱스
 		int newIndex = (i - rotateCount) % index;
@@ -185,25 +185,25 @@ void rotatestep(int sr, int sc, int n, int m, int rotateCount)
 // ---------------------------
 void rotate(int rotateCount)
 {
-	int sr, sc, n, m;
+	int sr, sc, n, m;                    // 현재 테두리의 시작 좌표와 세로/가로 길이
 
 	// 만들 수 있는 테두리 개수는 짧은 변이 결정한다
 	int step = N < M ? N / 2 : M / 2;
 
 	// 가장 바깥 테두리에서 출발
-	sr = sc = 1;
-	n = N;
-	m = M;
+	sr = sc = 1;                         // 시작 좌표 (1, 1)
+	n = N;                               // 세로 길이는 전체 행 수
+	m = M;                               // 가로 길이는 전체 열 수
 
-	for (int s = 0; s < step; s++)
+	for (int s = 0; s < step; s++)       // 테두리 개수만큼 반복
 	{
-		rotatestep(sr, sc, n, m, rotateCount);
+		rotatestep(sr, sc, n, m, rotateCount);   // 현재 테두리를 rotateCount칸 회전
 
 		// 한 겹 안쪽으로: 시작점은 대각선으로 한 칸, 크기는 가로세로 2씩 줄어든다
-		sr++;
-		sc++;
-		n -= 2;
-		m -= 2;
+		sr++;                            // 시작 행 한 칸 아래로
+		sc++;                            // 시작 열 한 칸 오른쪽으로
+		n -= 2;                          // 세로 길이 2 감소 (위아래 한 줄씩)
+		m -= 2;                          // 가로 길이 2 감소 (좌우 한 줄씩)
 	}
 }
 
@@ -218,5 +218,5 @@ int main()
 
 	printMap();  // 결과 출력
 
-	return 0;
+	return 0;    // 프로그램 정상 종료
 }

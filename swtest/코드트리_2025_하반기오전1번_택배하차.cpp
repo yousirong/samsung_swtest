@@ -32,16 +32,16 @@
 	    M이 홀수면 마지막 오른쪽 하차는 뺄 택배가 없어 아무것도 출력하지 않는다.
 	  - moveDown의 b.r += 1 은 쓰이지 않는 지역 변수 갱신이다. 실제 위치는 box[index].r 이다.
 */
-#include <stdio.h>
+#include <stdio.h>                       // scanf, printf, putchar 사용
 
-#define MAX (50+5)
+#define MAX (50+5)                       // N 최대 50 + 여유
 
-int T;
-int N, M, maxBoxNum;
+int T;                                   // 테스트 케이스 수
+int N, M, maxBoxNum;                     // 창고 크기, 택배 수, 가장 큰 택배 번호
 
-int MAP[MAX][MAX];
+int MAP[MAX][MAX];                       // 칸별 택배 번호 (0 빈칸, -1 테두리)
 
-struct BOX
+struct BOX                               // 택배 정보
 {
 	int k; // 택배 번호
 	int h; // 세로크기
@@ -51,154 +51,154 @@ struct BOX
 	bool drop; // 하차 여부
 };
 
-BOX box[100 + 10];
+BOX box[100 + 10];                       // 번호를 인덱스로 쓰는 택배 배열
 
 void input()
 {
-	maxBoxNum = 0;
+	maxBoxNum = 0;                       // 최대 번호 초기화
 
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 창고 크기, 택배 수 입력
 
-	for (int i = 1; i <= 100; i++)
-		box[i].k = 0;
+	for (int i = 1; i <= 100; i++)       // 모든 번호를
+		box[i].k = 0;                    // "없음"으로 초기화
 
-	for (int r = 0; r <= N + 1; r++)
+	for (int r = 0; r <= N + 1; r++)     // 테두리 포함 전체를
 		for (int c = 0; c <= N + 1; c++)
-			MAP[r][c] = -1;
+			MAP[r][c] = -1;              // -1로
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 안쪽은
 		for (int c = 1; c <= N; c++)
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 빈칸으로
 }
 
 void printMap() // for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", MAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
-void setBox(int index)
+void setBox(int index)                   // 택배를 지도에 찍기
 {
-	BOX b = box[index];
+	BOX b = box[index];                  // 택배 정보
 
-	for (int r = b.r; r < b.r + b.h; r++)
+	for (int r = b.r; r < b.r + b.h; r++)     // 차지하는 영역
 		for (int c = b.c; c < b.c + b.w; c++)
-			MAP[r][c] = index;
+			MAP[r][c] = index;           // 번호 찍기
 }
 
-void deleteBox(int index)
+void deleteBox(int index)                // 택배를 지도에서 지우기
 {
-	BOX b = box[index];
-	for (int r = b.r; r < b.r + b.h; r++)
+	BOX b = box[index];                  // 택배 정보
+	for (int r = b.r; r < b.r + b.h; r++)     // 차지하는 영역
 		for (int c = b.c; c < b.c + b.w; c++)
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 빈칸으로
 }
 
-bool checkDown(int index)
+bool checkDown(int index)                // 한 칸 내려갈 수 있는가
 {
-	BOX b = box[index];
+	BOX b = box[index];                  // 택배 정보
 
 	for (int c = b.c; c < b.c + b.w; c++)
 		if (MAP[b.r + b.h][c] != 0)return false;
 		// 바로 아래 줄이 전부 비어 있어야 한 칸 내려갈 수 있다.
 
-	return true;
+	return true;                         // 내려갈 수 있음
 }
 
-bool checkLeft(int index)
+bool checkLeft(int index)                // 왼쪽으로 뺄 수 있는가
 {
-	BOX b = box[index];
+	BOX b = box[index];                  // 택배 정보
 
-	for (int r = b.r; r < b.r + b.h; r++)
-		for (int c = 1; c < b.c; c++)
-			if (MAP[r][c] != 0) return false;
+	for (int r = b.r; r < b.r + b.h; r++)     // 차지하는 행마다
+		for (int c = 1; c < b.c; c++)         // 왼쪽 칸들이
+			if (MAP[r][c] != 0) return false; // 비어 있어야 함
 
-	return true;
+	return true;                         // 뺄 수 있음
 }
 
-bool checkRight(int index)
+bool checkRight(int index)               // 오른쪽으로 뺄 수 있는가
 {
-	BOX b = box[index];
+	BOX b = box[index];                  // 택배 정보
 
-	for (int r = b.r; r < b.r + b.h; r++)
-		for (int c = b.c + b.w; c <= N; c++)
-			if (MAP[r][c] != 0) return false;
-	
-	return true;
+	for (int r = b.r; r < b.r + b.h; r++)          // 차지하는 행마다
+		for (int c = b.c + b.w; c <= N; c++)       // 오른쪽 칸들이
+			if (MAP[r][c] != 0) return false;      // 비어 있어야 함
+
+	return true;                         // 뺄 수 있음
 }
 
-void moveLeft()
+void moveLeft()                          // 왼쪽 하차
 {
-	for (int i = 1; i <= maxBoxNum; i++)
+	for (int i = 1; i <= maxBoxNum; i++) // 번호가 작은 순서로
 	{
-		if(box[i].drop == true || box[i].k == 0)continue;
+		if(box[i].drop == true || box[i].k == 0)continue;   // 이미 뺐거나 없는 번호
 
-		if (checkLeft(i) == true)
+		if (checkLeft(i) == true)        // 뺄 수 있으면
 		{
-			box[i].drop = true;
-			deleteBox(i);
+			box[i].drop = true;          // 하차 표시
+			deleteBox(i);                // 지도에서 지우기
 
-			printf("%d\n", i);
+			printf("%d\n", i);           // 번호 출력
 
-			return;
+			return;                      // 하나만 뺀다
 		}
 	}
 }
 
-void moveRight()
+void moveRight()                         // 오른쪽 하차
 {
-	for (int i = 1; i <= maxBoxNum; i++)
+	for (int i = 1; i <= maxBoxNum; i++) // 번호가 작은 순서로
 	{
-		if (box[i].drop == true || box[i].k == 0)continue;
+		if (box[i].drop == true || box[i].k == 0)continue;  // 이미 뺐거나 없는 번호
 
-		if (checkRight(i) == true)
+		if (checkRight(i) == true)       // 뺄 수 있으면
 		{
-			box[i].drop = true;
-			deleteBox(i);
+			box[i].drop = true;          // 하차 표시
+			deleteBox(i);                // 지도에서 지우기
 
-			printf("%d\n", i);
+			printf("%d\n", i);           // 번호 출력
 
-			return;
+			return;                      // 하나만 뺀다
 		}
 	}
 }
 
 
-void moveDown(int index)
+void moveDown(int index)                 // 택배를 끝까지 떨어뜨리기
 {
-	BOX b = box[index];
+	BOX b = box[index];                  // 택배 정보 (복사본)
 
 	deleteBox(index);
 	// 자기 몸에 막히지 않도록 먼저 지도에서 지운다.
 
 	while (1)
 	{
-		if (checkDown(index) == false) break;
+		if (checkDown(index) == false) break;   // 더 못 내려가면 멈춤
 
 		b.r += 1; // 임시 변수 수정
 		box[index].r += 1; // 실제값 수정
 	}
-	setBox(index);
+	setBox(index);                       // 새 위치에 찍기
 }
 
-void moveDownAll()
+void moveDownAll()                       // 더 떨어질 택배가 없을 때까지 정리
 {
 	while (1)
 	{
-		bool check = true;
+		bool check = true;               // 이번 바퀴에 아무것도 안 떨어졌는가
 		for (int i = 1; i <= maxBoxNum; i++)
 		{
-			if (box[i].drop == true || box[i].k == 0) continue;
-			if (checkDown(i) == false) continue;
+			if (box[i].drop == true || box[i].k == 0) continue;   // 이미 뺐거나 없는 번호
+			if (checkDown(i) == false) continue;                 // 못 떨어지면 제외
 
-			check = false;
+			check = false;               // 떨어진 택배 있음
 
-			moveDown(i);
+			moveDown(i);                 // 떨어뜨리기
 		}
 		if (check == true) break;
 		// 한 바퀴 동안 아무것도 안 떨어졌으면 정리가 끝난 것이다.
@@ -210,26 +210,26 @@ void simulate()
 	//1. 택배 투입
 	for (int m = 0; m < M; m++)
 	{
-		int k, h, w, c;
+		int k, h, w, c;                  // 번호, 세로, 가로, 왼쪽 열
 
-		scanf("%d %d %d %d", &k, &h, &w, &c);
+		scanf("%d %d %d %d", &k, &h, &w, &c);   // 택배 입력
 
 		box[k].k = k; // M과 최대 k가 다를 수 있음
-		box[k].h = h;
-		box[k].w = w;
-		box[k].r = 1;
-		box[k].c = c;
-		box[k].drop = false;
+		box[k].h = h;                    // 세로
+		box[k].w = w;                    // 가로
+		box[k].r = 1;                    // 맨 위에서 시작
+		box[k].c = c;                    // 왼쪽 열
+		box[k].drop = false;             // 아직 하차 안 함
 
 		if (maxBoxNum < k) maxBoxNum = k;
 		// 번호가 띄엄띄엄 올 수 있어 가장 큰 번호까지 돌기 위해 기억해 둔다.
 
-		moveDown(k);
+		moveDown(k);                     // 떨어뜨리기
 	}
 
 	// printMap();
 
-	for (int m = 0; m < M; m+=2)
+	for (int m = 0; m < M; m+=2)         // 왼쪽 + 오른쪽을 한 묶음으로
 	{
 		// 2. 택배 하차 (좌측)
 		moveLeft();
@@ -244,12 +244,12 @@ void simulate()
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // 시뮬레이션 + 출력
 	}
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

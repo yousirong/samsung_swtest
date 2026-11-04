@@ -54,25 +54,25 @@
 	  - position, MAP은 input()/simulate()에서 매번 새로 채우지만 posIndex 등은 M개만 지운다.
 	    한 번 실행하는 데는 문제가 없다.
 */
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX_N (20 + 5)
-#define MAX_M (5 + 2)
+#define MAX_N (20 + 5)         // N 최대 20 + 여유
+#define MAX_M (5 + 2)          // M 최대 5 + 여유
 
-#define HEAD (1)
-#define BODY (2)
-#define TAIL (3)
+#define HEAD (1)               // 머리사람
+#define BODY (2)               // 몸통 사람
+#define TAIL (3)               // 꼬리사람
 #define ROOP (4) // 이동선 (사람 없음)
 
 // 공을 던지는 방향
-#define RIGHT (0)
-#define UP (1)
-#define LEFT (2)
-#define DOWN (3)
+#define RIGHT (0)              // →
+#define UP (1)                 // ↑
+#define LEFT (2)               // ←
+#define DOWN (3)               // ↓
 
-int T;
+int T;                         // 테스트 케이스 수
 
-int N, M, K;
+int N, M, K;                   // 격자 크기, 팀 수, 라운드 수
 
 struct MAP_INFO
 {
@@ -81,18 +81,18 @@ struct MAP_INFO
 	int loop; // loop의 번호
 };
 
-MAP_INFO MAP[MAX_N][MAX_N];
-bool visit[MAX_N][MAX_N];
+MAP_INFO MAP[MAX_N][MAX_N];    // 격자 정보
+bool visit[MAX_N][MAX_N];      // BFS 방문 표시
 
 struct RCON
 {
-	int r;
-	int c;
-	int value;
+	int r;                     // 행
+	int c;                     // 열
+	int value;                 // 역할 (1 ~ 4)
 	int order; // k번째 사람
 };
 
-RCON queue[MAX_N * MAX_N];
+RCON queue[MAX_N * MAX_N];     // BFS용 큐
 
 RCON position[MAX_M][MAX_N * MAX_N]; // 루프 : 1, 2, 2, 3, 4, 4, 4, 4, 4, ... 의 좌표가 생성
 int posIndex[MAX_M]; // 1 ~ 4의 수 (이동선 전체 길이)
@@ -101,107 +101,107 @@ int peopleIndex[MAX_M]; // 1 ~ 3의 수 (팀의 사람 수)
 bool checkDirection[MAX_M]; // 방향이 바뀌었는지 여부
 
 // ↑, →, ↓, ←
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0, -1 };
+int dr[] = { -1, 0, 1, 0 };    // 방향별 행 변화량
+int dc[] = { 0, 1, 0, -1 };    // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d %d", &N, &M, &K);
+	scanf("%d %d %d", &N, &M, &K);       // 격자 크기, 팀 수, 라운드 수 입력
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			scanf("%d", &MAP[r][c].value);
-			MAP[r][c].loop = MAP[r][c].order = -1;
+			scanf("%d", &MAP[r][c].value);           // 칸 값 입력
+			MAP[r][c].loop = MAP[r][c].order = -1;   // 팀 번호, 순서 미정
 		}
 	}
 
-	for (int i = 0; i < M; i++)
-		posIndex[i] = peopleIndex[i] = checkDirection[i] = 0;
+	for (int i = 0; i < M; i++)          // 팀마다
+		posIndex[i] = peopleIndex[i] = checkDirection[i] = 0;   // 초기화
 }
 
 void printMap(int map[MAX_N][MAX_N]) // for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", map[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 void printMapValue(MAP_INFO map[MAX_N][MAX_N]) // for debug
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", map[r][c].value);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", map[r][c].value);   // 역할 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 void printPosition(int loop) // for debug
 {
-	int index = posIndex[loop];
+	int index = posIndex[loop];          // 이동선 길이
 
-	for (int i = 0; i < index; i++)
+	for (int i = 0; i < index; i++)      // 자리마다
 	{
-		RCON p = position[loop][i];
+		RCON p = position[loop][i];      // i번째 자리
 
-		printf("%d] (%d, %d) %d, %d\n", i, p.r, p.c, p.order, p.value);
+		printf("%d] (%d, %d) %d, %d\n", i, p.r, p.c, p.order, p.value);   // 출력
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // 머리 (r, c)에서 시작해 팀 loop의 이동선을 머리 -> 몸통 -> 꼬리 -> 4 순서로 적는다.
 void BFS(int r, int c, int loop)
 {
-	int rp, wp, order;
+	int rp, wp, order;                   // 큐 위치, 순서 번호
 
-	order = 1;
+	order = 1;                           // 머리가 1번
 
-	MAP[r][c].loop = loop;
-	MAP[r][c].order = order;
+	MAP[r][c].loop = loop;               // 팀 번호
+	MAP[r][c].order = order;             // 순서
 
-	position[loop][posIndex[loop]].r = r;
+	position[loop][posIndex[loop]].r = r;              // 머리 좌표 기록
 	position[loop][posIndex[loop]].c = c;
-	position[loop][posIndex[loop]].order = order++;
-	position[loop][posIndex[loop]++].value = HEAD;
+	position[loop][posIndex[loop]].order = order++;    // 순서 1, 다음은 2
+	position[loop][posIndex[loop]++].value = HEAD;     // 역할 머리
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 빈 큐
 
-	visit[r][c] = true;
+	visit[r][c] = true;                  // 머리 방문 표시
 
 	// 1 -> 2 먼저 찾기
 	// 몸통 쪽 이웃 하나만 큐에 넣어야 BFS가 몸통 방향으로만 고리를 따라간다.
 	for (int i = 0; i < 4; i++)
 	{
-		int nr, nc;
+		int nr, nc;                      // 이웃 칸
 
-		nr = r + dr[i];
-		nc = c + dc[i];
+		nr = r + dr[i];                  // 이웃 행
+		nc = c + dc[i];                  // 이웃 열
 
-		if (nr < 1 || nc < 1 || nr > N || nc > N) continue;
+		if (nr < 1 || nc < 1 || nr > N || nc > N) continue;   // 격자 밖
 
-		if (MAP[nr][nc].value == BODY)
+		if (MAP[nr][nc].value == BODY)   // 몸통이면
 		{
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣는다
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = true;
+			visit[nr][nc] = true;        // 방문 표시
 
-			MAP[nr][nc].loop = loop;
-			MAP[nr][nc].order = order;
+			MAP[nr][nc].loop = loop;     // 팀 번호
+			MAP[nr][nc].order = order;   // 순서
 
-			position[loop][posIndex[loop]].r = nr;
+			position[loop][posIndex[loop]].r = nr;             // 좌표 기록
 			position[loop][posIndex[loop]].c = nc;
-			position[loop][posIndex[loop]].order = order++;
-			position[loop][posIndex[loop]++].value = BODY;
+			position[loop][posIndex[loop]].order = order++;    // 순서
+			position[loop][posIndex[loop]++].value = BODY;     // 역할 몸통
 
-			break;
+			break;                       // 하나만 넣는다
 		}
 	}
 
@@ -212,30 +212,30 @@ void BFS(int r, int c, int loop)
 	// 그래서 BFS지만 실제로는 고리를 한 줄로 따라가는 셈이다.
 	while (rp < wp)
 	{
-		RCON out = queue[rp++];
+		RCON out = queue[rp++];          // 한 칸 꺼낸다
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
-			if (nr < 1 || nc < 1 || nr > N || nc > N) continue;
-			if (MAP[nr][nc].value == 0 || visit[nr][nc] == true) continue;
+			if (nr < 1 || nc < 1 || nr > N || nc > N) continue;   // 격자 밖
+			if (MAP[nr][nc].value == 0 || visit[nr][nc] == true) continue;   // 빈칸이거나 방문했으면 건너뜀
 
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣는다
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = true;
+			visit[nr][nc] = true;        // 방문 표시
 
-			MAP[nr][nc].loop = loop;
-			MAP[nr][nc].order = order;
+			MAP[nr][nc].loop = loop;     // 팀 번호
+			MAP[nr][nc].order = order;   // 순서
 
-			position[loop][posIndex[loop]].r = nr;
+			position[loop][posIndex[loop]].r = nr;                 // 좌표 기록
 			position[loop][posIndex[loop]].c = nc;
-			position[loop][posIndex[loop]].order = order++;
-			position[loop][posIndex[loop]++].value = MAP[nr][nc].value;
+			position[loop][posIndex[loop]].order = order++;        // 순서
+			position[loop][posIndex[loop]++].value = MAP[nr][nc].value;   // 역할
 
 			// 사람(몸통, 꼬리)이면 팀 인원에 더한다.
 			if (MAP[nr][nc].value <= TAIL) peopleIndex[loop]++;
@@ -246,27 +246,27 @@ void BFS(int r, int c, int loop)
 // 팀 loop를 한 칸 움직인다. 역할(value, order)은 자리에 두고 좌표만 민다.
 void move(int loop)
 {
-	RCON tmp;
-	int index = posIndex[loop];
-	bool check = checkDirection[loop];
+	RCON tmp;                            // 밀려 나가는 좌표 보관
+	int index = posIndex[loop];          // 이동선 길이
+	bool check = checkDirection[loop];   // 방향이 뒤집혔는지
 
 	if (check == false) // 1 -> 4 -> .. -> 2 -> 1로 이동
 	{
 		// 각 자리가 앞 자리의 좌표로 가고, 머리는 고리의 맨 끝(머리 바로 뒤쪽) 좌표로 간다.
 		tmp = position[loop][index - 1];
 
-		for (int i = index - 2; i >= 0; i--)
+		for (int i = index - 2; i >= 0; i--)   // 뒤에서부터
 		{
-			int r, c;
+			int r, c;                    // 앞 자리 좌표
 
-			r = position[loop][i].r;
-			c = position[loop][i].c;
+			r = position[loop][i].r;     // 행
+			c = position[loop][i].c;     // 열
 
-			position[loop][i + 1].r = r;
+			position[loop][i + 1].r = r; // 한 칸 뒤 자리로
 			position[loop][i + 1].c = c;
 		}
 
-		position[loop][0].r = tmp.r;
+		position[loop][0].r = tmp.r;     // 머리는 맨 끝 좌표로
 		position[loop][0].c = tmp.c;
 	}
 	else // 1 -> 2 -> 2 -> ... -> 3 -> 4 -> 1로 이동
@@ -274,31 +274,31 @@ void move(int loop)
 		// 방향이 뒤집힌 팀 : 반대로 민다. 꼬리 자리(실제 머리)가 4 쪽으로 나아간다.
 		tmp = position[loop][0];
 
-		for (int i = 1; i < index; i++)
+		for (int i = 1; i < index; i++)  // 앞에서부터
 		{
-			int r, c;
+			int r, c;                    // 뒤 자리 좌표
 
-			r = position[loop][i].r;
-			c = position[loop][i].c;
+			r = position[loop][i].r;     // 행
+			c = position[loop][i].c;     // 열
 
-			position[loop][i - 1].r = r;
+			position[loop][i - 1].r = r; // 한 칸 앞 자리로
 			position[loop][i - 1].c = c;
 		}
 
-		position[loop][index - 1].r = tmp.r;
+		position[loop][index - 1].r = tmp.r;   // 맨 끝은 0번 좌표로
 		position[loop][index - 1].c = tmp.c;
 	}
 
 	// 바뀐 좌표에 역할을 다시 적는다. (고리의 모든 칸을 덮어쓰므로 지울 필요가 없다)
 	for (int i = 0; i < index; i++)
 	{
-		int r = position[loop][i].r;
-		int c = position[loop][i].c;
-		int order = position[loop][i].order;
-		int value = position[loop][i].value;
+		int r = position[loop][i].r;          // 행
+		int c = position[loop][i].c;          // 열
+		int order = position[loop][i].order;  // 순서
+		int value = position[loop][i].value;  // 역할
 
-		MAP[r][c].order = order;
-		MAP[r][c].value = value;
+		MAP[r][c].order = order;         // 격자에 순서 적기
+		MAP[r][c].value = value;         // 격자에 역할 적기
 	}
 }
 
@@ -319,26 +319,26 @@ int getScore(int round)
 	// ← 15 ~ 21 ==> 2번 방향
 	// ↓ 22 ~ 28 ==> 3번 방향
 
-	int ballDir = (((round - 1) % (4 * N))) / N;
-	int line = ((round - 1) % N) + 1;
+	int ballDir = (((round - 1) % (4 * N))) / N;   // 공 방향
+	int line = ((round - 1) % N) + 1;              // 몇 번째 줄
 
 	// 네 방향 모두 같은 틀이다 : 줄을 따라가다 처음 만난 사람의 순서로 점수를 내고 방향을 뒤집는다.
 	if (ballDir == RIGHT) // →   line번째 행, 왼쪽부터
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (hit[MAP[line][c].value] == true)
+			if (hit[MAP[line][c].value] == true)   // 사람이면
 			{
-				int order = MAP[line][c].order;
-				int loop = MAP[line][c].loop;
+				int order = MAP[line][c].order;    // 순서
+				int loop = MAP[line][c].loop;      // 팀 번호
 
 				// 방향이 뒤집힌 팀은 라벨이 그대로라 머리부터의 순서를 뒤집어 센다.
 				if (checkDirection[loop] == true)
 					order = peopleIndex[loop] - order + 1;
 
-				checkDirection[loop] = !checkDirection[loop];
+				checkDirection[loop] = !checkDirection[loop];   // 방향 뒤집기
 
-				return order * order;
+				return order * order;      // k^2점
 			}
 		}
 	}
@@ -346,17 +346,17 @@ int getScore(int round)
 	{
 		for (int r = N; r >= 1; r--)
 		{
-			if (hit[MAP[r][line].value] == true)
+			if (hit[MAP[r][line].value] == true)   // 사람이면
 			{
-				int order = MAP[r][line].order;
-				int loop = MAP[r][line].loop;
+				int order = MAP[r][line].order;    // 순서
+				int loop = MAP[r][line].loop;      // 팀 번호
 
-				if (checkDirection[loop] == true)
-					order = peopleIndex[loop] - order + 1;
+				if (checkDirection[loop] == true)  // 뒤집힌 팀이면
+					order = peopleIndex[loop] - order + 1;   // 순서 뒤집기
 
-				checkDirection[loop] = !checkDirection[loop];
+				checkDirection[loop] = !checkDirection[loop];   // 방향 뒤집기
 
-				return order * order;
+				return order * order;      // k^2점
 			}
 		}
 	}
@@ -364,17 +364,17 @@ int getScore(int round)
 	{
 		for (int c = N; c >= 1; c--)
 		{
-			if (hit[MAP[N + 1 - line][c].value] == true)
+			if (hit[MAP[N + 1 - line][c].value] == true)   // 사람이면
 			{
-				int order = MAP[N + 1 - line][c].order;
-				int loop = MAP[N + 1 - line][c].loop;
+				int order = MAP[N + 1 - line][c].order;    // 순서
+				int loop = MAP[N + 1 - line][c].loop;      // 팀 번호
 
-				if (checkDirection[loop] == true)
-					order = peopleIndex[loop] - order + 1;
+				if (checkDirection[loop] == true)          // 뒤집힌 팀이면
+					order = peopleIndex[loop] - order + 1; // 순서 뒤집기
 
-				checkDirection[loop] = !checkDirection[loop];
+				checkDirection[loop] = !checkDirection[loop];   // 방향 뒤집기
 
-				return order * order;
+				return order * order;      // k^2점
 			}
 		}
 	}
@@ -382,17 +382,17 @@ int getScore(int round)
 	{
 		for (int r = 1; r <= N; r++)
 		{
-			if (hit[MAP[r][N + 1 - line].value] == true)
+			if (hit[MAP[r][N + 1 - line].value] == true)   // 사람이면
 			{
-				int order = MAP[r][N + 1 - line].order;
-				int loop = MAP[r][N + 1 - line].loop;
+				int order = MAP[r][N + 1 - line].order;    // 순서
+				int loop = MAP[r][N + 1 - line].loop;      // 팀 번호
 
-				if (checkDirection[loop] == true)
-					order = peopleIndex[loop] - order + 1;
+				if (checkDirection[loop] == true)          // 뒤집힌 팀이면
+					order = peopleIndex[loop] - order + 1; // 순서 뒤집기
 
-				checkDirection[loop] = !checkDirection[loop];
+				checkDirection[loop] = !checkDirection[loop];   // 방향 뒤집기
 
-				return order * order;
+				return order * order;      // k^2점
 			}
 		}
 	}
@@ -403,48 +403,48 @@ int getScore(int round)
 
 int simulate()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 방문 기록 초기화
 		for (int c = 1; c <= N; c++)
 			visit[r][c] = false;
 
 	// 머리(1)를 찾을 때마다 한 팀의 이동선을 만든다.
-	int loop = 0;
+	int loop = 0;                        // 팀 번호
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= N; c++)
 		{
-			if (MAP[r][c].value != HEAD || visit[r][c] == true) continue;
+			if (MAP[r][c].value != HEAD || visit[r][c] == true) continue;   // 머리가 아니면 건너뜀
 
-			BFS(r, c, loop);
+			BFS(r, c, loop);             // 이동선 만들기
 
 			//printPosition(loop);
 
-			loop++;
+			loop++;                      // 다음 팀 번호
 		}
 	}
 
-	int score = 0;
-	for (int k = 1; k <= K; k++)
+	int score = 0;                       // 총점
+	for (int k = 1; k <= K; k++)         // K라운드
 	{
 		// 1) 모든 팀 이동 -> 2), 3) 공 던지기와 점수
 		for (int m = 0; m < M; m++) move(m);
 
-		score += getScore(k);
+		score += getScore(k);            // 공 던지기 점수
 	}
 
-	return score;
+	return score;                        // 총점 반환
 }
 
 int main()
 {
 	// scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

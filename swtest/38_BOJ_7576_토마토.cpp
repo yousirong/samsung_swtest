@@ -34,9 +34,9 @@
 	     반드시 -1(빈 칸)로 밀어야 한다.
 */
 
-#include <stdio.h>
+#include <stdio.h>              // scanf, printf, putchar 사용
 
-#define MAX (1000 + 100)
+#define MAX (1000 + 100)        // M, N 최대 1000 + 여유
 
 int M, N;               // M: 열 개수(가로), N: 행 개수(세로)  ※ 입력 순서가 M N 이다
 int MAP[MAX][MAX];      // 상자 상태 겸 "익은 날짜" 기록판
@@ -48,37 +48,37 @@ struct RC
 	int c;   // col (열)
 };
 
-typedef struct RC RC;
+typedef struct RC RC;           // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];    // BFS용 큐 (한 칸이 최대 한 번 들어간다)
 
 // 방향 배열: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = {  0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };     // 방향별 행 변화량
+int dc[] = {  0, 1, 0,-1 };     // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &M, &N);
+	scanf("%d %d", &M, &N);              // 가로 M, 세로 N 입력
 
 	// 바깥 테두리를 -1(빈 칸)로 채워 둔다.
 	// 0으로 두면 상자 밖이 "안 익은 토마토"로 읽혀 버리므로 반드시 -1이어야 한다.
-	for (int r = 0; r <= N + 1; r++)
+	for (int r = 0; r <= N + 1; r++)     // 바깥 줄 포함 모든 행
 	{
-		for (int c = 0; c <= M + 1; c++)
+		for (int c = 0; c <= M + 1; c++) // 바깥 줄 포함 모든 열
 		{
-			MAP[r][c] = -1;
+			MAP[r][c] = -1;              // 빈 칸으로 채운다
 		}
 	}
 
 	// 실제 상자 입력
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 1열부터 M열까지
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 칸 상태 입력
 		}
 	}
 }
@@ -88,11 +88,11 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%2d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%2d ", MAP[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
 }
 
@@ -105,7 +105,7 @@ void BFS()
 {
 	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;  // 빈 큐
 
 	// 시작점 모으기 : 값이 1인 칸을 전부 큐에 넣는다.
 	// 이들이 큐 앞쪽에 나란히 들어가므로 같은 날짜에서 동시에 출발하는 효과가 난다.
@@ -113,25 +113,25 @@ void BFS()
 	{
 		for (int c = 1; c <= M; c++)
 		{
-			if (MAP[r][c] == 1)
+			if (MAP[r][c] == 1)          // 익은 토마토면
 			{
-				queue[wp].r = r;
-				queue[wp++].c = c;
+				queue[wp].r = r;         // 행 기록
+				queue[wp++].c = c;       // 열 기록, 삽입 위치 증가
 			}
 		}
 	}
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 한 칸 꺼낸다
 
 		// 상하좌우
 		for (int i = 0; i < 4; i++)
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸 좌표
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
 			// 0이 아니면 전부 건너뛴다.
 			//   -1  : 빈 칸(또는 상자 바깥)
@@ -140,8 +140,8 @@ void BFS()
 			if (MAP[nr][nc] != 0)
 				continue;
 
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 이웃 행 기록
+			queue[wp++].c = nc;          // 이웃 열 기록, 삽입 위치 증가
 
 			// 값을 채우는 순간이 곧 방문 표시다.
 			// 현재 칸이 x일째면 이웃은 x+1일째에 익는다.
@@ -155,11 +155,11 @@ void BFS()
 // ---------------------------
 int getAnswer()
 {
-	int maxAnswer = 0;
+	int maxAnswer = 0;                   // 가장 늦게 익은 날짜
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 모든 열
 		{
 			// 0이 남아 있다 = BFS가 닿지 못한 토마토가 있다
 			if (MAP[r][c] == 0)
@@ -181,11 +181,11 @@ int getAnswer()
 // ---------------------------
 int main()
 {
-	input();
+	input();                             // 상자 입력
 
-	BFS();
+	BFS();                               // 익은 토마토에서 동시에 퍼뜨리기
 
-	printf("%d\n", getAnswer());
+	printf("%d\n", getAnswer());         // 걸린 날짜 출력
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

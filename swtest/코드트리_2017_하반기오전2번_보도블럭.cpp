@@ -45,11 +45,11 @@
 	  겹칠 수 있는 것은 "내리막 경사로 vs 오르막 경사로"뿐이라 그 검사만 하면 된다.
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf 사용
 
-#define MAX (100 + 20)
+#define MAX (100 + 20)         // N 최대 100 + 여유
 
-int T;
+int T;                 // 테스트 케이스 수
 int N, L;              // N: 지도 크기, L: 경사로 길이
 int MAP[MAX][MAX];     // 원본 지도
 int TMAP[MAX][MAX];    // 전치 행렬 (세로줄을 가로줄처럼 다루기 위함)
@@ -59,13 +59,13 @@ int TMAP[MAX][MAX];    // 전치 행렬 (세로줄을 가로줄처럼 다루기 
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &L);
+	scanf("%d %d", &N, &L);              // 지도 크기, 경사로 길이 입력
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 1열부터 N열까지
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 높이 입력
 
 			// 읽는 김에 전치 행렬도 같이 채운다.
 			// 나중에 TMAP[c]를 넘기면 MAP의 c번째 세로줄을 검사하는 셈이 된다.
@@ -79,7 +79,7 @@ void input()
 // ---------------------------
 int abs(int x)
 {
-	return (x > 0) ? x : -x;
+	return (x > 0) ? x : -x;             // 양수면 그대로, 아니면 부호 반전
 }
 
 // ---------------------------
@@ -89,15 +89,15 @@ int abs(int x)
 // ---------------------------
 bool isFlat(int arr[MAX], int start, int end)
 {
-	int value = arr[start];
+	int value = arr[start];              // 기준 높이
 
-	for (int i = start + 1; i <= end; i++)
+	for (int i = start + 1; i <= end; i++)   // 구간의 나머지 칸
 	{
-		if (value != arr[i])
-			return false;
+		if (value != arr[i])             // 다른 높이가 있으면
+			return false;                // 평평하지 않다
 	}
 
-	return true;
+	return true;                         // 모두 같은 높이
 }
 
 // ---------------------------
@@ -151,8 +151,8 @@ int checkRow(int arr[MAX])
 	// ----------------------------------------
 	for (int c = 1; c <= N; c++)
 	{
-		inverse[c] = arr[N + 1 - c];
-		visit_inverse[c] = visit[N + 1 - c];
+		inverse[c] = arr[N + 1 - c];             // 높이 뒤집기
+		visit_inverse[c] = visit[N + 1 - c];     // 경사로 표시 뒤집기
 	}
 
 	// ----------------------------------------
@@ -160,13 +160,13 @@ int checkRow(int arr[MAX])
 	// ----------------------------------------
 	for (int c = 1; c <= N - 1; c++)
 	{
-		if (inverse[c] == inverse[c + 1])
-			continue;
+		if (inverse[c] == inverse[c + 1])        // 높이가 같으면
+			continue;                            // 넘어간다
 
-		if (abs(inverse[c] - inverse[c + 1]) > 1)
-			return 0;
+		if (abs(inverse[c] - inverse[c + 1]) > 1)   // 높이 차 2 이상이면
+			return 0;                               // 불가능
 
-		if (inverse[c] > inverse[c + 1])
+		if (inverse[c] > inverse[c + 1])         // 내리막이면
 		{
 			// 경사로가 밖으로 나가면 안 된다
 			if (c + L > N)
@@ -180,8 +180,8 @@ int checkRow(int arr[MAX])
 			// (같은 방향끼리는 절대 겹치지 않으므로 이 교차 검사만 하면 충분하다)
 			for (int k = c + 1; k <= c + L; k++)
 			{
-				if (visit_inverse[k] == true)
-					return 0;
+				if (visit_inverse[k] == true)    // 이미 경사로가 있으면
+					return 0;                    // 겹쳐서 불가능
 			}
 		}
 	}
@@ -198,15 +198,15 @@ int checkRow(int arr[MAX])
 // ---------------------------
 int checkAllRow()
 {
-	int sum = 0;
+	int sum = 0;                         // 지나갈 수 있는 길 수
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 줄 번호마다
 	{
-		sum += checkRow(MAP[r]);
-		sum += checkRow(TMAP[r]);
+		sum += checkRow(MAP[r]);         // r번째 가로줄
+		sum += checkRow(TMAP[r]);        // r번째 세로줄
 	}
 
-	return sum;
+	return sum;                          // 길 수 반환
 }
 
 int main()
@@ -215,12 +215,12 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		printf("%d\n", checkAllRow());
+		printf("%d\n", checkAllRow());   // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

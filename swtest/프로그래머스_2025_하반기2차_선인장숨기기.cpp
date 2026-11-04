@@ -61,12 +61,12 @@
 	  - 덱에는 값이 아니라 인덱스를 담는다. 창을 벗어났는지 판단해야 하기 때문이다.
 	  - 창 크기가 1이어도(h = 1 또는 w = 1) 같은 코드가 그대로 동작한다.
 */
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf, putchar 사용
 
-#define MAX_CELL (500000 + 10)
-#define INF (0x7fffffff)
+#define MAX_CELL (500000 + 10)     // 칸 수 최대 50만 + 여유
+#define INF (0x7fffffff)           // 비가 안 온 칸 표시
 
-int T;
+int T;            // 테스트 케이스 수
 
 int M, N, H, W;   // 격자 세로, 가로 / 선인장 세로, 가로
 int K;            // 빗방울 개수
@@ -76,30 +76,30 @@ int rowMin[MAX_CELL];      // 가로 W 창의 최솟값
 int windowMin[MAX_CELL];   // 가로 W + 세로 H 창의 최솟값 (= 그 자리에 놓았을 때 비를 맞는 순간)
 
 int deq[MAX_CELL];         // 단조 덱 (값이 아니라 인덱스를 담는다)
-int head, tail;
+int head, tail;            // 덱의 앞, 뒤 위치
 
-int answerR, answerC;
+int answerR, answerC;      // 답 (왼쪽 위 행, 열)
 
 // 2차원 좌표를 한 줄로 펴서 쓴다 (m, n이 각각 50만까지 갈 수 있어 2차원 배열을 못 쓴다)
 int at(int r, int c)
 {
-	return r * N + c;
+	return r * N + c;                    // 1차원 인덱스
 }
 
 void input()
 {
-	scanf("%d %d %d %d", &M, &N, &H, &W);
+	scanf("%d %d %d %d", &M, &N, &H, &W);   // 격자 크기, 선인장 크기 입력
 
-	for (int i = 0; i < M * N; i++)
-		dropTime[i] = INF;
+	for (int i = 0; i < M * N; i++)      // 모든 칸
+		dropTime[i] = INF;               // 비가 안 온 상태로
 
-	scanf("%d", &K);
+	scanf("%d", &K);                     // 빗방울 개수 입력
 
-	for (int k = 1; k <= K; k++)
+	for (int k = 1; k <= K; k++)         // 빗방울 순서대로
 	{
-		int r, c;
+		int r, c;                        // 떨어진 칸
 
-		scanf("%d %d", &r, &c);
+		scanf("%d %d", &r, &c);          // 좌표 입력
 
 		dropTime[at(r, c)] = k;   // 순번은 1부터
 	}
@@ -107,33 +107,33 @@ void input()
 
 void printMap(int map[MAX_CELL]) // for debug
 {
-	for (int r = 0; r < M; r++)
+	for (int r = 0; r < M; r++)          // 모든 행
 	{
-		for (int c = 0; c < N; c++)
+		for (int c = 0; c < N; c++)      // 모든 열
 		{
-			if (map[at(r, c)] == INF) printf("  . ");
-			else printf("%3d ", map[at(r, c)]);
+			if (map[at(r, c)] == INF) printf("  . ");     // 비가 안 온 칸
+			else printf("%3d ", map[at(r, c)]);          // 순번 출력
 		}
-		putchar('\n');
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // 1) 각 행에서 가로 W 창의 최솟값을 구한다
 void slideRow()
 {
-	for (int r = 0; r < M; r++)
+	for (int r = 0; r < M; r++)          // 행마다
 	{
 		head = tail = 0;   // 행이 바뀌면 덱을 비운다
 
-		for (int c = 0; c < N; c++)
+		for (int c = 0; c < N; c++)      // 왼쪽에서 오른쪽으로
 		{
-			int value = dropTime[at(r, c)];
+			int value = dropTime[at(r, c)];   // 새로 들어온 값
 
 			// 새 값보다 크거나 같은 값은 앞으로 최솟값이 될 수 없다
 			while (head < tail && dropTime[at(r, deq[tail - 1])] >= value) tail--;
 
-			deq[tail++] = c;
+			deq[tail++] = c;             // 새 인덱스를 뒤에 넣는다
 
 			// 창을 벗어난 인덱스는 앞에서 버린다
 			if (deq[head] <= c - W) head++;
@@ -147,21 +147,21 @@ void slideRow()
 // 2) rowMin을 세로 H 창으로 다시 밀어 h x w 창의 최솟값을 만든다
 void slideColumn()
 {
-	for (int c = 0; c + W <= N; c++)
+	for (int c = 0; c + W <= N; c++)     // 창의 시작 열마다
 	{
 		head = tail = 0;   // 열이 바뀌면 덱을 비운다
 
-		for (int r = 0; r < M; r++)
+		for (int r = 0; r < M; r++)      // 위에서 아래로
 		{
-			int value = rowMin[at(r, c)];
+			int value = rowMin[at(r, c)];   // 새로 들어온 값
 
-			while (head < tail && rowMin[at(deq[tail - 1], c)] >= value) tail--;
+			while (head < tail && rowMin[at(deq[tail - 1], c)] >= value) tail--;   // 더 큰 값은 뒤에서 버린다
 
-			deq[tail++] = r;
+			deq[tail++] = r;             // 새 인덱스를 뒤에 넣는다
 
-			if (deq[head] <= r - H) head++;
+			if (deq[head] <= r - H) head++;   // 창을 벗어난 인덱스는 앞에서 버린다
 
-			if (r >= H - 1) windowMin[at(r - H + 1, c)] = rowMin[at(deq[head], c)];
+			if (r >= H - 1) windowMin[at(r - H + 1, c)] = rowMin[at(deq[head], c)];   // 창의 최솟값 기록
 		}
 	}
 }
@@ -169,20 +169,20 @@ void slideColumn()
 // 비를 가장 늦게 맞는 자리를 고른다 (행 우선으로 훑고 "더 클 때만" 갱신)
 void getAnswer()
 {
-	int best = -1;
+	int best = -1;                       // 지금까지 가장 늦은 순간
 
-	answerR = answerC = 0;
+	answerR = answerC = 0;               // 답 초기화
 
-	for (int r = 0; r + H <= M; r++)
+	for (int r = 0; r + H <= M; r++)     // 놓을 수 있는 시작 행
 	{
-		for (int c = 0; c + W <= N; c++)
+		for (int c = 0; c + W <= N; c++) // 놓을 수 있는 시작 열
 		{
-			if (best < windowMin[at(r, c)])
+			if (best < windowMin[at(r, c)])   // 더 늦게 맞으면
 			{
-				best = windowMin[at(r, c)];
+				best = windowMin[at(r, c)];   // 최댓값 갱신
 
-				answerR = r;
-				answerC = c;
+				answerR = r;             // 답 행
+				answerC = c;             // 답 열
 			}
 		}
 	}
@@ -191,19 +191,19 @@ void getAnswer()
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		slideRow();
+		slideRow();                      // 가로 창 최솟값
 
-		slideColumn();
+		slideColumn();                   // 세로까지 창 최솟값
 
-		getAnswer();
+		getAnswer();                     // 최적 위치 찾기
 
-		printf("%d %d\n", answerR, answerC);
+		printf("%d %d\n", answerR, answerC);   // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

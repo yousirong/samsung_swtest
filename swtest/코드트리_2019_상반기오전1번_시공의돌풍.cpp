@@ -50,51 +50,51 @@
 	  아래쪽 청정기(시계)는 위아래를 뒤집은 같은 코드다.
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX (50 + 10)
-#define TORNADO_POSITION (-1)
+#define MAX (50 + 10)            // N, M 최대 50 + 여유
+#define TORNADO_POSITION (-1)    // 공기청정기 칸 표시
 
-int T;
+int T;                  // 테스트 케이스 수
 int N, M, time;         // time : 시뮬레이션할 초
 int MAP[MAX][MAX];      // 현재 먼지 상태 (-1은 공기청정기)
 int tmpMAP[MAX][MAX];   // 이번 초에 "새로 들어온" 먼지만 모으는 배열
 
-struct RC
+struct RC                // 좌표 한 쌍
 {
-	int r;
-	int c;
+	int r;               // 행
+	int c;               // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;    // struct RC를 RC로 줄여 쓰기
 
 RC tornado[2];  // 공기청정기 두 칸. 입력을 위에서부터 읽으므로 [0]이 위쪽, [1]이 아래쪽이다.
-int tcnt;
+int tcnt;       // 찾은 공기청정기 칸 수
 
 // 방향 배열: ↑, →, ↓, ←
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0, -1 };
+int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
+int dc[] = { 0, 1, 0, -1 };   // 방향별 열 변화량
 
 // ---------------------------
 // 입력
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d", &N, &M, &time);
+	scanf("%d %d %d", &N, &M, &time);    // 격자 크기, 시간 입력
 
-	tcnt = 0;
+	tcnt = 0;                            // 청정기 칸 수 초기화
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 모든 열
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 먼지 양 입력
 
 			// 공기청정기 위치는 따로 기억해 둔다 (위쪽이 먼저 저장된다)
 			if (MAP[r][c] == TORNADO_POSITION)
 			{
-				tornado[tcnt].r = r;
-				tornado[tcnt++].c = c;
+				tornado[tcnt].r = r;     // 청정기 행
+				tornado[tcnt++].c = c;   // 청정기 열, 개수 증가
 			}
 		}
 	}
@@ -105,13 +105,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%d ", MAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -122,22 +122,22 @@ void diffusion()
 	// 이번 초에 새로 들어올 양만 담을 배열을 비운다
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= M; c++)
-			tmpMAP[r][c] = 0;
+			tmpMAP[r][c] = 0;            // 받을 양 0
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 모든 열
 		{
 			// 먼지가 없는 칸(0)과 공기청정기 칸(-1)은 확산하지 않는다
 			if (MAP[r][c] <= 0) continue;
 
-			int dust, count;
+			int dust, count;             // 한 방향 확산량, 퍼진 방향 수
 			dust = count = 0;   // 네 방향 모두 막히면 dust가 0으로 남아 아무것도 빠지지 않는다
 
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)  // 4방향
 			{
-				int nr = r + dr[i];
-				int nc = c + dc[i];
+				int nr = r + dr[i];      // 이웃 행
+				int nc = c + dc[i];      // 이웃 열
 
 				// 격자 밖으로는 퍼지지 않는다
 				if (nr < 1 || nc < 1 || nr > N || nc > M) continue;
@@ -151,7 +151,7 @@ void diffusion()
 
 				// 받는 쪽은 임시 배열에만 쌓아 둔다 (같은 초에 다시 퍼지지 않도록)
 				tmpMAP[nr][nc] += dust;
-				count++;
+				count++;                 // 퍼진 방향 수 증가
 			}
 
 			// 실제로 퍼져 나간 방향의 수만큼만 잃는다
@@ -162,7 +162,7 @@ void diffusion()
 	// 이번 초에 받은 양을 한꺼번에 반영
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= M; c++)
-			MAP[r][c] += tmpMAP[r][c];
+			MAP[r][c] += tmpMAP[r][c];   // 받은 양 더하기
 }
 
 // ---------------------------
@@ -184,22 +184,22 @@ void cleaning()
 	// 1) 왼쪽 열 : 위 -> 아래로 값이 내려온다 (바람은 청정기 쪽으로 들어간다)
 	//    (up_r-1,1) <- (up_r-2,1) <- ... <- (2,1) <- (1,1)
 	for (int r = up_r - 1; r > 1; r--)
-		MAP[r][1] = MAP[r - 1][1];
+		MAP[r][1] = MAP[r - 1][1];       // 위 칸 값을 가져온다
 
 	// 2) 윗줄 : 오른쪽 -> 왼쪽으로 값이 이동
 	//    (1,1) <- (1,2) <- ... <- (1,M)
 	for (int c = 1; c <= M - 1; c++)
-		MAP[1][c] = MAP[1][c + 1];
+		MAP[1][c] = MAP[1][c + 1];       // 오른쪽 칸 값을 가져온다
 
 	// 3) 오른쪽 열 : 아래 -> 위로 값이 올라간다
 	//    (1,M) <- (2,M) <- ... <- (up_r,M)
 	for (int r = 1; r <= up_r - 1; r++)
-		MAP[r][M] = MAP[r + 1][M];
+		MAP[r][M] = MAP[r + 1][M];       // 아래 칸 값을 가져온다
 
 	// 4) 청정기 행 : 왼쪽 -> 오른쪽으로 값이 이동 (청정기에서 나온 바람 방향)
 	//    (up_r,M) <- (up_r,M-1) <- ... <- (up_r,2) <- (up_r,1)
 	for (int c = M; c > 1; c--)
-		MAP[up_r][c] = MAP[up_r][c - 1];
+		MAP[up_r][c] = MAP[up_r][c - 1]; // 왼쪽 칸 값을 가져온다
 
 	// 청정기에서 바로 나오는 칸은 깨끗한 공기다
 	MAP[up_r][2] = 0;
@@ -214,22 +214,22 @@ void cleaning()
 
 	// 1) 왼쪽 열 : 아래 -> 위로 값이 올라온다
 	for (int r = down_r + 1; r <= N - 1; r++)
-		MAP[r][1] = MAP[r + 1][1];
+		MAP[r][1] = MAP[r + 1][1];       // 아래 칸 값을 가져온다
 
 	// 2) 아랫줄 : 오른쪽 -> 왼쪽으로 값이 이동
 	for (int c = 1; c <= M - 1; c++)
-		MAP[N][c] = MAP[N][c + 1];
+		MAP[N][c] = MAP[N][c + 1];       // 오른쪽 칸 값을 가져온다
 
 	// 3) 오른쪽 열 : 위 -> 아래로 값이 내려간다
 	for (int r = N; r > down_r; r--)
-		MAP[r][M] = MAP[r - 1][M];
+		MAP[r][M] = MAP[r - 1][M];       // 위 칸 값을 가져온다
 
 	// 4) 청정기 행 : 왼쪽 -> 오른쪽으로 값이 이동
 	for (int c = M; c > 1; c--)
-		MAP[down_r][c] = MAP[down_r][c - 1];
+		MAP[down_r][c] = MAP[down_r][c - 1];   // 왼쪽 칸 값을 가져온다
 
-	MAP[down_r][2] = 0;
-	MAP[down_r][1] = TORNADO_POSITION;
+	MAP[down_r][2] = 0;                  // 청정기 바로 옆은 깨끗한 공기
+	MAP[down_r][1] = TORNADO_POSITION;   // 청정기 자리 표시 복구
 }
 
 // ---------------------------
@@ -237,18 +237,18 @@ void cleaning()
 // ---------------------------
 int getAnswer()
 {
-	int sum = 0;
+	int sum = 0;                         // 먼지 총합
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 모든 열
 		{
-			if (MAP[r][c] != TORNADO_POSITION)
-				sum += MAP[r][c];
+			if (MAP[r][c] != TORNADO_POSITION)   // 청정기 칸이 아니면
+				sum += MAP[r][c];                // 먼지 더하기
 		}
 	}
 
-	return sum;
+	return sum;                          // 총합 반환
 }
 
 int main()
@@ -257,20 +257,20 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		// 1초 = 확산 -> 청정기 작동
 		for (int t = 0; t < time; t++)
 		{
-			diffusion();
-			cleaning();
+			diffusion();                 // 먼지 확산
+			cleaning();                  // 공기청정기 작동
 			// printMap();
 		}
 
-		printf("%d\n", getAnswer());
+		printf("%d\n", getAnswer());     // 남은 먼지 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

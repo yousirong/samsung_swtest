@@ -36,12 +36,12 @@
 	    그때는 범위 검사를 명시적으로 해야 한다.
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (200 + 100)
-#define BLOCK_COUNT (19)
+#define MAX (200 + 100)        // N, M 최대 200 + 블록이 삐져나갈 여유
+#define BLOCK_COUNT (19)       // 테트로미노 모양 수 (회전/대칭 포함)
 
-int T;
+int T;                 // 테스트 케이스 수
 
 int N, M;              // 격자 크기
 int MAP[MAX][MAX];     // 숫자판 (실제 범위 밖은 0)
@@ -181,18 +181,18 @@ int BLOCK[BLOCK_COUNT][4][4] =
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 격자 크기 입력
 
 	// 배열 전체를 0으로 밀어 둔다.
 	// 격자 밖으로 삐져나간 블록이 0을 더하게 만들어 범위 검사를 없애기 위함.
 	for (int r = 0; r < MAX; r++)
 		for (int c = 0; c < MAX; c++)
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 0으로 초기화
 
 	// 실제 숫자판 (0-based)
 	for (int r = 0; r < N; r++)
 		for (int c = 0; c < M; c++)
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 칸의 수 입력
 }
 
 // ---------------------------
@@ -200,13 +200,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 0; r < N; r++)
+	for (int r = 0; r < N; r++)          // 모든 행
 	{
-		for (int c = 0; c < M; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 0; c < M; c++)      // 모든 열
+			printf("%d ", MAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -217,17 +217,17 @@ void printMap()
 // ---------------------------
 int scan(int blockNum, int sr, int sc)
 {
-	int sum = 0;
+	int sum = 0;                         // 덮은 칸의 합
 
-	for (int r = 0; r < 4; r++)
+	for (int r = 0; r < 4; r++)          // 4x4 틀의 행
 	{
-		for (int c = 0; c < 4; c++)
+		for (int c = 0; c < 4; c++)      // 4x4 틀의 열
 		{
-			sum += (MAP[sr + r][sc + c] * BLOCK[blockNum][r][c]);
+			sum += (MAP[sr + r][sc + c] * BLOCK[blockNum][r][c]);   // 덮는 칸만 더해진다
 		}
 	}
 
-	return sum;
+	return sum;                          // 합 반환
 }
 
 int main()
@@ -236,11 +236,11 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		int maxAnswer = 0;
+		int maxAnswer = 0;               // 최대 합
 
 		// 모든 시작 좌표 x 모든 블록 모양을 전부 시도
 		for (int r = 0; r < N; r++)
@@ -249,16 +249,16 @@ int main()
 			{
 				for (int k = 0; k < BLOCK_COUNT; k++)
 				{
-					int tmp = scan(k, r, c);
+					int tmp = scan(k, r, c);   // k번 블록을 (r, c)에 놓은 합
 
-					if (maxAnswer < tmp)
-						maxAnswer = tmp;
+					if (maxAnswer < tmp)       // 더 크면
+						maxAnswer = tmp;       // 최댓값 갱신
 				}
 			}
 		}
 
-		printf("%d\n", maxAnswer);
+		printf("%d\n", maxAnswer);       // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

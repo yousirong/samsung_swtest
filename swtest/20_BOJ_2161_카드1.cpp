@@ -27,23 +27,23 @@
 	  배열은 2N 이상이면 충분하다. (그래서 MAX * 2로 잡았다)
 */
 
-#include <stdio.h>
+#include <stdio.h>          // scanf, printf 사용
 
-#define MAX (1000 + 100)
+#define MAX (1000 + 100)    // 카드 최대 1000장 + 여유
 
-int N;
+int N;                // 카드 장수
 int queue[MAX * 2];   // 선형 큐. 최대 2N-1칸까지 쓰이므로 2배로 잡는다
 int rp, wp;           // rp: 맨 위 카드 위치, wp: 다음에 넣을 위치
 
 int main()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 카드 장수 입력
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 빈 큐로 시작
 
 	// 초기 상태 : 위에서부터 1, 2, 3, ..., N
 	for (int i = 1; i <= N; i++)
-		queue[wp++] = i;
+		queue[wp++] = i;                 // i번 카드를 맨 아래에 넣는다
 
 	// 카드가 한 장 남을 때까지 = N-1번 반복
 	for (int i = 0; i < N - 1; i++)
@@ -60,5 +60,5 @@ int main()
 	// (N == 1이면 반복이 없으므로 처음 넣은 카드 1이 그대로 출력된다)
 	printf("%d\n", queue[wp - 1]);
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

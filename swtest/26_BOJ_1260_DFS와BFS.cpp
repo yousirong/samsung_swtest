@@ -26,9 +26,9 @@
 	  4) 시작 정점과 연결되지 않은 정점은 아예 출력되지 않는다. 문제 조건상 그게 맞다.
 */
 
-#include <stdio.h>
+#include <stdio.h>        // scanf, printf, putchar 사용
 
-#define MAX (1000 + 50)
+#define MAX (1000 + 50)   // 정점 최대 1000개 + 여유
 
 int N, M, V;          // N: 정점 수, M: 간선 수, V: 탐색을 시작할 정점
 int MAP[MAX][MAX];    // 인접 행렬. MAP[a][b] == 1 이면 a-b 연결
@@ -41,19 +41,19 @@ bool visit[MAX];      // 방문 여부
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d", &N, &M, &V);
+	scanf("%d %d %d", &N, &M, &V);       // 정점 수, 간선 수, 시작 정점 입력
 
 	// 간선 M개
 	for (int i = 1; i <= M; i++)
 	{
-		int n1, n2;
+		int n1, n2;                      // 간선 양 끝 정점
 
-		scanf("%d %d", &n1, &n2);
+		scanf("%d %d", &n1, &n2);        // 간선 입력
 
 		// 무방향 그래프이므로 양방향 모두 표시
 		// (같은 간선이 중복 입력돼도 1로 덮어쓰므로 문제없다)
-		MAP[n1][n2] = 1;
-		MAP[n2][n1] = 1;
+		MAP[n1][n2] = 1;                 // n1 -> n2 연결
+		MAP[n2][n1] = 1;                 // n2 -> n1 연결
 	}
 }
 
@@ -62,13 +62,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", MAP[r][c]);    // 연결 여부 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 행렬 끝 빈 줄
 }
 
 // ---------------------------
@@ -105,16 +105,16 @@ void BFS(int node)
 {
 	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;  // 빈 큐
 
 	// 시작 정점을 큐에 넣고 바로 방문 표시
-	queue[wp++] = node;
-	visit[node] = true;
+	queue[wp++] = node;                  // 시작 정점 삽입
+	visit[node] = true;                  // 시작 정점 방문 표시
 
 	// 처리할 원소가 남아 있는 동안
 	while (rp < wp)
 	{
-		int out = queue[rp++];
+		int out = queue[rp++];           // 큐에서 하나 꺼낸다
 
 		// BFS의 방문 시점 = 큐에서 꺼낸 순간
 		printf("%d ", out);
@@ -122,10 +122,10 @@ void BFS(int node)
 		// 이웃을 작은 번호부터 확인해서 큐에 넣는다
 		for (int c = 1; c <= N; c++)
 		{
-			if (MAP[out][c] == 0 || visit[c] == true)
-				continue;
+			if (MAP[out][c] == 0 || visit[c] == true)   // 연결 없거나 이미 방문했으면
+				continue;                               // 건너뛴다
 
-			queue[wp++] = c;
+			queue[wp++] = c;             // 이웃 c를 큐에 넣는다
 
 			// 넣는 즉시 표시해야 같은 정점이 두 번 들어가지 않는다
 			visit[c] = true;
@@ -138,20 +138,20 @@ void BFS(int node)
 // ---------------------------
 int main()
 {
-	input();
+	input();                             // 그래프 입력
 
 	// 1) DFS 방문 순서
-	DFS(V);
-	putchar('\n');
+	DFS(V);                              // V에서 DFS 시작
+	putchar('\n');                       // DFS 결과 줄바꿈
 
 	// 2) BFS를 돌리기 전에 visit을 반드시 초기화한다.
 	//    DFS가 이미 전부 true로 만들어 놨기 때문에, 빼먹으면 BFS 결과가 통째로 틀린다.
 	for (int i = 1; i <= N; i++)
-		visit[i] = false;
+		visit[i] = false;                // 방문 표시 해제
 
 	// 3) BFS 방문 순서
-	BFS(V);
-	putchar('\n');
+	BFS(V);                              // V에서 BFS 시작
+	putchar('\n');                       // BFS 결과 줄바꿈
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

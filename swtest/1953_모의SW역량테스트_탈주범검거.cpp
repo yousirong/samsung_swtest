@@ -26,11 +26,11 @@
 	    그때 큐에 남은 칸들은 이미 visit가 매겨져 있으므로 세는 데는 문제가 없다.
 	  - isLink의 마지막 return -1은 dir이 1 ~ 4 밖일 때만 오는데, 그런 호출은 없다.
 */
-#include <stdio.h>
+#include <stdio.h>              // scanf, printf 사용
 
-#define MAX (50+5)
+#define MAX (50+5)              // N, M 최대 50 + 여유
 
-int T;
+int T;                  // 테스트 케이스 수
 int N, M, R, C, L;      // 세로, 가로, 맨홀 행, 맨홀 열, 경과 시간
 int MAP[MAX][MAX];      // 터널 구조물 번호 (0 = 없음)
 int visit[MAX][MAX];    // 처음 도착한 시각 (0 = 못 감)
@@ -38,39 +38,39 @@ int visit[MAX][MAX];    // 처음 도착한 시각 (0 = 못 감)
 // 파이프 한 종류가 어느 쪽으로 뚫려 있는지 (1 = 뚫림)
 struct PIPE
 {
-	int up;
-	int down;
-	int right;
-	int left;
+	int up;             // 위쪽 구멍
+	int down;           // 아래쪽 구멍
+	int right;          // 오른쪽 구멍
+	int left;           // 왼쪽 구멍
 };
 
-PIPE pipe[8];
+PIPE pipe[8];           // pipe[번호] = 그 구조물의 구멍 정보
 
-struct RC
+struct RC               // 좌표 한 쌍
 {
-	int r;
-	int c;
+	int r;              // 행
+	int c;              // 열
 };
 
-RC queue[MAX * MAX];
-int rp, wp;
+RC queue[MAX * MAX];    // BFS용 큐
+int rp, wp;             // rp: 꺼낼 위치, wp: 넣을 위치
 
 /* 0, ↑, →, ↓, ← */
-int dr[] = { 0,-1,0,1,0 };
-int dc[] = { 0,0,1,0,-1 };
+int dr[] = { 0,-1,0,1,0 };      // 방향별 행 변화량 (0번은 사용 안 함)
+int dc[] = { 0,0,1,0,-1 };      // 방향별 열 변화량 (0번은 사용 안 함)
 
 void input()
 {
-	scanf("%d %d %d %d %d", &N, &M, &R, &C, &L);
+	scanf("%d %d %d %d %d", &N, &M, &R, &C, &L);   // 지도 크기, 맨홀 위치, 시간 입력
 
 	// 테두리 포함 전부 0 -> 테두리는 "터널 없음"이 되어 범위 검사가 필요 없다
 	for (int r = 0; r <= N + 1; r++)
 		for (int c = 0; c <= M + 1; c++)
-			MAP[r][c] = visit[r][c] = 0;
+			MAP[r][c] = visit[r][c] = 0;   // 지도와 방문 기록 초기화
 
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= M; c++)
-			scanf("%d", &MAP[r][c]);
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
+		for (int c = 1; c <= M; c++)     // 1열부터 M열까지
+			scanf("%d", &MAP[r][c]);     // 터널 구조물 번호 입력
 }
 
 // p1에서 dir 방향으로 p2에 갈 수 있는가 : 서로 마주 보는 구멍이 둘 다 뚫려 있어야 한다
@@ -85,39 +85,39 @@ int isLink(PIPE p1, PIPE p2, int dir)
 	// p1의 왼쪽과 p2의 오른쪽 비교
 	if (dir == 4)	return p1.left && p2.right;
 
-	return -1;
+	return -1;                           // 잘못된 방향 (호출되지 않음)
 }
 
 void BFS(int r, int c)
 {
 	int cnt;   // 마지막으로 큐에 넣은 칸의 도착 시각
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 빈 큐
 
-	queue[wp].r = r;
-	queue[wp++].c = c;
+	queue[wp].r = r;                     // 맨홀 행
+	queue[wp++].c = c;                   // 맨홀 열, 삽입 위치 증가
 	visit[r][c] = 1;   // 맨홀에 들어간 시각 = 1시간
 
-	cnt = 0;
+	cnt = 0;                             // 아직 넣은 칸 없음
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 한 칸 꺼낸다
 
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 4; i++)     // 상, 우, 하, 좌
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸 좌표
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
 			// 안 가 본 칸 + 터널이 있음 + 두 파이프가 이어짐
 			if (visit[nr][nc] == 0 && MAP[nr][nc] != 0
 				&& isLink(pipe[MAP[out.r][out.c]], pipe[MAP[nr][nc]], i))
 			{
-				queue[wp].r = nr;
-				queue[wp++].c = nc;
-				cnt = visit[nr][nc] = visit[out.r][out.c] + 1;
+				queue[wp].r = nr;        // 이웃 행 기록
+				queue[wp++].c = nc;      // 이웃 열 기록, 삽입 위치 증가
+				cnt = visit[nr][nc] = visit[out.r][out.c] + 1;   // 도착 시각 기록
 			}
 		}
 
@@ -129,11 +129,11 @@ void BFS(int r, int c)
 // 도착 시각이 L 이하인 칸 = 탈주범이 있을 수 있는 칸
 int checkVisit()
 {
-	int sum = 0;
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= M; c++)
-			if (visit[r][c] != 0 && visit[r][c] <= L) sum++;
-	return sum;
+	int sum = 0;                         // 칸 개수
+	for (int r = 1; r <= N; r++)         // 모든 행
+		for (int c = 1; c <= M; c++)     // 모든 열
+			if (visit[r][c] != 0 && visit[r][c] <= L) sum++;   // L시간 안에 닿는 칸이면 센다
+	return sum;                          // 개수 반환
 }
 
 int main()
@@ -147,19 +147,19 @@ int main()
 	pipe[6] = { 0, 1, 0, 1 };   // 하좌
 	pipe[7] = { 1, 0, 0, 1 };   // 상좌
 
-	scanf("%d", &T);
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		int ans;
+		int ans;                         // 정답
 
-		input();
+		input();                         // 지도 입력
 
 		BFS(R + 1, C + 1);   // 입력 좌표는 0-based, 지도는 1-based
 
-		ans = checkVisit();
+		ans = checkVisit();              // L시간 안에 닿는 칸 세기
 
-		printf("#%d %d\n", tc, ans);
+		printf("#%d %d\n", tc, ans);     // 결과 출력
 	}
-	return 0;
-}
+	return 0;                            // 프로그램 정상 종료
+}

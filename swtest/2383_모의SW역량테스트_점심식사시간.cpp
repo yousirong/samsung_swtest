@@ -33,23 +33,23 @@
 	    거리 1 + 대기 1 + 계단 2 = 4 이상이라 max에서 항상 밀려 결과에 영향이 없다.
 	  - abs()를 직접 만들어 쓴다 (stdlib.h를 include하지 않았다).
 */
-#include <stdio.h>
+#include <stdio.h>                  // scanf, printf 사용
 
-#define MAX (10+5)
+#define MAX (10+5)                  // N, 사람 수 최대 10 + 여유
 
-int T;
-int N;
-int MAP[MAX][MAX];
+int T;                      // 테스트 케이스 수
+int N;                      // 방 크기
+int MAP[MAX][MAX];          // 방 정보 (1 = 사람, 2 이상 = 계단 길이)
 int list[MAX];              // list[p] : p번 사람이 고른 계단 (0 = 1번 계단, 1 = 2번 계단)
 
-struct RC
+struct RC                   // 좌표 한 쌍
 {
-	int r;
-	int c;
+	int r;                  // 행
+	int c;                  // 열
 };
 
 RC people[MAX];             // 사람 좌표
-int pcnt;
+int pcnt;                   // 사람 수
 
 RC stair[2 + 3];            // stair[1], stair[2] : 계단 좌표
 int stairLength[2 + 3];     // 계단 길이
@@ -57,67 +57,67 @@ int distance[2 + 3][MAX];   // distance[s][p] : p번 사람에서 s번 계단 �
 
 int abs(int x)
 {
-	return x > 0 ? x : -x;
+	return x > 0 ? x : -x;              // 절댓값
 }
 
 int getLength(int r1, int c1, int r2, int c2)
 {
-	return abs(r1 - r2) + abs(c1 - c2);
+	return abs(r1 - r2) + abs(c1 - c2); // 맨해튼 거리
 }
 
 void input()
 {
-	pcnt = 0;
+	pcnt = 0;                            // 사람 수 초기화
 
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 방 크기 입력
 
 	int scnt = 1; // 1번 계단 부터시작
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 1열부터 N열까지
 		{
-			int tmp;
-			scanf("%d", &tmp);
+			int tmp;                     // 칸 값
+			scanf("%d", &tmp);           // 칸 값 입력
 
-			MAP[r][c] = tmp;
+			MAP[r][c] = tmp;             // 방에 기록
 			if (tmp == 1)        // 사람
 			{
-				people[pcnt].r = r;
-				people[pcnt++].c = c;
+				people[pcnt].r = r;      // 사람 행
+				people[pcnt++].c = c;    // 사람 열, 사람 수 증가
 			}
 			else if (tmp >= 2)   // 계단 (값 = 길이)
 			{
-				stair[scnt].r = r;
-				stair[scnt].c = c;
-				stairLength[scnt++] = tmp;
+				stair[scnt].r = r;       // 계단 행
+				stair[scnt].c = c;       // 계단 열
+				stairLength[scnt++] = tmp;   // 계단 길이, 계단 번호 증가
 			}
 		}
 	}
 
 	// 사람마다 두 계단까지의 거리를 미리 구해 둔다
-	for (int s = 1; s <= 2; s++)
-		for (int p = 0; p < pcnt; p++)
-			distance[s][p] = getLength(people[p].r, people[p].c, stair[s].r, stair[s].c);
+	for (int s = 1; s <= 2; s++)             // 계단 1, 2
+		for (int p = 0; p < pcnt; p++)       // 모든 사람
+			distance[s][p] = getLength(people[p].r, people[p].c, stair[s].r, stair[s].c);   // 거리 저장
 }
 
 // stairNumber 계단을 고른 사람 count명(people[]에 번호)이 다 내려가는 시각
 int calculate(int people[MAX], int count, int stairNumber)
 {
-	int time;
-	int distanceArr[11] = { 0 };
+	int time;                            // 현재 시각
+	int distanceArr[11] = { 0 };         // 이 계단을 고른 사람들의 남은 거리
 
 	// 거리 저장
 	for (int i = 0; i < count; i++)
-		distanceArr[i] = distance[stairNumber][people[i]];
+		distanceArr[i] = distance[stairNumber][people[i]];   // i번째 사람의 계단까지 거리
 
 	// 거리 오름차순 정렬 (먼저 도착한 사람이 대기열 앞에 서도록)
-	for (int i = 0; i < count - 1; i++)
+	for (int i = 0; i < count - 1; i++)          // 기준 위치
 	{
-		for (int k = i + 1; k < count; k++)
+		for (int k = i + 1; k < count; k++)      // 기준 뒤의 모든 위치
 		{
-			if (distanceArr[i] > distanceArr[k])
+			if (distanceArr[i] > distanceArr[k]) // 뒤쪽이 더 가까우면
 			{
-				int tmp = distanceArr[i];
+				int tmp = distanceArr[i];        // 두 값을 맞바꾼다
 				distanceArr[i] = distanceArr[k];
 				distanceArr[k] = tmp;
 			}
@@ -127,11 +127,11 @@ int calculate(int people[MAX], int count, int stairNumber)
 	int downStair[MAX]; // queue  (값 = 남은 계단 칸 수)
 	int wp, rp;         // rp : 아직 다 못 내려간 첫 사람, wp : 다음에 넣을 자리
 
-	time = 1;
-	rp = wp = 0;
-	while (1)
+	time = 1;                            // 시각 1부터
+	rp = wp = 0;                         // 빈 대기열
+	while (1)                            // 모두 내려갈 때까지
 	{
-		time++;
+		time++;                          // 1분 경과
 
 		// 1분 지남 : 모두 입구에 한 걸음 가까워진다
 		for (int i = 0; i < count; i++) distanceArr[i] -= 1;
@@ -139,22 +139,22 @@ int calculate(int people[MAX], int count, int stairNumber)
 		// 입구에 막 도착한 사람은 대기열 뒤에 선다
 		for (int i = 0; i < count; i++)
 		{
-			if (distanceArr[i] == 0)
-				downStair[wp++] = stairLength[stairNumber];
+			if (distanceArr[i] == 0)     // 이번 분에 입구 도착
+				downStair[wp++] = stairLength[stairNumber];   // 남은 계단 칸 수 = 계단 길이
 		}
 
 		// 대기열 앞 3명만 계단 위에서 한 칸 내려간다
 		// (i > wp 이라 i == wp 인 빈 칸도 줄이지만, 그 칸은 나중에 덮어써진다)
 		for (int i = rp; i < rp + 3; i++)
 		{
-			if (i > wp) break;
+			if (i > wp) break;           // 대기열 끝을 넘으면 중단
 
-			downStair[i] -= 1;
+			downStair[i] -= 1;           // 한 칸 내려간다
 		}
 
 		// 다 내려간 사람(0)만큼 rp를 민다. 먼저 들어간 사람이 먼저 끝나므로 0은 앞쪽에 모인다
 		for (int i = rp; i < wp; i++)
-			if (downStair[i] == 0) rp++;
+			if (downStair[i] == 0) rp++; // 다 내려간 사람 수만큼 전진
 
 		if (rp == count) break;   // 이 계단을 고른 사람이 전부 내려갔다
 	}
@@ -165,56 +165,56 @@ int calculate(int people[MAX], int count, int stairNumber)
 // 지금 배정(list[])으로 모두 내려가는 시각 = 두 계단 중 늦은 쪽
 int simulate()
 {
-	int peopleA[MAX] = { 0 };
-	int peopleB[MAX] = { 0 };
-	int acnt, bcnt, timeA, timeB;
+	int peopleA[MAX] = { 0 };            // 1번 계단을 고른 사람 번호
+	int peopleB[MAX] = { 0 };            // 2번 계단을 고른 사람 번호
+	int acnt, bcnt, timeA, timeB;        // 각 계단 인원과 완료 시각
 
-	acnt = bcnt = 0;
+	acnt = bcnt = 0;                     // 인원 초기화
 
-	for (int i = 0; i < pcnt; i++)
+	for (int i = 0; i < pcnt; i++)       // 모든 사람을
 	{
-		if (list[i] == 0) peopleA[acnt++] = i;
-		else peopleB[bcnt++] = i;
+		if (list[i] == 0) peopleA[acnt++] = i;   // 1번 계단 쪽으로
+		else peopleB[bcnt++] = i;                // 2번 계단 쪽으로
 	}
 
-	timeA = calculate(peopleA, acnt, 1);
-	timeB = calculate(peopleB, bcnt, 2);
+	timeA = calculate(peopleA, acnt, 1); // 1번 계단 완료 시각
+	timeB = calculate(peopleB, bcnt, 2); // 2번 계단 완료 시각
 
-	return (timeA > timeB) ? timeA : timeB;
+	return (timeA > timeB) ? timeA : timeB;   // 늦은 쪽이 전체 완료 시각
 }
 
-int MINANS = 0x7fff0000;
+int MINANS = 0x7fff0000;                 // 최소 완료 시각
 // L번 사람의 계단을 고른다
 void DFS(int L)
 {
 	if (L == pcnt)   // 모두 골랐다 -> 시뮬레이션
 	{
-		int tmp = simulate();
-		if (tmp < MINANS) MINANS = tmp;
+		int tmp = simulate();            // 이 배정의 완료 시각
+		if (tmp < MINANS) MINANS = tmp;  // 최솟값 갱신
 
-		return;
+		return;                          // 되돌아간다
 	}
 
 	list[L] = 0;     // 1번 계단
-	DFS(L + 1);
+	DFS(L + 1);      // 다음 사람
 
 	list[L] = 1;     // 2번 계단
-	DFS(L + 1);
+	DFS(L + 1);      // 다음 사람
 }
 
 int main()
 {
-	scanf("%d", &T);
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 방 입력
 
-		MINANS = 0x7fff0000;
+		MINANS = 0x7fff0000;             // 최솟값 초기화
 
-		DFS(0);
+		DFS(0);                          // 0번 사람부터 계단 배정
 
-		printf("#%d %d\n", tc, MINANS);
+		printf("#%d %d\n", tc, MINANS);  // 결과 출력
 	}
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

@@ -30,12 +30,12 @@
 	  - selected[]는 DFS에서 고를 때 1, 돌아올 때 0으로 되돌린다 (원상복구).
 	  - 남은 수가 모자라면(n - i + 1 < 5 - L) 더 볼 필요가 없지만, 경우의 수가 작아서 생략했다.
 */
-#include <stdio.h>
+#include <stdio.h>              // scanf, printf 사용
 
-#define MAX_N (30+5)
-#define MAX_M (10+5)
+#define MAX_N (30+5)            // n 최대 30 + 여유
+#define MAX_M (10+5)            // m 최대 10 + 여유
 
-int T;
+int T;                      // 테스트 케이스 수
 
 int N, M;                   // 수의 범위, 시도 횟수
 int QUERY[MAX_M][5];        // 시도마다 넣은 5개
@@ -47,49 +47,49 @@ int COUNT;                  // 맞는 후보 수 (템플릿의 지역 answer와 
 
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 수의 범위, 시도 횟수 입력
 
-	for (int i = 0; i < M; i++)
-		for (int j = 0; j < 5; j++)
-			scanf("%d", &QUERY[i][j]);
+	for (int i = 0; i < M; i++)          // 시도마다
+		for (int j = 0; j < 5; j++)      // 넣은 5개
+			scanf("%d", &QUERY[i][j]);   // 입력
 
-	for (int i = 0; i < M; i++)
-		scanf("%d", &RESP[i]);
+	for (int i = 0; i < M; i++)          // 시도마다
+		scanf("%d", &RESP[i]);           // 응답 입력
 
-	for (int x = 0; x <= N; x++)
-		selected[x] = 0;
+	for (int x = 0; x <= N; x++)         // 모든 수
+		selected[x] = 0;                 // 고르지 않은 상태로
 
-	COUNT = 0;
+	COUNT = 0;                           // 후보 수 초기화
 }
 
 // 지금 고른 5개가 모든 시도의 응답과 맞는가
 int check()
 {
-	for (int i = 0; i < M; i++)
+	for (int i = 0; i < M; i++)          // 시도마다
 	{
-		int cnt = 0;
+		int cnt = 0;                     // 겹친 개수
 
-		for (int j = 0; j < 5; j++)
-			if (selected[QUERY[i][j]] == 1) cnt++;
+		for (int j = 0; j < 5; j++)      // 시도한 5개 각각
+			if (selected[QUERY[i][j]] == 1) cnt++;   // 후보에 있으면 센다
 
-		if (cnt != RESP[i]) return 0;
+		if (cnt != RESP[i]) return 0;    // 응답과 다르면 탈락
 	}
-	return 1;
+	return 1;                            // 모든 응답과 일치
 }
 
 // L개 골랐고, 다음은 start 이상에서 고른다
 void DFS(int L, int start)
 {
-	if (L == 5)
+	if (L == 5)                          // 5개를 다 골랐으면
 	{
-		if (check() == 1) COUNT++;
-		return;
+		if (check() == 1) COUNT++;       // 맞으면 후보 수 증가
+		return;                          // 되돌아간다
 	}
 
-	for (int i = start; i <= N; i++)
+	for (int i = start; i <= N; i++)     // start부터 N까지 후보
 	{
-		selected[i] = 1;
-		DFS(L + 1, i + 1);
+		selected[i] = 1;                 // i를 고른다
+		DFS(L + 1, i + 1);               // 다음은 i보다 큰 수에서
 		selected[i] = 0;   // 원상복구
 	}
 }
@@ -97,15 +97,15 @@ void DFS(int L, int start)
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		DFS(0, 1);
+		DFS(0, 1);                       // 0개 고른 상태, 1부터
 
-		printf("%d\n", COUNT);
+		printf("%d\n", COUNT);           // 후보 수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

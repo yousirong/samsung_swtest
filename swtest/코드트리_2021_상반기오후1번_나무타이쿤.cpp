@@ -26,7 +26,7 @@
 	  3단계가 2단계 완료 후에 일괄 판정된다는 점이 핵심 함정이다.
 */
 
-#include <stdio.h>
+#include <stdio.h>          // scanf, printf, putchar 사용
 
 #define MAX_N (50 + 5)		// N <= 50, 격자 바깥 테두리(0행/0열, N+1행/N+1열)까지 여유
 #define MAX_M (100 + 10)	// M <= 100
@@ -40,8 +40,8 @@ int P[MAX_M];			// m번째 사이클의 이동 거리
 
 struct RC				// 좌표 한 쌍
 {
-	int r;
-	int c;
+	int r;              // 행
+	int c;              // 열
 };
 
 // 현재 영양제가 놓인 칸들의 목록. 최대 N*N개까지 늘어날 수 있다.
@@ -49,60 +49,60 @@ RC supplement[MAX_N * MAX_N];
 int scnt;				// 현재 영양제 개수
 
 // 3단계 "번식" 판정에 쓰는 대각선 4방향 : ↖, ↗, ↘, ↙
-int dr4[] = { -1, -1, 1, 1 };
-int dc4[] = { -1, 1, 1, -1 };
+int dr4[] = { -1, -1, 1, 1 };    // 대각선별 행 변화량
+int dc4[] = { -1, 1, 1, -1 };    // 대각선별 열 변화량
 
 // 1단계 "이동"에 쓰는 8방향. 0번 인덱스는 더미(문제의 방향 번호 1~8을 그대로 쓰기 위함)
 // -, →, ↗, ↑, ↖, ←, ↙, ↓, ↘
-int dr8[] = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };
-int dc8[] = { 0, 1, 1, 0, -1, -1, -1, 0, 1 };
+int dr8[] = { 0, 0, -1, -1, -1, 0, 1, 1, 1 };   // 방향별 행 변화량
+int dc8[] = { 0, 1, 1, 0, -1, -1, -1, 0, 1 };   // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 격자 크기, 사이클 수 입력
 
 	// 테두리(0행/0열, N+1행/N+1열)까지 0으로 초기화.
 	// 이렇게 해두면 grow()에서 대각선 이웃을 볼 때 범위 검사를 생략할 수 있다.
 	for (int r = 0; r <= N + 1; r++)
 		for (int c = 0; c <= N + 1; c++)
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 나무 없음
 
 	// 초기 나무 배치
 	for (int r = 1; r <= N; r++)
 		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 나무 그루 수 입력
 
 	// 각 사이클의 (방향, 거리)
 	for (int m = 0; m < M; m++)
-		scanf("%d %d", &D[m], &P[m]);
+		scanf("%d %d", &D[m], &P[m]);    // 방향과 거리 입력
 
 	// 초기 영양제 위치 : 격자의 왼쪽 아래 2x2 영역
 	//   (N-1, 1) (N-1, 2)
 	//   (N  , 1) (N  , 2)
-	supplement[0].r = N; supplement[0].c = 1;
-	supplement[1].r = N; supplement[1].c = 2;
-	supplement[2].r = N - 1; supplement[2].c = 1;
-	supplement[3].r = N - 1; supplement[3].c = 2;
-	scnt = 4;
+	supplement[0].r = N; supplement[0].c = 1;          // 왼쪽 아래
+	supplement[1].r = N; supplement[1].c = 2;          // 그 오른쪽
+	supplement[2].r = N - 1; supplement[2].c = 1;      // 그 위
+	supplement[3].r = N - 1; supplement[3].c = 2;      // 그 오른쪽 위
+	scnt = 4;                            // 영양제 4개
 }
 
 void printMap() // for debug : 현재 격자 상태를 눈으로 확인할 때 사용
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", MAP[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // [1단계] 모든 영양제를 방향 dir로 size칸 이동시킨다. 격자는 상하좌우가 이어져 있다.
 void moveSupplement(int dir, int size)
 {
-	for (int i = 0; i < scnt; i++)
+	for (int i = 0; i < scnt; i++)       // 영양제마다
 	{
-		int nr, nc;
+		int nr, nc;                      // 이동 후 좌표
 
 		// size가 N보다 클 수 있으므로 size % N으로 줄인다.
 		// 한 바퀴(N칸) 돌면 제자리이므로 결과가 같다. 실제 이동량은 0 ~ N-1.
@@ -112,47 +112,47 @@ void moveSupplement(int dir, int size)
 		// 이동 전 좌표가 [1, N]이고 변화량이 [-(N-1), N-1]이므로
 		// 결과는 [2-N, 2N-1] 범위. 따라서 아래처럼 "한 번만" 보정해도 항상 [1, N]에 들어온다.
 		// (while이 필요 없는 이유가 여기에 있다. size % N을 빼먹으면 이 보정이 깨진다.)
-		if (nr > N) nr -= N;
-		if (nc > N) nc -= N;
-		if (nr < 1) nr += N;
-		if (nc < 1) nc += N;
+		if (nr > N) nr -= N;             // 아래로 넘치면 위로
+		if (nc > N) nc -= N;             // 오른쪽으로 넘치면 왼쪽으로
+		if (nr < 1) nr += N;             // 위로 넘치면 아래로
+		if (nc < 1) nc += N;             // 왼쪽으로 넘치면 오른쪽으로
 
-		supplement[i].r = nr;
-		supplement[i].c = nc;
+		supplement[i].r = nr;            // 새 행
+		supplement[i].c = nc;            // 새 열
 	}
 }
 
 // [2단계] 영양제가 놓인 칸의 나무를 1그루씩 성장시킨다.
 void insert()
 {
-	for (int i = 0; i < scnt; i++)
+	for (int i = 0; i < scnt; i++)       // 영양제마다
 	{
-		int r, c;
+		int r, c;                        // 영양제 좌표
 
-		r = supplement[i].r;
-		c = supplement[i].c;
+		r = supplement[i].r;             // 행
+		c = supplement[i].c;             // 열
 
-		MAP[r][c]++;
+		MAP[r][c]++;                     // 나무 1그루 성장
 	}
 }
 
 // [3단계] 영양제 칸마다 대각선 4방향 이웃 중 나무가 있는 칸 수만큼 추가 성장시킨다.
 void grow()
 {
-	for (int s = 0; s < scnt; s++)
+	for (int s = 0; s < scnt; s++)       // 영양제마다
 	{
-		int r, c;
+		int r, c;                        // 영양제 좌표
 
-		r = supplement[s].r;
-		c = supplement[s].c;
+		r = supplement[s].r;             // 행
+		c = supplement[s].c;             // 열
 
-		int count = 0;
-		for (int i = 0; i < 4; i++)
+		int count = 0;                   // 나무가 있는 대각선 이웃 수
+		for (int i = 0; i < 4; i++)      // 대각선 4방향
 		{
-			int nr, nc;
+			int nr, nc;                  // 대각선 이웃
 
-			nr = r + dr4[i];
-			nc = c + dc4[i];
+			nr = r + dr4[i];             // 이웃 행
+			nc = c + dc4[i];             // 이웃 열
 
 			// 테두리를 0으로 채워 뒀으므로 격자 밖(0행/0열, N+1행/N+1열)은 자동으로 "나무 없음" 처리된다.
 			// !!x 는 x가 0이면 0, 0이 아니면 1 → "나무가 1그루 이상인가"를 0/1로 바꾸는 관용 표현.
@@ -171,11 +171,11 @@ void grow()
 // (r, c)가 이번 턴에 영양제가 놓여 있던 칸인지 확인
 bool check(int r, int c)
 {
-	for (int i = 0; i < scnt; i++)
-		if (supplement[i].r == r && supplement[i].c == c)
-			return true;
+	for (int i = 0; i < scnt; i++)       // 영양제 목록에서
+		if (supplement[i].r == r && supplement[i].c == c)   // 같은 좌표가 있으면
+			return true;                                    // 영양제 칸이다
 
-	return false;
+	return false;                        // 영양제 칸이 아니다
 }
 
 // [4단계] 영양제 칸을 제외하고 나무가 2그루 이상인 칸에서 2그루를 베어내고,
@@ -186,10 +186,10 @@ void makeSupplement()
 	// supplement를 곧바로 덮어쓰면 아래 check()가 참조하는 "현재 영양제 목록"이 망가진다.
 	RC tmpSupplement[MAX_N * MAX_N] = { 0 };
 
-	int tcnt = 0;
-	for (int r = 1; r <= N; r++)
+	int tcnt = 0;                        // 새 영양제 수
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
 			if (MAP[r][c] < 2) continue;	// 나무가 2그루 미만이면 벨 수 없다
 
@@ -207,7 +207,7 @@ void makeSupplement()
 	for (int i = 0; i < tcnt; i++)
 		supplement[i] = tmpSupplement[i];
 
-	scnt = tcnt;
+	scnt = tcnt;                         // 영양제 수 갱신
 }
 
 // M번의 사이클을 순서대로 수행한다. 각 단계의 순서가 곧 문제 규칙이다.
@@ -225,12 +225,12 @@ void simulate()
 // 격자에 남은 나무 그루 수의 총합
 int getAnswer()
 {
-	int sum = 0;
-	for (int r = 1; r <= N; r++)
-		for (int c = 1; c <= N; c++)
-			sum += MAP[r][c];
+	int sum = 0;                         // 나무 합
+	for (int r = 1; r <= N; r++)         // 모든 행
+		for (int c = 1; c <= N; c++)     // 모든 열
+			sum += MAP[r][c];            // 더한다
 
-	return sum;
+	return sum;                          // 합 반환
 }
 
 int main()
@@ -238,14 +238,14 @@ int main()
 	// 이 문제는 테스트케이스가 하나뿐이다.
 	// scanf("%d", &T);
 	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // M사이클 수행
 
-		printf("%d\n", getAnswer());
+		printf("%d\n", getAnswer());     // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

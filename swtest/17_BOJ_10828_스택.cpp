@@ -33,9 +33,9 @@
 	  그러지 않으면 stack[-1]을 읽는 잘못된 접근이 된다.
 */
 
-#include <stdio.h>
+#include <stdio.h>        // scanf, printf, putchar 사용
 
-#define MAX (10000 + 500)
+#define MAX (10000 + 500) // 명령 최대 10000개 + 여유
 
 int N;            // 명령의 개수
 
@@ -53,8 +53,8 @@ int strCompare(const char* a, const char* b)
 	// a가 끝나지 않았고 두 문자가 같은 동안 계속 전진
 	while (*a && *a == *b)
 	{
-		++a;
-		++b;
+		++a;                             // a의 다음 문자로
+		++b;                             // b의 다음 문자로
 	}
 
 	// 멈춘 지점의 문자 차이. 끝까지 같았다면 둘 다 '\0'이라 0이 된다.
@@ -66,9 +66,9 @@ int strCompare(const char* a, const char* b)
 // ---------------------------
 void printStack()
 {
-	for (int i = sp - 1; i >= 0; i--)
-		printf("%d ", stack[i]);
-	putchar('\n');
+	for (int i = sp - 1; i >= 0; i--)    // 맨 위(sp-1)부터 바닥(0)까지
+		printf("%d ", stack[i]);         // 원소 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -78,11 +78,11 @@ int main()
 {
 	sp = 0;   // 빈 스택으로 시작
 
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 명령 개수 입력
 
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N; i++)          // 명령을 N번 처리
 	{
-		char command[100];
+		char command[100];               // 명령어 문자열 버퍼
 
 		// 명령어 문자열 입력
 		scanf("%s", command);
@@ -92,8 +92,8 @@ int main()
 		// ---------------------------
 		if (strCompare(command, "push") == 0)
 		{
-			int value;
-			scanf("%d", &value);
+			int value;                   // 넣을 정수
+			scanf("%d", &value);         // 정수 X 입력
 
 			// 현재 sp 자리에 넣고 sp를 한 칸 올린다
 			stack[sp++] = value;
@@ -104,7 +104,7 @@ int main()
 		// ---------------------------
 		else if (strCompare(command, "pop") == 0)
 		{
-			if (sp != 0)
+			if (sp != 0)                 // 스택이 비어 있지 않으면
 				// --sp로 먼저 내려간 자리가 곧 기존의 맨 위 원소다
 				printf("%d\n", stack[--sp]);
 			else
@@ -116,7 +116,7 @@ int main()
 		// ---------------------------
 		else if (strCompare(command, "size") == 0)
 		{
-			printf("%d\n", sp);
+			printf("%d\n", sp);          // 원소 개수 출력
 		}
 
 		// ---------------------------
@@ -124,7 +124,7 @@ int main()
 		// ---------------------------
 		else if (strCompare(command, "empty") == 0)
 		{
-			printf("%d\n", sp != 0 ? 0 : 1);
+			printf("%d\n", sp != 0 ? 0 : 1);   // sp가 0이면 1, 아니면 0 출력
 		}
 
 		// ---------------------------
@@ -132,7 +132,7 @@ int main()
 		// ---------------------------
 		else if (strCompare(command, "top") == 0)
 		{
-			if (sp != 0)
+			if (sp != 0)                 // 스택이 비어 있지 않으면
 				// sp는 "다음 자리"이므로 맨 위는 sp-1
 				printf("%d\n", stack[sp - 1]);
 			else
@@ -140,5 +140,5 @@ int main()
 		}
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

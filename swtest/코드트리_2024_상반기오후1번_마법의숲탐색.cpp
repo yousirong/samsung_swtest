@@ -48,73 +48,73 @@
 	  - checkSouth의 gr == R + 1 검사는 "중앙이 이미 마지막 행"이라 더 내려갈 수 없다는 뜻이다.
 	    (배열 기준으로 실제 마지막 행은 R + 2, 그 위 칸이 R + 1)
 */
-#include <stdio.h>
+#include <stdio.h>                       // scanf, printf, putchar 사용
 
-#define MAX (70+10)
-#define MAX_K (1000+10)	
+#define MAX (70+10)                      // R, C 최대 70 + 여유
+#define MAX_K (1000+10)	                 // K 최대 1000 + 여유
 
-#define BODY (1)
-#define CENTER (2)
-#define EXIT (3)
-#define GOLEM_ID (10)
+#define BODY (1)                         // 골렘 몸통
+#define CENTER (2)                       // 골렘 중앙
+#define EXIT (3)                         // 골렘 출구
+#define GOLEM_ID (10)                    // 골렘 번호에 곱하는 값
 
-int T;
+int T;                                   // 테스트 케이스 수
 
-int R, C, K;
+int R, C, K;                             // 숲 행 수, 열 수, 골렘 수
 
-int MAP[MAX][MAX];
-int start_c[MAX_K];
-int exit_d[MAX_K];
+int MAP[MAX][MAX];                       // 숲 (골렘 번호 x 10 + 종류)
+int start_c[MAX_K];                      // 골렘별 출발 열
+int exit_d[MAX_K];                       // 골렘별 출구 방향
 
-struct RC
+struct RC                                // 좌표
 {
-	int r;
-	int c;
+	int r;                               // 행
+	int c;                               // 열
 };
 
-RC queue[MAX * MAX];
+RC queue[MAX * MAX];                     // BFS 큐
 
-struct GOLEM
+struct GOLEM                             // 골렘 정보
 {
-	int r;
-	int c;
-	int dir;
-	int id;
+	int r;                               // 중앙 행
+	int c;                               // 중앙 열
+	int dir;                             // 출구 방향
+	int id;                              // 골렘 번호 x 10
 };
 
 // 북, 동, 남, 서
-int dr[] = { -1,0,1,0 };
-int dc[] = { 0,1,0,-1 };
+int dr[] = { -1,0,1,0 };                 // 방향별 행 변화량
+int dc[] = { 0,1,0,-1 };                 // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d %d", &R, &C, &K);
+	scanf("%d %d %d", &R, &C, &K);       // 숲 크기, 골렘 수 입력
 
-	for (int r = 0; r < MAX; r++)
+	for (int r = 0; r < MAX; r++)        // 숲 초기화
 		for (int c = 0; c < MAX; c++)
 			MAP[r][c] = 0;
 
-	for (int k = 1; k <= K; k++)
+	for (int k = 1; k <= K; k++)         // 골렘별
 	{
-		scanf("%d %d", &start_c[k], &exit_d[k]);
+		scanf("%d %d", &start_c[k], &exit_d[k]);   // 출발 열, 출구 방향 입력
 	}
 }
 
 void printMap() //for debug
 {
-	for (int r = 3; r <= R + 2; r++)
+	for (int r = 3; r <= R + 2; r++)     // 실제 숲 행만
 	{
-		for (int c = 1; c <= C; c++)
-			printf("%2d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= C; c++)     // 모든 열
+			printf("%2d ", MAP[r][c]);   // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // 남쪽
 bool checkSouth(GOLEM golem)
 {
-	int gr, gc;
+	int gr, gc;                          // 골렘 중앙
 
 	gr = golem.r;
 	gc = golem.c;
@@ -122,50 +122,50 @@ bool checkSouth(GOLEM golem)
 	if (gr == R + 1) return false;
 	// 중앙이 더 내려가면 십자의 아래 팔이 숲을 벗어난다.
 
-	int nr[3] = { 0 };
-	int nc[3] = { 0 };
+	int nr[3] = { 0 };                   // 확인할 세 칸 행
+	int nc[3] = { 0 };                   // 확인할 세 칸 열
 
-	nr[0] = gr + 1;
+	nr[0] = gr + 1;                      // ↙
 	nc[0] = gc - 1;
 
-	nr[1] = gr + 2;
+	nr[1] = gr + 2;                      // ↓↓
 	nc[1] = gc;
 
-	nr[2] = gr + 1;
+	nr[2] = gr + 1;                      // ↘
 	nc[2] = gc + 1;
 
-	for (int i = 0; i < 3; i++)
-		if (MAP[nr[i]][nc[i]] != 0) return false;
+	for (int i = 0; i < 3; i++)          // 세 칸 모두
+		if (MAP[nr[i]][nc[i]] != 0) return false;   // 비어 있어야 함
 
-	return true;
+	return true;                         // 남쪽 이동 가능
 }
 
 // 서쪽 + 남쪽
 bool checkWest(GOLEM golem)
 {
-	int gr, gc;
+	int gr, gc;                          // 골렘 중앙
 
 	gr = golem.r;
 	gc = golem.c;
 
-	if (gc == 2) return false;
+	if (gc == 2) return false;           // 더 서쪽으로 가면 숲 밖
 
-	int nr[3] = { 0 };
-	int nc[3] = { 0 };
+	int nr[3] = { 0 };                   // 확인할 세 칸 행
+	int nc[3] = { 0 };                   // 확인할 세 칸 열
 
-	nr[0] = gr - 1;
+	nr[0] = gr - 1;                      // ↖
 	nc[0] = gc - 1;
 
-	nr[1] = gr;
+	nr[1] = gr;                          // ←←
 	nc[1] = gc-2;
 
-	nr[2] = gr + 1;
+	nr[2] = gr + 1;                      // ↙
 	nc[2] = gc - 1;
 
-	for (int i = 0; i < 3; i++)
-		if (MAP[nr[i]][nc[i]] != 0) return false;
+	for (int i = 0; i < 3; i++)          // 세 칸 모두
+		if (MAP[nr[i]][nc[i]] != 0) return false;   // 비어 있어야 함
 
-	GOLEM tmpGolem = { 0 };
+	GOLEM tmpGolem = { 0 };              // 서쪽으로 옮긴 골렘
 
 	tmpGolem.r = gr;
 	tmpGolem.c = gc-1;
@@ -177,29 +177,29 @@ bool checkWest(GOLEM golem)
 // 동쪾 + 남쪽
 bool checkEast(GOLEM golem)
 {
-	int gr, gc;
+	int gr, gc;                          // 골렘 중앙
 
 	gr = golem.r;
 	gc = golem.c;
 
-	if (gc == C - 1) return false;
+	if (gc == C - 1) return false;       // 더 동쪽으로 가면 숲 밖
 
-	int nr[3] = { 0 };
-	int nc[3] = { 0 };
+	int nr[3] = { 0 };                   // 확인할 세 칸 행
+	int nc[3] = { 0 };                   // 확인할 세 칸 열
 
-	nr[0] = gr -1;
+	nr[0] = gr -1;                       // ↗
 	nc[0] = gc + 1;
 
-	nr[1] = gr;
+	nr[1] = gr;                          // →→
 	nc[1] = gc + 2;
 
-	nr[2] = gr + 1;
+	nr[2] = gr + 1;                      // ↘
 	nc[2] = gc + 1;
 
-	for (int i = 0; i < 3; i++)
-		if (MAP[nr[i]][nc[i]] != 0) return false;
+	for (int i = 0; i < 3; i++)          // 세 칸 모두
+		if (MAP[nr[i]][nc[i]] != 0) return false;   // 비어 있어야 함
 
-	GOLEM tmpGolem = { 0 };
+	GOLEM tmpGolem = { 0 };              // 동쪽으로 옮긴 골렘
 
 	tmpGolem.r = gr;
 	tmpGolem.c = gc+1;
@@ -208,75 +208,75 @@ bool checkEast(GOLEM golem)
 	// 회전 이동은 "옆으로 한 칸 + 남쪽으로 한 칸"이라 남쪽도 확인해야 한다.
 }
 
-void setGolem(GOLEM golem)
+void setGolem(GOLEM golem)               // 골렘을 숲에 찍기
 {
-	int gr, gc, gid, dir;
+	int gr, gc, gid, dir;                // 중앙, 번호, 출구 방향
 
 	gr = golem.r;
 	gc = golem.c;
 	gid = golem.id;
 	dir = golem.dir;
 
-	MAP[gr][gc] = CENTER + gid;
+	MAP[gr][gc] = CENTER + gid;          // 중앙
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)          // 상하좌우 팔
 	{
-		int nr, nc;
+		int nr, nc;                      // 팔 좌표
 
 		nr = gr + dr[i];
 		nc = gc + dc[i];
 
-		MAP[nr][nc] = BODY + gid;
+		MAP[nr][nc] = BODY + gid;        // 몸통
 	}
 
 	MAP[gr + dr[dir]][gc + dc[dir]] = EXIT + gid;
 	// 출구는 몸통 한 칸을 출구 표시로 덮어쓴다 (번호 x 10 + 3).
 }
 
-int BFS(GOLEM golem)
+int BFS(GOLEM golem)                     // 정령 이동, 최남단 실제 행 반환
 {
-	int rp, wp;
-	bool visit[MAX][MAX] = { 0 };
+	int rp, wp;                          // 큐 위치
+	bool visit[MAX][MAX] = { 0 };        // 방문 표시
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 큐 초기화
 
-	queue[wp].r = golem.r;
+	queue[wp].r = golem.r;               // 골렘 중앙에서 시작
 	queue[wp++].c = golem.c;
 
-	visit[golem.r][golem.c] = true;
+	visit[golem.r][golem.c] = true;      // 방문 표시
 
-	int maxR = 0;
-	while (rp < wp)
+	int maxR = 0;                        // 최남단 행
+	while (rp < wp)                      // 큐가 빌 때까지
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 하나 꺼내기
 
-		if (maxR < out.r) maxR = out.r;
+		if (maxR < out.r) maxR = out.r;  // 최남단 갱신
 
 		int golemID = (MAP[out.r][out.c] / GOLEM_ID) * GOLEM_ID;
 		// 한 값에서 골렘 번호와 종류를 같이 읽는다.
 		int type = MAP[out.r][out.c] % GOLEM_ID;
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸
 
 			nr = out.r + dr[i];
 			nc = out.c + dc[i];
 
-			if (nr<1 || nc<1 || nr>(R + 2) || nc>C) continue;
-			if (MAP[nr][nc] == 0 || visit[nr][nc] == true) continue;
+			if (nr<1 || nc<1 || nr>(R + 2) || nc>C) continue;            // 범위 밖
+			if (MAP[nr][nc] == 0 || visit[nr][nc] == true) continue;     // 빈칸이거나 방문함
 
-			int ngolemID = (MAP[nr][nc] / GOLEM_ID) * GOLEM_ID;
+			int ngolemID = (MAP[nr][nc] / GOLEM_ID) * GOLEM_ID;         // 이웃의 골렘 번호
 
 			if (type != EXIT && golemID != ngolemID) continue;
 			// 다른 골렘으로 넘어가려면 지금 칸이 출구여야 한다.
 
 			// 뽑은 좌표의 타입이 출구가 아니고
 			// 다음 좌표의 ID가 다른 경우
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣기
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = true;
+			visit[nr][nc] = true;        // 방문 표시
 		}
 	}
 	return maxR - 2;
@@ -284,27 +284,27 @@ int BFS(GOLEM golem)
 }
 
 
-int simulate(GOLEM golem)
+int simulate(GOLEM golem)                // 골렘 하나 처리, 점수 반환
 {
-	GOLEM g = golem;
+	GOLEM g = golem;                     // 움직일 골렘
 
-	while (1)
+	while (1)                            // 더 못 움직일 때까지
 	{
-		if (checkSouth(g) == true) g.r = g.r + 1;
+		if (checkSouth(g) == true) g.r = g.r + 1;   // 남쪽
 		else if (checkWest(g) == true) // 서쪽 + 남쪽
 		{
 			g.r = g.r + 1;
 			g.c = g.c - 1;
-			g.dir = (g.dir - 1 + 4) % 4;
+			g.dir = (g.dir - 1 + 4) % 4; // 출구 반시계 회전
 		}
 		else if (checkEast(g) == true) // 동쪽 + 남쪽
 		{
 			g.r = g.r + 1;
 			g.c = g.c + 1;
-			g.dir = (g.dir + 1) % 4;
+			g.dir = (g.dir + 1) % 4;     // 출구 시계 회전
 		}
 		else
-			break;
+			break;                       // 멈춤
 	}
 
 	if (g.r <= 3)
@@ -313,40 +313,40 @@ int simulate(GOLEM golem)
 		for (int r = 0; r < MAX; r++)
 			for (int c = 0; c < MAX; c++)
 				MAP[r][c] = 0;
-		
-		return 0;
+
+		return 0;                        // 점수 없음
 	}
 
-	setGolem(g);
+	setGolem(g);                         // 골렘 찍기
 
-	return BFS(g);
+	return BFS(g);                       // 정령 이동 결과
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		int sum = 0;
-		for (int k = 1; k <= K; k++)
+		int sum = 0;                     // 답
+		for (int k = 1; k <= K; k++)     // 골렘별
 		{
-			GOLEM g = { 0 };
+			GOLEM g = { 0 };             // 골렘 생성
 
-			g.r = 1;
-			g.c = start_c[k];
-			g.dir = exit_d[k];
-			g.id = k * GOLEM_ID;
+			g.r = 1;                     // 숲 위쪽 바깥에서 시작
+			g.c = start_c[k];            // 출발 열
+			g.dir = exit_d[k];           // 출구 방향
+			g.id = k * GOLEM_ID;         // 번호 x 10
 
-			int row = simulate(g);
+			int row = simulate(g);       // 처리
 
 			//printMap();
 
-			sum += row;
+			sum += row;                  // 누적
 		}
-		printf("%d\n", sum);
+		printf("%d\n", sum);             // 결과 출력
 	}
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

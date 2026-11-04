@@ -52,79 +52,79 @@
 	  [확인 필요] 편의점에 닿을 수 없는 입력이면 getNextStep이 값을 못 채운 채 돌아온다.
 	              (문제에서 항상 도달 가능하다고 보고 따로 처리하지 않았다)
 */
-#include <stdio.h>
+#include <stdio.h>                       // scanf, printf, putchar 사용
 
-#define MAX_N (15+5)
-#define MAX_M (30+5)
+#define MAX_N (15+5)                     // N 최대 15 + 여유
+#define MAX_M (30+5)                     // M 최대 30 + 여유
 
-#define INF (0x7fff0000)
-#define BASECAMP (1)
-#define WALL (2)
+#define INF (0x7fff0000)                 // 아주 큰 값
+#define BASECAMP (1)                     // 베이스캠프
+#define WALL (2)                         // 벽 / 통행 금지
 
-int T;
+int T;                                   // 테스트 케이스 수
 
-int N, M;
+int N, M;                                // 격자 크기, 사람 수
 
 int MAP[MAX_N][MAX_N];   // 입력 그대로 : 0 빈칸, 1 베이스캠프, 2 벽
 int BLOCK[MAX_N][MAX_N]; // 이동 불가 확인 (벽 + 도착한 편의점 + 사용된 베이스캠프)
 
-struct RC
+struct RC                                // 좌표
 {
-	int r;
-	int c;
+	int r;                               // 행
+	int c;                               // 열
 };
 
 RC STORE[MAX_M];   // 사람마다 가야 할 편의점
 RC PLAYER[MAX_M];  // 사람의 현재 위치
-RC queue[MAX_N * MAX_N];
+RC queue[MAX_N * MAX_N];                 // BFS 큐
 
 // ↑, ←, →, ↓   (문제의 이동 우선순위와 같은 순서다)
-int dr[] = { -1, 0, 0, 1 };
-int dc[] = { 0,-1,1,0 };
+int dr[] = { -1, 0, 0, 1 };              // 방향별 행 변화량
+int dc[] = { 0,-1,1,0 };                 // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d\n", &N, &M);
+	scanf("%d %d\n", &N, &M);            // 격자 크기, 사람 수 입력
 
-	for (int r = 0; r <= N + 1; r++)
+	for (int r = 0; r <= N + 1; r++)     // 테두리 포함 전체
 		for (int c = 0; c <= N + 1; c++)
-			MAP[r][c] = BLOCK[r][c] = 0;
+			MAP[r][c] = BLOCK[r][c] = 0; // 초기화
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 칸
 		for (int c = 1; c <= N; c++)
-			scanf("%d", &MAP[r][c]);
-			
-	for (int m = 1; m <= M; m++)
+			scanf("%d", &MAP[r][c]);     // 격자 입력 (※ 벽을 BLOCK에 옮기지 않음 - 위 [버그] 참고)
+
+	for (int m = 1; m <= M; m++)         // 사람별
 	{
-		int r, c;
+		int r, c;                        // 편의점 좌표
 
-		scanf("%d %d", &r, &c);
+		scanf("%d %d", &r, &c);          // 편의점 좌표 입력
 
-		STORE[m].r = r;
-		STORE[m].c = c;
+		STORE[m].r = r;                  // 편의점 행 저장
+		STORE[m].c = c;                  // 편의점 열 저장
 	}
 }
 
 void printStatus() // for debug
 {
-	int tmpMAP[MAX_N][MAX_N] = { 0 };
+	int tmpMAP[MAX_N][MAX_N] = { 0 };    // 출력용 임시 지도
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 원래 격자 복사
 		for (int c = 1; c <= N; c++)
 			tmpMAP[r][c] = MAP[r][c];
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 베이스캠프는 -1로
 		for (int c = 1; c <= N; c++)
 			if(tmpMAP[r][c] == BASECAMP) tmpMAP[r][c] =-1;
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 벽은 -2로
 		for (int c = 1; c <= N; c++)
 			if (tmpMAP[r][c] == WALL) tmpMAP[r][c] = -2;
 
-	for (int p = 1; p <= M; p++)
+	for (int p = 1; p <= M; p++)         // 사람 번호 표시
 		tmpMAP[PLAYER[p].r][PLAYER[p].c] = p;
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 출력
 	{
 		for (int c = 1; c <= N; c++)
 			printf("%2d ", tmpMAP[r][c]);
@@ -133,7 +133,7 @@ void printStatus() // for debug
 	putchar('\n');
 }
 
-void printBefore(RC before[MAX_N][MAX_N])
+void printBefore(RC before[MAX_N][MAX_N])   // for debug : before 배열 출력
 {
 	for (int r = 1; r <= N; r++)
 	{
@@ -163,79 +163,79 @@ RC getNextStep(int index) // BFS
 	// visit배열에 +1
 	// before배열에 out좌표 갱신
 
-	RC ret;
-	int rp, wp;
+	RC ret;                              // 반환할 다음 칸
+	int rp, wp;                          // 큐 읽기/쓰기 위치
 	int visit[MAX_N][MAX_N] = { 0 };   // 0이면 미방문, 아니면 (거리 + 1)
 	RC before[MAX_N][MAX_N] = { 0 };   // 그 칸을 처음 발견해 준 앞 칸
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 큐 초기화
 
-	int sr = PLAYER[index].r;
-	int sc = PLAYER[index].c;
-	int er = STORE[index].r;
-	int ec = STORE[index].c;
+	int sr = PLAYER[index].r;            // 출발 행 (사람)
+	int sc = PLAYER[index].c;            // 출발 열
+	int er = STORE[index].r;             // 도착 행 (편의점)
+	int ec = STORE[index].c;             // 도착 열
 
-	queue[wp].r = sr;
+	queue[wp].r = sr;                    // 출발 칸 큐에 넣기
 	queue[wp++].c = sc;
 
-	visit[sr][sc] = 1;
+	visit[sr][sc] = 1;                   // 출발 칸 방문
 
-	before[sr][sc].r = -1;
+	before[sr][sc].r = -1;               // 출발 칸의 앞 칸은 없음
 	before[sr][sc].c = -1;
 
-	while (rp < wp)
+	while (rp < wp)                      // 큐가 빌 때까지
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 하나 꺼내기
 
-		if (er == out.r && ec == out.c)
+		if (er == out.r && ec == out.c)  // 편의점에 도달했으면
 		{
 			// 편의점에서 before를 따라 거꾸로 올라가다가
 			// "앞 칸이 출발 칸"이 되는 순간의 좌표가 곧 첫 한 칸이다.
-			int tr = er;
-			int tc = ec;
+			int tr = er;                 // 되짚는 현재 행
+			int tc = ec;                 // 되짚는 현재 열
 			while (1)
 			{
 				int br, bc; // 이전 좌표
 
-				br = before[tr][tc].r;
-				bc = before[tr][tc].c;
+				br = before[tr][tc].r;   // 앞 칸 행
+				bc = before[tr][tc].c;   // 앞 칸 열
 
-				if (br == sr && bc == sc) break;
+				if (br == sr && bc == sc) break;   // 앞 칸이 출발 칸이면 멈춤
 
-				tr = br;
+				tr = br;                 // 한 칸 거슬러 올라감
 				tc = bc;
 			}
 
-			ret.r = tr;
+			ret.r = tr;                  // 첫 한 칸
 			ret.c = tc;
 
-			return ret;
+			return ret;                  // 반환
 		}
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 상좌우하 순서로
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
-			if (nr<1 || nc<1 || nr>N || nc>N) continue;
+			if (nr<1 || nc<1 || nr>N || nc>N) continue;   // 격자 밖
 			// 이미 본 칸과 못 지나가는 칸(벽, 도착한 편의점, 사용된 베이스캠프)은 건너뛴다.
 			if (visit[nr][nc] != 0 || BLOCK[nr][nc] == WALL) continue;
 
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣기
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = visit[out.r][out.c] + 1;
+			visit[nr][nc] = visit[out.r][out.c] + 1;   // 거리 기록
 
-			before[nr][nc] = out;
+			before[nr][nc] = out;        // 앞 칸 기록
 		}
 
 	}
 
-	ret.r = ret.c = -1;
+	ret.r = ret.c = -1;                  // 도달 불가
 
-	return ret;
+	return ret;                          // 반환
 }
 
 // index번 사람이 출발할 베이스캠프 (자기 편의점에서 가장 가까운 빈 베이스캠프)
@@ -257,38 +257,38 @@ RC getBaseCamp(int index) // BFS
 	// queue[wp] 돌리기
 	// visit배열에 +1
 	// before배열에 out좌표 갱신
-	RC ret;
-	int rp, wp;
-	int visit[MAX_N][MAX_N] = { 0 };
-	RC before[MAX_N][MAX_N] = { 0 };
+	RC ret;                              // 반환할 베이스캠프
+	int rp, wp;                          // 큐 읽기/쓰기 위치
+	int visit[MAX_N][MAX_N] = { 0 };     // 방문 + 거리
+	RC before[MAX_N][MAX_N] = { 0 };     // (여기서는 사용하지 않음)
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 큐 초기화
 
 	// 편의점에서 거꾸로 퍼뜨린다. 거리는 어느 쪽에서 재도 같다.
 	int sr = STORE[index].r;
 	int sc = STORE[index].c;
 
-	queue[wp].r = sr;
+	queue[wp].r = sr;                    // 편의점 큐에 넣기
 	queue[wp++].c = sc;
 
-	visit[sr][sc] = 1;
+	visit[sr][sc] = 1;                   // 편의점 방문
 
-	ret.r = ret.c = INF;
-	int minDistance = INF;
+	ret.r = ret.c = INF;                 // 아직 후보 없음
+	int minDistance = INF;               // 최소 거리
 
-	while (rp < wp)
+	while (rp < wp)                      // 큐가 빌 때까지
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 하나 꺼내기
 
 		// 아직 아무도 쓰지 않은 베이스캠프가 후보다.
 		if (MAP[out.r][out.c] == BASECAMP && BLOCK[out.r][out.c]==0)
 		{
-			if (visit[out.r][out.c] < minDistance)
+			if (visit[out.r][out.c] < minDistance)        // 더 가까우면
 			{
-				minDistance = visit[out.r][out.c];
-				ret = out;
+				minDistance = visit[out.r][out.c];        // 최소 거리 갱신
+				ret = out;                                // 후보 갱신
 			}
-			else if (visit[out.r][out.c] == minDistance)
+			else if (visit[out.r][out.c] == minDistance)  // 거리가 같으면
 			{
 				// 거리가 같으면 행, 열 순으로 작은 것
 				if (out.r < ret.r) ret = out;
@@ -302,23 +302,23 @@ RC getBaseCamp(int index) // BFS
 			continue;
 		}
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
-			if (nr<1 || nc<1 || nr>N || nc>N) continue;
-			if (visit[nr][nc] != 0 || BLOCK[nr][nc] == WALL) continue;
+			if (nr<1 || nc<1 || nr>N || nc>N) continue;   // 격자 밖
+			if (visit[nr][nc] != 0 || BLOCK[nr][nc] == WALL) continue;   // 방문했거나 통행 금지
 
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣기
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = visit[out.r][out.c] + 1;
+			visit[nr][nc] = visit[out.r][out.c] + 1;   // 거리 기록
 		}
 	}
-	return ret;
+	return ret;                          // 고른 베이스캠프 반환
 }
 
 int simulate()
@@ -326,38 +326,38 @@ int simulate()
 	// 1. time이 1일때
 	// 본인이 가고 싶은 편의점 방향을 향해서 1칸 움직임
 	// nextstep에 getNextStep함수로결과 받기
-	int time = 0;
-	while (1)
+	int time = 0;                        // 현재 시각
+	while (1)                            // 1분씩
 	{
 		// 1) 이동할 칸을 먼저 전부 계산한다 (같은 분 안에서는 동시에 움직이는 셈).
 		RC nextStep[MAX_M] = { 0 };
 		for (int p = 1; p <= time; p++)   // time = 지금까지 출발한 사람 수
 		{
-			if (p > M) break;
+			if (p > M) break;            // M명을 넘으면 멈춤
 			if (PLAYER[p].r == STORE[p].r && PLAYER[p].c == STORE[p].c) continue;   // 이미 도착
 
-			nextStep[p] = getNextStep(p);
+			nextStep[p] = getNextStep(p);   // 다음 칸 계산
 		}
 		// 2. time이 1일때
 		// 편의점에 도착하면 count 1 증가하고
 		// player 좌표는 해당 좌표로 갱신하고
 		// store의 좌표는 block으로 못가게 해야함.
 		// time 1증가
-		int count = 0;
-		for (int p = 1; p <= time; p++)
+		int count = 0;                   // 도착한 사람 수
+		for (int p = 1; p <= time; p++)  // 출발한 사람들
 		{
-			if (p > M) break;
-			if (PLAYER[p].r == STORE[p].r && PLAYER[p].c == STORE[p].c)
+			if (p > M) break;            // M명을 넘으면 멈춤
+			if (PLAYER[p].r == STORE[p].r && PLAYER[p].c == STORE[p].c)   // 이미 도착했으면
 			{
-				count++;
+				count++;                 // 도착 수 증가
 				continue;
 			}
-			int nr, nc;
+			int nr, nc;                  // 다음 칸
 
 			nr = nextStep[p].r;
 			nc = nextStep[p].c;
 
-			PLAYER[p].r = nr;
+			PLAYER[p].r = nr;            // 한 칸 이동
 			PLAYER[p].c = nc;
 
 			// 편의점에 도착했으면 그 칸은 이제 아무도 못 지나간다.
@@ -366,7 +366,7 @@ int simulate()
 		}
 		// 모두 도착했으면 지금 분이 답이다.
 		if (count == M) return time;
-		time++;
+		time++;                          // 1분 경과
 
 
 		// 3. getBaseCamp 함수에 time 넣고 받은 결과를 player[time]
@@ -377,7 +377,7 @@ int simulate()
 			RC position = getBaseCamp(time);
 			BLOCK[position.r][position.c] = WALL;
 
-			PLAYER[time] = position;
+			PLAYER[time] = position;     // 사람을 베이스캠프에 놓기
 		}
 	}
 
@@ -388,13 +388,13 @@ int simulate()
 int main()
 {
 	// scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 결과 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

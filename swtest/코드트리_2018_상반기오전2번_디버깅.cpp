@@ -49,12 +49,12 @@
 	  DFS 맨 앞에 if (PASS == true) return; 을 넣으면 성공하는 순간 바로 빠져나올 수 있다.
 */
 
-#include <stdio.h>
+#include <stdio.h>                  // scanf, printf, putchar 사용
 
-#define MAX_H (30 + 5)
-#define MAX_N (10 + 5)
+#define MAX_H (30 + 5)              // 가로 줄 최대 30 + 여유
+#define MAX_N (10 + 5)              // 세로선 최대 10 + 여유
 
-int T;
+int T;                      // 테스트 케이스 수
 
 int C, M, R;                // C: 세로선 수, M: 기존 가로선 수, R: 가로 줄 수
 int MAP[MAX_H][MAX_N];      // MAP[r][c] == 1 이면 c와 c+1을 잇는 가로선이 있다
@@ -64,13 +64,13 @@ int num_of_cases[MAX_H * MAX_N]; // 예전 구현의 흔적. 지금은 쓰지 �
 // 가로선을 새로 놓을 수 있는 후보 자리
 struct RC
 {
-	int r;
-	int c;
+	int r;                  // 가로 줄 번호
+	int c;                  // 왼쪽 세로선 번호
 };
 
-typedef struct RC RC;
+typedef struct RC RC;       // struct RC를 RC로 줄여 쓰기
 
-RC ladder[MAX_H * MAX_N];
+RC ladder[MAX_H * MAX_N];   // 후보 자리 목록
 int lcnt;                   // 후보 자리 개수
 
 bool PASS;                  // 지금 시도 중인 개수로 성공한 경우가 있었는지
@@ -80,24 +80,24 @@ bool PASS;                  // 지금 시도 중인 개수로 성공한 경우�
 // ---------------------------
 void input()
 {
-	scanf("%d %d %d", &C, &M, &R);
+	scanf("%d %d %d", &C, &M, &R);       // 세로선 수, 기존 가로선 수, 가로 줄 수 입력
 
 	// 사다리 초기화
 	for (int r = 1; r <= R; r++)
 	{
 		for (int c = 1; c <= C; c++)
 		{
-			MAP[r][c] = 0;
+			MAP[r][c] = 0;               // 가로선 없음
 		}
 	}
 
 	// 기존 가로선 : (r, c)는 c번과 c+1번 세로선을 잇는다
 	for (int i = 0; i < M; i++)
 	{
-		int r, c;
-		scanf("%d %d", &r, &c);
+		int r, c;                        // 가로선 위치
+		scanf("%d %d", &r, &c);          // 위치 입력
 
-		MAP[r][c] = 1;
+		MAP[r][c] = 1;                   // 가로선 표시
 	}
 }
 
@@ -106,13 +106,13 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= R; r++)
+	for (int r = 1; r <= R; r++)         // 모든 가로 줄
 	{
-		for (int c = 1; c <= C; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= C; c++)     // 모든 세로선
+			printf("%d ", MAP[r][c]);    // 가로선 여부 출력
+		putchar('\n');                   // 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -120,11 +120,11 @@ void printMap()
 // ---------------------------
 void copyMap(int copy[MAX_H][MAX_N], int original[MAX_H][MAX_N])
 {
-	for (int i = 1; i <= R; i++)
+	for (int i = 1; i <= R; i++)         // 모든 가로 줄
 	{
-		for (int k = 1; k <= C; k++)
+		for (int k = 1; k <= C; k++)     // 모든 세로선
 		{
-			copy[i][k] = original[i][k];
+			copy[i][k] = original[i][k]; // 한 칸씩 복사
 		}
 	}
 }
@@ -134,9 +134,9 @@ void copyMap(int copy[MAX_H][MAX_N], int original[MAX_H][MAX_N])
 // ---------------------------
 void printCases()
 {
-	for (int i = 0; i < lcnt; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < lcnt; i++)       // 후보 수만큼
+		printf("%d ", num_of_cases[i]);  // 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -150,7 +150,7 @@ void printCases()
 // ---------------------------
 bool check()
 {
-	int start[MAX_N] = { 0 };
+	int start[MAX_N] = { 0 };            // 세로선 자리별 번호
 
 	// 처음에는 c번 자리에 c번 번호가 있다
 	for (int c = 1; c <= C; c++)
@@ -161,10 +161,10 @@ bool check()
 	{
 		for (int c = 1; c <= C; c++)
 		{
-			if (MAP[r][c] == 0)
-				continue;
+			if (MAP[r][c] == 0)          // 가로선이 없으면
+				continue;                // 넘어간다
 
-			int tmp = start[c];
+			int tmp = start[c];          // 두 자리의 번호를 맞바꾼다
 			start[c] = start[c + 1];
 			start[c + 1] = tmp;
 		}
@@ -173,11 +173,11 @@ bool check()
 	// 전부 제자리로 돌아왔는가
 	for (int c = 1; c <= C; c++)
 	{
-		if (start[c] != c)
-			return false;
+		if (start[c] != c)               // 하나라도 다르면
+			return false;                // 실패
 	}
 
-	return true;
+	return true;                         // 모두 제자리
 }
 
 // ---------------------------
@@ -194,16 +194,16 @@ void DFS(int depth, int start, int setup)
 	{
 		// printCases();
 
-		if (check() == true)
-			PASS = true;
+		if (check() == true)             // 성공하면
+			PASS = true;                 // 성공 표시
 
-		return;
+		return;                          // 되돌아간다
 	}
 
-	for (int i = start; i < lcnt; i++)
+	for (int i = start; i < lcnt; i++)   // start부터 후보
 	{
-		int r = ladder[i].r;
-		int c = ladder[i].c;
+		int r = ladder[i].r;             // 후보 가로 줄
+		int c = ladder[i].c;             // 후보 세로선
 
 		// 이번 탐색에서 방금 놓은 가로선 때문에 붙어 버리는 자리는 건너뛴다.
 		// (후보를 만들 때는 기존 가로선만 고려했으므로 여기서 다시 봐야 한다)
@@ -213,7 +213,7 @@ void DFS(int depth, int start, int setup)
 		// 가로선 설치
 		MAP[r][c] = 1;
 
-		DFS(depth + 1, i + 1, setup);
+		DFS(depth + 1, i + 1, setup);    // 다음 가로선
 
 		// 되돌리기 (백트래킹)
 		MAP[r][c] = 0;
@@ -232,16 +232,16 @@ int simulate()
 	if (check() == true)
 		return 0;
 
-	for (int setup = 1; setup <= 3; setup++)
+	for (int setup = 1; setup <= 3; setup++)   // 1개, 2개, 3개 순으로
 	{
-		DFS(0, 0, setup);
+		DFS(0, 0, setup);                // setup개를 놓는 조합 시도
 
 		// 개수를 늘려 가며 처음 성공한 지점이 곧 최솟값이다
 		if (PASS == true)
 			return setup;
 	}
 
-	return -1;
+	return -1;                           // 3개로도 불가능
 }
 
 // ---------------------------
@@ -254,17 +254,17 @@ int simulate()
 // ---------------------------
 void getEmptyLadder()
 {
-	lcnt = 0;
+	lcnt = 0;                            // 후보 수 초기화
 
-	for (int r = 1; r <= R; r++)
+	for (int r = 1; r <= R; r++)         // 모든 가로 줄
 	{
-		for (int c = 1; c <= C - 1; c++)
+		for (int c = 1; c <= C - 1; c++) // 놓을 수 있는 세로선
 		{
-			if ((MAP[r][c] == 0 && MAP[r][c + 1] == 0)
-				&& (MAP[r][c] == 0 && MAP[r][c - 1] == 0))
+			if ((MAP[r][c] == 0 && MAP[r][c + 1] == 0)          // 자리와 오른쪽이 비어 있고
+				&& (MAP[r][c] == 0 && MAP[r][c - 1] == 0))      // 왼쪽도 비어 있으면
 			{
-				ladder[lcnt].r = r;
-				ladder[lcnt++].c = c;
+				ladder[lcnt].r = r;      // 후보 줄
+				ladder[lcnt++].c = c;    // 후보 세로선, 개수 증가
 			}
 		}
 	}
@@ -276,17 +276,17 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		// 놓을 수 있는 자리를 먼저 목록으로 만들어 둔다
 		getEmptyLadder();
 
-		PASS = false;
+		PASS = false;                    // 성공 표시 초기화
 
-		printf("%d\n", simulate());
+		printf("%d\n", simulate());      // 최소 개수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

@@ -46,9 +46,9 @@
 	     출력이 많으므로 입출력 속도(버퍼 출력 등)도 함께 신경 써야 한다.
 */
 
-#include <stdio.h>
+#include <stdio.h>        // scanf, printf, putchar 사용
 
-#define MAX (10000 + 500)
+#define MAX (10000 + 500) // 명령 최대 10000개 + 여유
 
 int N;            // 명령 개수
 
@@ -61,13 +61,13 @@ int rp, wp;       // rp: 맨 앞 원소 위치, wp: 다음에 넣을 위치
 // ---------------------------
 int strCompare(const char* a, const char* b)
 {
-	while (*a && *a == *b)
+	while (*a && *a == *b)               // a가 끝나지 않았고 두 문자가 같은 동안
 	{
-		++a;
-		++b;
+		++a;                             // a의 다음 문자로
+		++b;                             // b의 다음 문자로
 	}
 
-	return *a - *b;
+	return *a - *b;                      // 멈춘 지점의 문자 차이 (같으면 0)
 }
 
 // ---------------------------
@@ -75,9 +75,9 @@ int strCompare(const char* a, const char* b)
 // ---------------------------
 void printQueue()
 {
-	for (int i = rp; i < wp; i++)
-		printf("%d ", queue[i]);
-	putchar('\n');
+	for (int i = rp; i < wp; i++)        // 맨 앞(rp)부터 맨 뒤(wp-1)까지
+		printf("%d ", queue[i]);         // 원소 출력
+	putchar('\n');                       // 줄바꿈
 }
 
 // ---------------------------
@@ -88,22 +88,22 @@ int main()
 	// 빈 큐로 시작 (rp == wp 이면 비어 있음)
 	rp = wp = 0;
 
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 명령 개수 입력
 
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N; i++)          // 명령을 N번 처리
 	{
-		char command[100];
+		char command[100];               // 명령어 문자열 버퍼
 
-		scanf("%s", command);
+		scanf("%s", command);            // 명령어 입력
 
 		// ---------------------------
 		// push X : 맨 뒤에 추가
 		// ---------------------------
 		if (strCompare(command, "push") == 0)
 		{
-			int value;
+			int value;                   // 넣을 정수
 
-			scanf("%d", &value);
+			scanf("%d", &value);         // 정수 X 입력
 
 			// 현재 wp 자리에 넣고 wp를 한 칸 앞으로
 			queue[wp++] = value;
@@ -114,7 +114,7 @@ int main()
 		// ---------------------------
 		else if (strCompare(command, "pop") == 0)
 		{
-			if (wp == rp)
+			if (wp == rp)                // 큐가 비어 있으면
 				printf("-1\n");   // 비어 있음
 			else
 				// queue[rp]를 출력한 뒤 rp를 한 칸 앞으로 민다
@@ -126,7 +126,7 @@ int main()
 		// ---------------------------
 		else if (strCompare(command, "size") == 0)
 		{
-			printf("%d\n", wp - rp);
+			printf("%d\n", wp - rp);     // 원소 개수 출력
 		}
 
 		// ---------------------------
@@ -134,7 +134,7 @@ int main()
 		// ---------------------------
 		else if (strCompare(command, "empty") == 0)
 		{
-			printf("%d\n", (wp == rp) ? 1 : 0);
+			printf("%d\n", (wp == rp) ? 1 : 0);   // 비었으면 1, 아니면 0 출력
 		}
 
 		// ---------------------------
@@ -142,10 +142,10 @@ int main()
 		// ---------------------------
 		else if (strCompare(command, "front") == 0)
 		{
-			if (wp == rp)
-				printf("-1\n");
+			if (wp == rp)                // 큐가 비어 있으면
+				printf("-1\n");          // -1 출력
 			else
-				printf("%d\n", queue[rp]);
+				printf("%d\n", queue[rp]);   // 맨 앞 원소 출력
 		}
 
 		// ---------------------------
@@ -154,12 +154,12 @@ int main()
 		// ---------------------------
 		else if (strCompare(command, "back") == 0)
 		{
-			if (wp == rp)
-				printf("-1\n");
+			if (wp == rp)                // 큐가 비어 있으면
+				printf("-1\n");          // -1 출력
 			else
-				printf("%d\n", queue[wp - 1]);
+				printf("%d\n", queue[wp - 1]);   // 맨 뒤 원소 출력
 		}
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

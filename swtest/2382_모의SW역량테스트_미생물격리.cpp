@@ -31,11 +31,11 @@
 	  - changeDir[]로 반대 방향을 바로 찾는다 : 상 <-> 하, 좌 <-> 우.
 	  - nextMAP은 매 시간 끝에 비우므로 다음 케이스도 깨끗한 상태로 시작한다.
 */
-#include <stdio.h>
+#include <stdio.h>              // scanf, printf 사용
 
-#define MAX (100+10)
+#define MAX (100+10)            // N 최대 100 + 여유
 
-int T;
+int T;                  // 테스트 케이스 수
 int N, M, K;            // 셀 크기, 격리 시간, 군집 수
 
 struct BIO
@@ -49,54 +49,54 @@ BIO MAP[MAX][MAX];      // 지금 상태
 BIO nextMAP[MAX][MAX];  // 한 시간 뒤 상태
 
 // 상, 하, 좌, 우
-int dr[] = {0, -1,1,0,0 };
-int dc[] = { 0,0,0,-1,1 };
+int dr[] = {0, -1,1,0,0 };      // 방향별 행 변화량 (0번은 사용 안 함)
+int dc[] = { 0,0,0,-1,1 };      // 방향별 열 변화량 (0번은 사용 안 함)
 int changeDir[5] = { 0,2,1,4,3 };   // 반대 방향
 
 void input()
 {
-	scanf("%d %d %d", &N, &M, &K);
+	scanf("%d %d %d", &N, &M, &K);       // 셀 크기, 격리 시간, 군집 수 입력
 
-	BIO init = { 0 };
-	for (int r = 0; r < N; r++)
-		for (int c = 0; c < N; c++)
-			MAP[r][c] = init;
+	BIO init = { 0 };                    // 빈 칸 값
+	for (int r = 0; r < N; r++)          // 모든 행
+		for (int c = 0; c < N; c++)      // 모든 열
+			MAP[r][c] = init;            // 빈 칸으로 초기화
 
-	for (int i = 0; i < K; i++)
+	for (int i = 0; i < K; i++)          // 군집 K개 입력
 	{
-		int r, c, num, dir;
+		int r, c, num, dir;              // 위치, 미생물 수, 방향
 
-		scanf("%d %d %d %d", &r, &c, &num, &dir);
+		scanf("%d %d %d %d", &r, &c, &num, &dir);   // 군집 정보 입력
 
-		MAP[r][c].num = num;
-		MAP[r][c].maxNum = num;
-		MAP[r][c].dir = dir;
+		MAP[r][c].num = num;             // 미생물 수
+		MAP[r][c].maxNum = num;          // 처음엔 자기 수가 최대
+		MAP[r][c].dir = dir;             // 이동 방향
 	}
 }
 
 int simulate()
 {
-	for (int m = 0; m < M; m++)
+	for (int m = 0; m < M; m++)          // M시간 반복
 	{
-		for (int r = 0; r < N; r++)
+		for (int r = 0; r < N; r++)      // 모든 행
 		{
-			for (int c = 0; c < N; c++)
+			for (int c = 0; c < N; c++)  // 모든 열
 			{
 				// 미생물이 없으면 continue
 				if (MAP[r][c].num == 0) continue;
 
 				int currentNum = MAP[r][c].num;   // 절반이 되기 전 수 (합칠 때 비교용)
 
-				int nr, nc;
+				int nr, nc;              // 이동할 칸
 
-				nr = r + dr[MAP[r][c].dir];
-				nc = c + dc[MAP[r][c].dir];
+				nr = r + dr[MAP[r][c].dir];   // 이동할 행
+				nc = c + dc[MAP[r][c].dir];   // 이동할 열
 
 				// 약품이 칠해진 구역 미생물 수 감소 및 방향 변경
 				if (nr == 0 || nr == N - 1 || nc == 0 || nc == N - 1)
 				{
-					MAP[r][c].num /= 2;
-					MAP[r][c].dir = changeDir[MAP[r][c].dir];
+					MAP[r][c].num /= 2;                          // 수가 절반으로
+					MAP[r][c].dir = changeDir[MAP[r][c].dir];    // 방향 반대로
 				}
 
 				// 빈공간이면 이동
@@ -105,44 +105,44 @@ int simulate()
 				else if (nextMAP[nr][nc].maxNum > currentNum) nextMAP[nr][nc].num += MAP[r][c].num;
 				else // 자신이 더 큰경우 max 변경 및 방향 전환 미생물추가
 				{
-					nextMAP[nr][nc].maxNum = currentNum;
-					nextMAP[nr][nc].dir = MAP[r][c].dir;
-					nextMAP[nr][nc].num += MAP[r][c].num;
+					nextMAP[nr][nc].maxNum = currentNum;     // 가장 큰 군집 수 갱신
+					nextMAP[nr][nc].dir = MAP[r][c].dir;     // 방향은 큰 군집을 따른다
+					nextMAP[nr][nc].num += MAP[r][c].num;    // 수는 합친다
 				}
 			}
 		}
 
 		// move 종료
 		// nextMAP -> MAP 복사. 합쳐진 군집은 이제 하나이므로 maxNum을 합친 수로 맞춘다.
-		BIO init = { 0 };
+		BIO init = { 0 };                // 빈 칸 값
 		for (int r = 0; r < N; r++)
 		{
 			for (int c = 0; c < N; c++)
 			{
-				MAP[r][c] = nextMAP[r][c];
-				MAP[r][c].maxNum = MAP[r][c].num;
-				nextMAP[r][c] = init;
+				MAP[r][c] = nextMAP[r][c];           // 다음 상태를 현재로
+				MAP[r][c].maxNum = MAP[r][c].num;    // 합쳐진 군집 하나로 본다
+				nextMAP[r][c] = init;                // 다음 상태 판 비우기
 			}
 		}
 	}
 
 	// 남은 미생물 수의 합
 	int sum = 0;
-	for (int r = 0; r < N; r++)
-		for (int c = 0; c < N; c++)
-			sum += MAP[r][c].num;
+	for (int r = 0; r < N; r++)          // 모든 행
+		for (int c = 0; c < N; c++)      // 모든 열
+			sum += MAP[r][c].num;        // 미생물 수 누적
 
-	return sum;
+	return sum;                          // 총합 반환
 }
 
 int main()
 {
-	scanf("%d", &T);
-	for (int tc = 1; tc <= T; tc++)
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 
-		printf("#%d %d\n", tc, simulate());
+		printf("#%d %d\n", tc, simulate());   // M시간 뒤 총합 출력
 	}
-}
+}

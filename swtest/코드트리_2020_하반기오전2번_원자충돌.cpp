@@ -57,12 +57,12 @@
       그래서 "모두 짝수거나 모두 홀수"라는 조건이 곧 "모두 직선이거나 모두 대각선"이라는 뜻이 된다.
 */
 
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX (50 + 5)
+#define MAX (50 + 5)             // N 최대 50 + 여유
 
-int T;
-int N, M, K;
+int T;                           // 테스트 케이스 수
+int N, M, K;                     // 격자 크기, 원자 수, 턴 수
 
 // 원자 하나
 struct ATOM
@@ -74,15 +74,15 @@ struct ATOM
     int d;   // 방향
 };
 
-typedef struct ATOM ATOM;
+typedef struct ATOM ATOM;        // struct ATOM을 ATOM으로 줄여 쓰기
 
 // 살아 있는 원자 목록. 충돌마다 칸당 4개가 생기므로 넉넉히 잡는다.
 ATOM atom[100000 + 5000];
-int acnt;
+int acnt;                        // 원자 수
 
 // 방향 배열 : ↑, ↗, →, ↘, ↓, ↙, ←, ↖
-int dr[] = { -1, -1, 0, 1, 1, 1, 0, -1 };
-int dc[] = { 0,  1, 1, 1, 0,-1,-1, -1 };
+int dr[] = { -1, -1, 0, 1, 1, 1, 0, -1 };   // 방향별 행 변화량
+int dc[] = { 0,  1, 1, 1, 0,-1,-1, -1 };    // 방향별 열 변화량
 
 // 한 칸에 모인 원자들의 합계 정보
 struct INFO
@@ -95,27 +95,27 @@ struct INFO
     int count;   // 이 칸에 모인 원자 수
 };
 
-typedef struct INFO INFO;
+typedef struct INFO INFO;        // struct INFO를 INFO로 줄여 쓰기
 
 /*
     입력
 */
 void input()
 {
-    scanf("%d %d %d", &N, &M, &K);
+    scanf("%d %d %d", &N, &M, &K);       // 격자 크기, 원자 수, 턴 수 입력
 
-    acnt = 0;
+    acnt = 0;                            // 원자 수 초기화
 
-    for (int i = 0; i < M; i++)
+    for (int i = 0; i < M; i++)          // 원자마다
     {
-        scanf("%d %d %d %d %d",
+        scanf("%d %d %d %d %d",          // 행, 열, 질량, 속력, 방향 입력
             &atom[acnt].r,
             &atom[acnt].c,
             &atom[acnt].m,
             &atom[acnt].s,
             &atom[acnt].d);
 
-        acnt++;
+        acnt++;                          // 원자 수 증가
     }
 }
 
@@ -124,16 +124,16 @@ void input()
 */
 void printAtom()
 {
-    for (int i = 0; i < acnt; i++)
+    for (int i = 0; i < acnt; i++)       // 원자마다
     {
-        printf("%d %d %d %d %d\n",
+        printf("%d %d %d %d %d\n",       // 행, 열, 질량, 속력, 방향 출력
             atom[i].r,
             atom[i].c,
             atom[i].m,
             atom[i].s,
             atom[i].d);
     }
-    putchar('\n');
+    putchar('\n');                       // 빈 줄
 }
 
 /*
@@ -141,7 +141,7 @@ void printAtom()
 */
 void simulate()
 {
-    for (int k = 0; k < K; k++)
+    for (int k = 0; k < K; k++)          // K턴
     {
         // 이번 턴에 각 칸으로 모이는 원자들의 합계. 매 턴 새로 비운다.
         INFO MAP[MAX][MAX] = { 0 };
@@ -151,25 +151,25 @@ void simulate()
         // -------------------------
         for (int i = 0; i < acnt; i++)
         {
-            int nr, nc;
-            int d, s, m;
+            int nr, nc;                  // 도착 칸
+            int d, s, m;                 // 방향, 속력, 질량
 
-            d = atom[i].d;
-            s = atom[i].s;
-            m = atom[i].m;
+            d = atom[i].d;               // 방향
+            s = atom[i].s;               // 속력
+            m = atom[i].m;               // 질량
 
             // 한 바퀴(N칸)는 제자리이므로 s % N 만큼만 움직이면 된다
             nr = atom[i].r + dr[d] * (s % N);
             nc = atom[i].c + dc[d] * (s % N);
 
             // 토러스 보정. 위에서 이동량을 줄여 뒀기 때문에 한 번이면 충분하다.
-            if (nr > N) nr -= N;
-            if (nc > N) nc -= N;
-            if (nr < 1) nr += N;
-            if (nc < 1) nc += N;
+            if (nr > N) nr -= N;         // 아래로 넘치면 위로
+            if (nc > N) nc -= N;         // 오른쪽으로 넘치면 왼쪽으로
+            if (nr < 1) nr += N;         // 위로 넘치면 아래로
+            if (nc < 1) nc += N;         // 왼쪽으로 넘치면 오른쪽으로
 
-            MAP[nr][nc].m += m;
-            MAP[nr][nc].s += s;
+            MAP[nr][nc].m += m;          // 질량 합
+            MAP[nr][nc].s += s;          // 속력 합
 
             // 이 칸에 원자가 하나뿐이면 이 방향을 그대로 쓴다.
             // 여럿이면 어차피 새 방향을 다시 정하므로 덮여도 상관없다.
@@ -179,31 +179,31 @@ void simulate()
             if (d % 2 == 0) MAP[nr][nc].even++;
             else MAP[nr][nc].odd++;
 
-            MAP[nr][nc].count++;
+            MAP[nr][nc].count++;         // 모인 원자 수
         }
 
         // -------------------------
         // 2) 합계를 보고 다음 턴의 원자 목록을 새로 만든다
         // -------------------------
-        acnt = 0;
+        acnt = 0;                        // 새 목록 시작
 
-        for (int r = 1; r <= N; r++)
+        for (int r = 1; r <= N; r++)     // 모든 행
         {
-            for (int c = 1; c <= N; c++)
+            for (int c = 1; c <= N; c++) // 모든 열
             {
-                if (MAP[r][c].count == 0) continue;
+                if (MAP[r][c].count == 0) continue;   // 원자가 없는 칸
 
                 // 혼자 있는 원자는 아무 일 없이 그대로 살아남는다
                 if (MAP[r][c].count == 1)
                 {
-                    atom[acnt].r = r;
-                    atom[acnt].c = c;
-                    atom[acnt].m = MAP[r][c].m;
-                    atom[acnt].s = MAP[r][c].s;
-                    atom[acnt].d = MAP[r][c].d;
-                    acnt++;
+                    atom[acnt].r = r;            // 행
+                    atom[acnt].c = c;            // 열
+                    atom[acnt].m = MAP[r][c].m;  // 질량
+                    atom[acnt].s = MAP[r][c].s;  // 속력
+                    atom[acnt].d = MAP[r][c].d;  // 방향
+                    acnt++;                      // 원자 수 증가
 
-                    continue;
+                    continue;                    // 다음 칸
                 }
 
                 // 여기부터는 2개 이상이 모인 충돌 상황이다.
@@ -211,36 +211,36 @@ void simulate()
                 // 나뉜 뒤의 질량이 0이면 4개를 만들지 않고 통째로 사라진다
                 if ((MAP[r][c].m / 5) == 0) continue;
 
-                int dir[4] = { 0 };
+                int dir[4] = { 0 };      // 새 원자 4개의 방향
 
                 // 모두 짝수(직선)이거나 모두 홀수(대각선)이면 새 방향은 직선 4개
                 if (MAP[r][c].even == MAP[r][c].count
                     || MAP[r][c].odd == MAP[r][c].count)
                 {
-                    dir[0] = 0;
-                    dir[1] = 2;
-                    dir[2] = 4;
-                    dir[3] = 6;
+                    dir[0] = 0;          // ↑
+                    dir[1] = 2;          // →
+                    dir[2] = 4;          // ↓
+                    dir[3] = 6;          // ←
                 }
                 else
                 {
-                    dir[0] = 1;
-                    dir[1] = 3;
-                    dir[2] = 5;
-                    dir[3] = 7;
+                    dir[0] = 1;          // ↗
+                    dir[1] = 3;          // ↘
+                    dir[2] = 5;          // ↙
+                    dir[3] = 7;          // ↖
                 }
 
                 // 같은 자리에 네 개의 새 원자가 생긴다
                 for (int i = 0; i < 4; i++)
                 {
-                    atom[acnt].r = r;
-                    atom[acnt].c = c;
+                    atom[acnt].r = r;    // 행
+                    atom[acnt].c = c;    // 열
 
                     atom[acnt].m = MAP[r][c].m / 5;                 // 합친 질량 / 5
                     atom[acnt].s = MAP[r][c].s / MAP[r][c].count;   // 합친 속력 / 개수
 
-                    atom[acnt].d = dir[i];
-                    acnt++;
+                    atom[acnt].d = dir[i];   // 새 방향
+                    acnt++;                  // 원자 수 증가
                 }
             }
         }
@@ -252,12 +252,12 @@ void simulate()
 */
 int getAnswer()
 {
-    int sum = 0;
+    int sum = 0;                         // 질량 합
 
-    for (int i = 0; i < acnt; i++)
-        sum += atom[i].m;
+    for (int i = 0; i < acnt; i++)       // 원자마다
+        sum += atom[i].m;                // 질량 더하기
 
-    return sum;
+    return sum;                          // 합 반환
 }
 
 int main()
@@ -266,14 +266,14 @@ int main()
     // scanf("%d", &T);
     T = 1;
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
+        input();                         // 입력
 
-        simulate();
+        simulate();                      // K턴 진행
 
-        printf("%d\n", getAnswer());
+        printf("%d\n", getAnswer());     // 결과 출력
     }
 
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

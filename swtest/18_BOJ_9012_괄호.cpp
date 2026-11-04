@@ -27,13 +27,13 @@
 	  개수만 같은 것으로는 부족하고, "중간에도 항상 음수가 아니어야" 한다는 점이 핵심이다.
 */
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf 사용
 
 int T;   // 테스트 케이스 수
 
 int main()
 {
-	scanf("%d", &T);
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
 
 	// T개의 문자열을 각각 판정
 	for (int tc = 0; tc < T; tc++)
@@ -43,10 +43,10 @@ int main()
 		int length;         // 문자열 길이
 		bool flag;          // 도중에 sp가 음수가 된 적이 있는지
 
-		scanf("%s", str);
+		scanf("%s", str);                // 괄호 문자열 입력
 
-		sp = 0;
-		flag = false;
+		sp = 0;                          // 쌓인 '(' 없음
+		flag = false;                    // 아직 실패한 적 없음
 
 		// 문자열 길이 구하기 : '\0'을 만날 때까지 센다 (strlen 대용)
 		for (length = 0; str[length]; length++);
@@ -54,11 +54,11 @@ int main()
 		// 왼쪽부터 한 글자씩 훑는다
 		for (int i = 0; i < length; i++)
 		{
-			int ch = str[i];
+			int ch = str[i];             // 현재 글자
 
-			if (ch == '(')
+			if (ch == '(')               // 여는 괄호면
 				sp++;   // 열린 괄호를 하나 쌓는다
-			else
+			else                         // 닫는 괄호면
 				sp--;   // 닫는 괄호는 쌓여 있던 것 하나를 뺀다
 
 			// 핵심 조건 (1)
@@ -66,8 +66,8 @@ int main()
 			// 뒤를 더 봐도 절대 복구되지 않으므로 즉시 중단한다.
 			if (sp < 0)
 			{
-				flag = true;
-				break;
+				flag = true;             // 실패 표시
+				break;                   // 더 볼 필요 없이 중단
 			}
 		}
 
@@ -75,10 +75,10 @@ int main()
 		//   flag == true : 도중에 ')' 가 앞질렀다
 		//   sp != 0      : 끝났는데 닫히지 않은 '(' 가 남았다
 		if (flag == true || sp != 0)
-			printf("NO\n");
+			printf("NO\n");              // 올바르지 않은 괄호 문자열
 		else
-			printf("YES\n");
+			printf("YES\n");             // 올바른 괄호 문자열
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

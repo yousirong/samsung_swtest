@@ -37,19 +37,19 @@
 //       1 1 / 1 2 / 1 3 / 2 1 / 2 2 / 2 3 / 3 1 / 3 2 / 3 3   (총 3^2 = 9가지)
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
-#define MAX (7 + 3)
+#define MAX (7 + 3)      // N, M 최대 7 + 여유
 
-int N, M;
+int N, M;                // N: 후보 수 범위, M: 수열 길이
 int num_of_cases[MAX];   // 만들고 있는 수열. num_of_cases[0..M-1]이 완성되면 한 경우.
 
 // 완성된 수열 한 줄 출력
 void printCases()
 {
-	for (int i = 0; i < M; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < M; i++)          // M개 자리를
+		printf("%d ", num_of_cases[i]);  // 차례로 출력
+	putchar('\n');                       // 한 경우 끝 줄바꿈
 }
 
 // 재귀로 중복순열 생성
@@ -59,15 +59,15 @@ void DFS(int depth)
 	// 자리를 M개 다 채웠다면 하나의 경우가 완성된 것
 	if (depth == M)
 	{
-		printCases();
-		return;
+		printCases();                    // 완성된 수열 출력
+		return;                          // 더 깊이 들어가지 않는다
 	}
 
 	// 이 자리에는 1 ~ N 중 무엇이든 올 수 있다.
 	// 앞 자리에서 무엇을 골랐는지와 전혀 무관하다.
 	for (int i = 1; i <= N; i++)
 	{
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // 이 자리에 i를 놓는다
 
 		// 중복이 허용되므로 사용 표시(visit)도, 되돌리기도 필요 없다.
 		// 다음 호출에서 이 자리 값을 덮어쓰기 때문에 따로 정리할 것이 없다.
@@ -77,11 +77,11 @@ void DFS(int depth)
 
 int main()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // N과 M 입력
 
 	DFS(0);   // 0번째 자리부터 채우기 시작
 
-	return 0;
+	return 0; // 프로그램 정상 종료
 }
 
 // ====================================================================
@@ -96,11 +96,11 @@ int main()
 //   15651과 재귀 구조는 완전히 같고, 넣는 값이 i 대신 number[i]라는 점만 다르다.
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
-#define MAX (7 + 3)
+#define MAX (7 + 3)      // N, M 최대 7 + 여유
 
-int N, M;
+int N, M;                // N: 후보 개수, M: 수열 길이
 
 int num_of_cases[MAX];   // 만들고 있는 수열
 int number[MAX];         // 후보로 주어진 수들 (1-based로 저장)
@@ -108,18 +108,18 @@ int number[MAX];         // 후보로 주어진 수들 (1-based로 저장)
 // 완성된 수열 한 줄 출력
 void printCases()
 {
-	for (int i = 0; i < M; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < M; i++)          // M개 자리를
+		printf("%d ", num_of_cases[i]);  // 차례로 출력
+	putchar('\n');                       // 한 경우 끝 줄바꿈
 }
 
 // 재귀로 중복순열 생성
 void DFS(int depth)
 {
-	if (depth == M)
+	if (depth == M)                      // M개 자리를 다 채웠으면
 	{
-		printCases();
-		return;
+		printCases();                    // 완성된 수열 출력
+		return;                          // 되돌아간다
 	}
 
 	// 이 자리에는 후보 전체가 다시 올 수 있다
@@ -128,34 +128,34 @@ void DFS(int depth)
 		// 15651과 유일하게 다른 줄 : 인덱스가 아니라 실제 입력값을 담는다
 		num_of_cases[depth] = number[i];
 
-		DFS(depth + 1);
+		DFS(depth + 1);                  // 다음 자리 채우기
 	}
 }
 
 int main()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // N과 M 입력
 
 	// 후보 수 입력
 	for (int i = 1; i <= N; i++)
-		scanf("%d", &number[i]);
+		scanf("%d", &number[i]);         // i번째 후보 입력
 
 	// 사전순 출력을 위한 오름차순 정렬 (선택 정렬)
 	// 재귀가 후보를 앞에서부터 훑으므로, 후보만 정렬해 두면 출력도 자동으로 사전순이 된다.
-	for (int i = 1; i <= N - 1; i++)
+	for (int i = 1; i <= N - 1; i++)     // 기준 위치
 	{
-		for (int k = i + 1; k <= N; k++)
+		for (int k = i + 1; k <= N; k++) // 기준 뒤의 모든 위치
 		{
-			if (number[i] > number[k])
+			if (number[i] > number[k])   // 뒤쪽 값이 더 작으면
 			{
-				int tmp = number[i];
+				int tmp = number[i];     // 두 값을 맞바꾼다
 				number[i] = number[k];
 				number[k] = tmp;
 			}
 		}
 	}
 
-	DFS(0);
+	DFS(0);                              // 0번째 자리부터 채우기 시작
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

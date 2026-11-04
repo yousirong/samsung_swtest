@@ -47,31 +47,31 @@
 	  다만 좌표가 격자 밖으로 밀려날 수 있으니, 문제의 좌표 정의를 한 번 확인해 두는 편이 안전하다.
 */
 
-#include <stdio.h>
+#include <stdio.h>                     // scanf, printf 사용
 
-#define MAX (100 + 20)
+#define MAX (100 + 20)                 // 격자 100 + 여유
 
-int T;
+int T;                         // 테스트 케이스 수
 
 int N;                         // 드래곤 커브 개수
 int MAP[MAX][MAX];             // 그 점이 커브 위에 있으면 1
 int dragonPosition[2000];      // 방향열 (최대 2^10 = 1024보다 넉넉하게)
 
 // 방향 번호 : 0 = 오른쪽, 1 = 위쪽, 2 = 왼쪽, 3 = 아래쪽
-int dr[] = { 0, -1, 0, 1 };
-int dc[] = { 1,  0,-1, 0 };
+int dr[] = { 0, -1, 0, 1 };    // 방향별 행 변화량
+int dc[] = { 1,  0,-1, 0 };    // 방향별 열 변화량
 
 // ---------------------------
 // 커브를 모두 만들어 MAP에 표시
 // ---------------------------
 void makeDragonCurve()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 커브 개수 입력
 
-	for (int i = 0; i < N; i++)
+	for (int i = 0; i < N; i++)          // 커브마다
 	{
 		int r, c, d, g;   // 시작점, 시작 방향, 세대
-		scanf("%d %d %d %d", &r, &c, &d, &g);
+		scanf("%d %d %d %d", &r, &c, &d, &g);   // 커브 정보 입력
 
 		// 0세대의 방향열은 시작 방향 하나뿐
 		dragonPosition[0] = d;
@@ -88,7 +88,7 @@ void makeDragonCurve()
 			//   결과 [0, 1, 2, 1]
 			for (int i = length + 1; i <= length * 2; i++)
 			{
-				dragonPosition[i - 1] = (dragonPosition[length * 2 - i] + 1) % 4;
+				dragonPosition[i - 1] = (dragonPosition[length * 2 - i] + 1) % 4;   // 뒤에서부터 읽어 +1
 			}
 
 			// 디버그용
@@ -96,7 +96,7 @@ void makeDragonCurve()
 			//     printf("%d, ", dragonPosition[i]);
 			// putchar('\n');
 
-			length *= 2;
+			length *= 2;                 // 길이 두 배
 		}
 
 		// 시작점도 커브 위의 점이다
@@ -108,10 +108,10 @@ void makeDragonCurve()
 		// 방향열대로 한 칸씩 이동하며 지나간 점을 표시
 		for (int k = 0; k < moveCount; k++)
 		{
-			r = r + dr[dragonPosition[k]];
-			c = c + dc[dragonPosition[k]];
+			r = r + dr[dragonPosition[k]];   // 행 이동
+			c = c + dc[dragonPosition[k]];   // 열 이동
 
-			MAP[r][c] = 1;
+			MAP[r][c] = 1;               // 커브 위의 점 표시
 		}
 	}
 }
@@ -124,19 +124,19 @@ void makeDragonCurve()
 // ---------------------------
 int countSquare()
 {
-	int sum = 0;
+	int sum = 0;                         // 정사각형 수
 
 	// 좌표가 0 ~ 100이므로 왼쪽 위 꼭짓점은 0 ~ 99까지만 볼 수 있다
 	for (int r = 0; r < 100; r++)
 	{
 		for (int c = 0; c < 100; c++)
 		{
-			if (MAP[r][c] + MAP[r + 1][c] + MAP[r][c + 1] + MAP[r + 1][c + 1] == 4)
-				sum++;
+			if (MAP[r][c] + MAP[r + 1][c] + MAP[r][c + 1] + MAP[r + 1][c + 1] == 4)   // 네 꼭짓점 모두 커브 위
+				sum++;                   // 센다
 		}
 	}
 
-	return sum;
+	return sum;                          // 개수 반환
 }
 
 int main()
@@ -145,12 +145,12 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		makeDragonCurve();
+		makeDragonCurve();               // 커브 입력 + 그리기
 
-		printf("%d\n", countSquare());
+		printf("%d\n", countSquare());   // 정사각형 수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

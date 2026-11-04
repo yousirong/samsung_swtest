@@ -70,36 +70,36 @@
       남은 블록 수는 진한 칸만 세면 된다. 연한 칸은 위 처리 때문에 항상 비어 있기 때문이다.
 */
 
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf, putchar 사용
 
-#define MAX (10 + 3)
-#define MAX_K (10000 + 500)
+#define MAX (10 + 3)               // 전체 배열 크기 (0 ~ 10 + 여유)
+#define MAX_K (10000 + 500)        // 블록 최대 개수 + 여유
 
 // 각 보드의 줄 번호 범위 (연한 칸 2줄 + 진한 칸 4줄)
-#define START (4)
-#define END (9)
+#define START (4)                  // 보드 시작 줄 (연한 칸 첫 줄)
+#define END (9)                    // 보드 끝 줄 (진한 칸 마지막 줄)
 
 // 벽 표시
 #define WALL (-1)
 
-int T;
+int T;                  // 테스트 케이스 수
 
 int K;                  // 블록 개수
 int MAP[MAX][MAX];      // 대기 구역 + 두 보드를 함께 담은 배열
 
 // 입력 블록 정보
-int TYPE[MAX_K];
-int R[MAX_K];
-int C[MAX_K];
+int TYPE[MAX_K];        // 블록 종류
+int R[MAX_K];           // 놓인 행
+int C[MAX_K];           // 놓인 열
 
 /*
     입력 + 벽 세우기
 */
 void input()
 {
-    for (int r = 0; r < MAX; r++)
+    for (int r = 0; r < MAX; r++)        // 배열 전체를
         for (int c = 0; c < MAX; c++)
-            MAP[r][c] = 0;
+            MAP[r][c] = 0;               // 빈칸으로
 
     // 빨간 보드의 오른쪽 끝 벽 (여기서 블록이 멈춘다)
     MAP[0][10] = MAP[1][10] = MAP[2][10] = MAP[3][10] = WALL;
@@ -107,10 +107,10 @@ void input()
     // 노란 보드의 아래쪽 끝 벽
     MAP[10][0] = MAP[10][1] = MAP[10][2] = MAP[10][3] = WALL;
 
-    scanf("%d", &K);
+    scanf("%d", &K);                     // 블록 개수 입력
 
-    for (int k = 0; k < K; k++)
-        scanf("%d %d %d", &TYPE[k], &R[k], &C[k]);
+    for (int k = 0; k < K; k++)          // 블록마다
+        scanf("%d %d %d", &TYPE[k], &R[k], &C[k]);   // 종류, 행, 열 입력
 }
 
 /*
@@ -118,13 +118,13 @@ void input()
 */
 void printMap()
 {
-    for (int r = 0; r < 11; r++)
+    for (int r = 0; r < 11; r++)         // 모든 행
     {
-        for (int c = 0; c < 11; c++)
-            printf("%d ", MAP[r][c]);
-        putchar('\n');
+        for (int c = 0; c < 11; c++)     // 모든 열
+            printf("%d ", MAP[r][c]);    // 값 출력
+        putchar('\n');                   // 행 끝 줄바꿈
     }
-    putchar('\n');
+    putchar('\n');                       // 빈 줄
 }
 
 /*
@@ -135,41 +135,41 @@ void printMap()
 */
 void moveRed(int type, int sr, int sc)
 {
-    int c = sc;
+    int c = sc;                          // 블록의 현재 열
 
-    if (type == 1)
+    if (type == 1)                       // 1 x 1 블록
     {
         // 한 칸짜리 : 바로 오른쪽만 보면 된다
         while (1)
         {
-            if (MAP[sr][c + 1] != 0) break;
-            c++;
+            if (MAP[sr][c + 1] != 0) break;   // 오른쪽이 막히면 멈춤
+            c++;                              // 한 칸 오른쪽
         }
 
-        MAP[sr][c] = 1;
+        MAP[sr][c] = 1;                  // 멈춘 자리에 놓는다
     }
-    else if (type == 2)
+    else if (type == 2)                  // 1 x 2 가로 블록
     {
         // 가로 2칸 : c와 c+1을 차지하므로, 진행 방향의 다음 칸은 c+2다
         while (1)
         {
-            if (MAP[sr][c + 2] != 0) break;
-            c++;
+            if (MAP[sr][c + 2] != 0) break;   // 앞이 막히면 멈춤
+            c++;                              // 한 칸 오른쪽
         }
 
-        MAP[sr][c] = MAP[sr][c + 1] = 1;
+        MAP[sr][c] = MAP[sr][c + 1] = 1; // 두 칸에 놓는다
     }
-    else if (type == 3)
+    else if (type == 3)                  // 2 x 1 세로 블록
     {
         // 세로 2칸 : 두 행이 함께 오른쪽으로 가므로 두 행 모두 다음 칸이 비어야 한다
         while (1)
         {
-            if (MAP[sr][c + 1] != 0) break;
-            if (MAP[sr + 1][c + 1] != 0) break;
-            c++;
+            if (MAP[sr][c + 1] != 0) break;       // 윗칸 앞이 막히면 멈춤
+            if (MAP[sr + 1][c + 1] != 0) break;   // 아랫칸 앞이 막히면 멈춤
+            c++;                                  // 한 칸 오른쪽
         }
 
-        MAP[sr][c] = MAP[sr + 1][c] = 1;
+        MAP[sr][c] = MAP[sr + 1][c] = 1; // 두 칸에 놓는다
     }
 }
 
@@ -181,40 +181,40 @@ void moveRed(int type, int sr, int sc)
 */
 void moveYellow(int type, int sr, int sc)
 {
-    int r = sr;
+    int r = sr;                          // 블록의 현재 행
 
-    if (type == 1)
+    if (type == 1)                       // 1 x 1 블록
     {
         while (1)
         {
-            if (MAP[r + 1][sc] != 0) break;
-            r++;
+            if (MAP[r + 1][sc] != 0) break;   // 아래가 막히면 멈춤
+            r++;                              // 한 칸 아래
         }
 
-        MAP[r][sc] = 1;
+        MAP[r][sc] = 1;                  // 멈춘 자리에 놓는다
     }
-    else if (type == 2)
+    else if (type == 2)                  // 1 x 2 가로 블록
     {
         // 가로 2칸 : 두 열이 함께 내려가므로 두 열 모두 아래가 비어야 한다
         while (1)
         {
-            if (MAP[r + 1][sc] != 0) break;
-            if (MAP[r + 1][sc + 1] != 0) break;
-            r++;
+            if (MAP[r + 1][sc] != 0) break;       // 왼칸 아래가 막히면 멈춤
+            if (MAP[r + 1][sc + 1] != 0) break;   // 오른칸 아래가 막히면 멈춤
+            r++;                                  // 한 칸 아래
         }
 
-        MAP[r][sc] = MAP[r][sc + 1] = 1;
+        MAP[r][sc] = MAP[r][sc + 1] = 1; // 두 칸에 놓는다
     }
-    else if (type == 3)
+    else if (type == 3)                  // 2 x 1 세로 블록
     {
         // 세로 2칸 : r과 r+1을 차지하므로 진행 방향의 다음 칸은 r+2다
         while (1)
         {
-            if (MAP[r + 2][sc] != 0) break;
-            r++;
+            if (MAP[r + 2][sc] != 0) break;   // 아래가 막히면 멈춤
+            r++;                              // 한 칸 아래
         }
 
-        MAP[r][sc] = MAP[r + 1][sc] = 1;
+        MAP[r][sc] = MAP[r + 1][sc] = 1; // 두 칸에 놓는다
     }
 }
 
@@ -226,11 +226,11 @@ void moveYellow(int type, int sr, int sc)
 */
 void deleteRed(int col)
 {
-    for (int c = col; c > START; c--)
-        for (int r = 0; r < 4; r++)
-            MAP[r][c] = MAP[r][c - 1];
+    for (int c = col; c > START; c--)    // col부터 입구 쪽으로
+        for (int r = 0; r < 4; r++)      // 4행 모두
+            MAP[r][c] = MAP[r][c - 1];   // 한 칸 안쪽으로 당긴다
 
-    MAP[0][START] = MAP[1][START] = MAP[2][START] = MAP[3][START] = 0;
+    MAP[0][START] = MAP[1][START] = MAP[2][START] = MAP[3][START] = 0;   // 맨 앞 열 비우기
 }
 
 /*
@@ -238,11 +238,11 @@ void deleteRed(int col)
 */
 void deleteYellow(int row)
 {
-    for (int r = row; r > START; r--)
-        for (int c = 0; c < 4; c++)
-            MAP[r][c] = MAP[r - 1][c];
+    for (int r = row; r > START; r--)    // row부터 입구 쪽으로
+        for (int c = 0; c < 4; c++)      // 4열 모두
+            MAP[r][c] = MAP[r - 1][c];   // 한 칸 아래로 당긴다
 
-    MAP[START][0] = MAP[START][1] = MAP[START][2] = MAP[START][3] = 0;
+    MAP[START][0] = MAP[START][1] = MAP[START][2] = MAP[START][3] = 0;   // 맨 앞 행 비우기
 }
 
 /*
@@ -253,20 +253,20 @@ void deleteYellow(int row)
 */
 int getScoreRed()
 {
-    for (int c = START + 2; c <= END; c++)
+    for (int c = START + 2; c <= END; c++)   // 진한 칸 열마다
     {
-        int cnt = 0;
-        for (int r = 0; r < 4; r++)
-            cnt += MAP[r][c];
+        int cnt = 0;                     // 찬 칸 수
+        for (int r = 0; r < 4; r++)      // 4행
+            cnt += MAP[r][c];            // 블록 수 세기
 
-        if (cnt == 4)
+        if (cnt == 4)                    // 꽉 찼으면
         {
-            deleteRed(c);
-            return 1;
+            deleteRed(c);                // 그 열 삭제
+            return 1;                    // 1점
         }
     }
 
-    return 0;
+    return 0;                            // 지운 줄 없음
 }
 
 /*
@@ -274,20 +274,20 @@ int getScoreRed()
 */
 int getScoreYellow()
 {
-    for (int r = START + 2; r <= END; r++)
+    for (int r = START + 2; r <= END; r++)   // 진한 칸 행마다
     {
-        int cnt = 0;
-        for (int c = 0; c < 4; c++)
-            cnt += MAP[r][c];
+        int cnt = 0;                     // 찬 칸 수
+        for (int c = 0; c < 4; c++)      // 4열
+            cnt += MAP[r][c];            // 블록 수 세기
 
-        if (cnt == 4)
+        if (cnt == 4)                    // 꽉 찼으면
         {
-            deleteYellow(r);
-            return 1;
+            deleteYellow(r);             // 그 행 삭제
+            return 1;                    // 1점
         }
     }
 
-    return 0;
+    return 0;                            // 지운 줄 없음
 }
 
 /*
@@ -299,10 +299,10 @@ int getScoreYellow()
 */
 bool checkRed()
 {
-    for (int r = 0; r < 4; r++)
-        if (MAP[r][START + 1] == 1) return true;
+    for (int r = 0; r < 4; r++)          // 4행
+        if (MAP[r][START + 1] == 1) return true;   // 블록이 있으면 true
 
-    return false;
+    return false;                        // 비어 있음
 }
 
 /*
@@ -310,10 +310,10 @@ bool checkRed()
 */
 bool checkYellow()
 {
-    for (int c = 0; c < 4; c++)
-        if (MAP[START + 1][c] == 1) return true;
+    for (int c = 0; c < 4; c++)          // 4열
+        if (MAP[START + 1][c] == 1) return true;   // 블록이 있으면 true
 
-    return false;
+    return false;                        // 비어 있음
 }
 
 /*
@@ -323,41 +323,41 @@ bool checkYellow()
 */
 void simulate()
 {
-    int score = 0;
+    int score = 0;                       // 총점
 
-    for (int k = 0; k < K; k++)
+    for (int k = 0; k < K; k++)          // 블록마다
     {
         // 같은 블록이 두 보드에 동시에 놓인다
-        moveRed(TYPE[k], R[k], C[k]);
-        moveYellow(TYPE[k], R[k], C[k]);
+        moveRed(TYPE[k], R[k], C[k]);    // 빨간 보드에 놓기
+        moveYellow(TYPE[k], R[k], C[k]); // 노란 보드에 놓기
 
         // 가로 2칸 블록이 두 줄을 동시에 채울 수 있어 최대 2줄까지 지워진다
-        score += getScoreRed();
-        score += getScoreRed();
+        score += getScoreRed();          // 빨간 보드 첫 줄
+        score += getScoreRed();          // 빨간 보드 둘째 줄
 
-        score += getScoreYellow();
-        score += getScoreYellow();
+        score += getScoreYellow();       // 노란 보드 첫 줄
+        score += getScoreYellow();       // 노란 보드 둘째 줄
 
         // 연한 칸이 두 줄이므로 두 번 검사한다 (위 checkRed 설명 참고)
-        if (checkRed() == true) deleteRed(END);
-        if (checkRed() == true) deleteRed(END);
+        if (checkRed() == true) deleteRed(END);        // 빨간 보드 밀어내기 1
+        if (checkRed() == true) deleteRed(END);        // 빨간 보드 밀어내기 2
 
-        if (checkYellow() == true) deleteYellow(END);
-        if (checkYellow() == true) deleteYellow(END);
+        if (checkYellow() == true) deleteYellow(END);  // 노란 보드 밀어내기 1
+        if (checkYellow() == true) deleteYellow(END);  // 노란 보드 밀어내기 2
     }
 
-    int blockCount = 0;
+    int blockCount = 0;                  // 남은 블록 칸 수
 
     // 연한 칸은 위 처리로 항상 비어 있으므로 진한 칸만 세면 된다
-    for (int c = START + 2; c <= END; c++)
+    for (int c = START + 2; c <= END; c++)   // 빨간 보드 진한 칸
         for (int r = 0; r < 4; r++)
-            blockCount += MAP[r][c];
+            blockCount += MAP[r][c];         // 블록 수 더하기
 
-    for (int r = START + 2; r <= END; r++)
+    for (int r = START + 2; r <= END; r++)   // 노란 보드 진한 칸
         for (int c = 0; c < 4; c++)
-            blockCount += MAP[r][c];
+            blockCount += MAP[r][c];         // 블록 수 더하기
 
-    printf("%d\n%d\n", score, blockCount);
+    printf("%d\n%d\n", score, blockCount);   // 총점과 남은 칸 수 출력
 }
 
 int main()
@@ -366,11 +366,11 @@ int main()
     // scanf("%d", &T);
     T = 1;
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
-        simulate();
+        input();                         // 입력
+        simulate();                      // 시뮬레이션
     }
 
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

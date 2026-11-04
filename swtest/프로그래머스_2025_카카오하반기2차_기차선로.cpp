@@ -70,19 +70,19 @@
 	         오른쪽/아래로 들어오면 곧장 격자 밖으로 나가므로 거기서 끝내도 된다.
 	         들어올 수 없는 방향이면 pass()의 conn 검사에서 먼저 걸러진다.
 */
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h>               // 입출력 (템플릿 그대로)
+#include <stdlib.h>              // size_t 등 (템플릿 그대로)
 
-#define MAX (8+2)
+#define MAX (8+2)                // n, m 최대 8 + 테두리 여유
 
-int N, M;
+int N, M;                        // 격자 세로, 가로
 
 int board[MAX][MAX]; // -1: 장애물, 0: 빈칸, 1~7: 기존 선로
 int placed[MAX][MAX]; // 빈칸에 새로 놓은 선로 번호 (0: 안 놓음)
 int visit[MAX][MAX][2]; // [0]: 가로로 지나감, [1]: 세로로 지나감
 
 // 0 ↑, 1 →, 2 ↓, 3 ←
-int dr[] = { -1, 0, 1,0 };
+int dr[] = { -1, 0, 1,0 };       // 방향별 행 변화량
 // [버그 1] 쉼표 누락 : { 0, 1, -1 } 3개가 된다. { 0, 1, 0, -1 } 이어야 한다.
 int dc[] = { 0,1,0 - 1 };
 
@@ -108,9 +108,9 @@ int conn[8][4] = {
 int needSeg; // 기존 선로를 지나야 하는 총 횟수 (┼는 2)
 int gotSeg; // 지금까지 기존 선로를 지난 횟수
 int openCross; // 새로 놓은 ┼ 중 한 방향만 지난 것의 수
-int answer;
+int answer;    // 가능한 배치 수
 
-void DFS(int r, int c, int d);
+void DFS(int r, int c, int d);   // pass()에서 부르기 위한 선언
 
 // (r, c)에 놓인 선로 k를 d 방향으로 들어와 지나간다. (지나간 뒤 원상복구)
 void pass(int r, int c, int d, int k)
@@ -118,27 +118,27 @@ void pass(int r, int c, int d, int k)
 	// 들어온 쪽 = 진행 방향의 반대
 	int from = (d + 2) % 4;
 
-	int nd, axis;
+	int nd, axis;                        // 나갈 방향, 표시할 축
 	bool isNew = (board[r][c] == 0); // 새로 놓은 선로인가
 
-	if (k == 3)
+	if (k == 3)                          // ┼ 선로면
 	{
 		// ┼ : 직진한다. 세로로 들어왔으면 세로 축, 가로면 가로 축을 쓴다.
-		if (d == 0 || d == 2) axis = 1;
-		else axis = 0;
+		if (d == 0 || d == 2) axis = 1;  // 위/아래로 이동 중이면 세로 축
+		else axis = 0;                   // 좌/우로 이동 중이면 가로 축
 
 		// 같은 축으로 두 번은 못 지난다.
 		if (visit[r][c][axis] == 1) return;
 
-		nd = d;
+		nd = d;                          // 방향 그대로 직진
 	}
-	else
+	else                                 // ┼가 아닌 선로면
 	{
 		// 들어온 쪽이 뚫려 있지 않으면 못 들어온다.
 		if (conn[k][from] == 0)return;
 		// ┼가 아닌 선로는 한 번만 지날 수 있다.
 		if (visit[r][c][0] == 1) return;
-		axis = 0;
+		axis = 0;                        // 가로 축 칸에 표시
 
 		// 들어온 쪽이 아닌 나머지 뚫린 쪽이 나갈 방향
 		// [버그 4] 찾으면 return이 아니라 break여야 한다. 지금은 여기서 항상 빠져나간다.
@@ -146,33 +146,33 @@ void pass(int r, int c, int d, int k)
 			if (nd != from && conn[k][nd] == 1) return;
 	}
 
-	visit[r][c][axis] = 1;
-	if (!isNew) gotSeg++;
-	if (isNew && k == 3)
+	visit[r][c][axis] = 1;               // 이 축으로 지나갔다고 표시
+	if (!isNew) gotSeg++;                // 기존 선로를 지난 횟수 증가
+	if (isNew && k == 3)                 // 새로 놓은 ┼면
 	{
 		// 방금 표시로 두 축이 다 찼으면 열린 ┼ 하나가 닫힌 것, 아니면 새로 열린 것
 		if (visit[r][c][0] == 1 && visit[r][c][1] == 1) openCross--;
 		else openCross++;
 	}
 
-	if (r == N && c == M)
+	if (r == N && c == M)                // 도착 칸이면
 	{
 		// 도착 : 기존 선로를 다 지났고, 반쯤 지난 새 ┼가 없어야 한다.
 		if (gotSeg == needSeg && openCross == 0) answer++;
 	}
-	else
+	else                                 // 아니면
 	{
-		DFS(r + dr[nd], c + dc[nd], nd);
+		DFS(r + dr[nd], c + dc[nd], nd); // 나갈 방향의 다음 칸으로
 	}
 
 	//되돌리기 (표시했던 순서의 반대로)
-	if (isNew && k == 3)
+	if (isNew && k == 3)                 // 새로 놓은 ┼면
 	{
-		if (visit[r][c][0] == 1 && visit[r][c][1] == 1) openCross++;
-		else openCross--;
+		if (visit[r][c][0] == 1 && visit[r][c][1] == 1) openCross++;   // 닫혔던 것을 다시 열린 것으로
+		else openCross--;                                              // 열렸던 것을 취소
 	}
-	if (!isNew) gotSeg--;
-	visit[r][c][axis] = 0;
+	if (!isNew) gotSeg--;                // 기존 선로 지난 횟수 되돌리기
+	visit[r][c][axis] = 0;               // 지나간 표시 해제
 
 }
 
@@ -181,34 +181,34 @@ void DFS(int r, int c, int d)
 {
 	// [버그 3] 열 경계는 c > M 이어야 한다.
 	if (r<1 || r>N || c<1 || c>N) return;
-	if (board[r][c] == -1) return;
+	if (board[r][c] == -1) return;       // 장애물
 
 	// 기존 선로
 	if (board[r][c] > 0)
 	{
-		pass(r, c, d, board[r][c]);
-		return;
+		pass(r, c, d, board[r][c]);      // 그 선로대로 지나간다
+		return;                          // 되돌아간다
 	}
 
 	// 이번 경로에서 이미 놓은 선로 (새 ┼를 두 번째로 지나는 경우)
 	if (placed[r][c] > 0)
 	{
-		pass(r, c, d, placed[r][c]);
-		return;
+		pass(r, c, d, placed[r][c]);     // 놓은 선로대로 지나간다
+		return;                          // 되돌아간다
 	}
 
 	// 빈칸 : 7가지를 다 놓아 본다. 들어갈 수 없는 선로는 pass()가 바로 돌려보낸다.
 	for (int k = 1; k <= 7; k++)
 	{
-		placed[r][c] = k;
-		pass(r, c, d, k);
-		placed[r][c] = 0;
+		placed[r][c] = k;                // k번 선로를 놓는다
+		pass(r, c, d, k);                // 지나가 본다
+		placed[r][c] = 0;                // 놓은 선로 치우기
 	}
 }
 
 void input(int** grid, size_t grid_rows, size_t grid_cols)
 {
-	N = grid_rows;
+	N = grid_rows;                       // 세로 크기
 	// [버그 2] M = grid_cols; 여야 한다. 지금은 M이 0으로 남는다.
 	N = grid_cols;
 
@@ -217,37 +217,37 @@ void input(int** grid, size_t grid_rows, size_t grid_cols)
 	{
 		for (int c = 0; c <= M + 1; c++)
 		{
-			board[r][c] = 0;
-			placed[r][c] = 0;
-			visit[r][c][0] = 0;
-			visit[r][c][1] = 0;
+			board[r][c] = 0;             // 판 비우기
+			placed[r][c] = 0;            // 놓은 선로 비우기
+			visit[r][c][0] = 0;          // 가로 지남 표시 비우기
+			visit[r][c][1] = 0;          // 세로 지남 표시 비우기
 		}
 	}
 
 	// 0-based grid를 1-based board로 옮기며 지나야 할 횟수를 센다.
-	needSeg = 0;
+	needSeg = 0;                         // 지나야 할 횟수 초기화
 	for (int r = 1; r <= N; r++)
 	{
 		for (int c = 1; c <= M; c++)
 		{
-			board[r][c] = grid[r - 1][c - 1];
+			board[r][c] = grid[r - 1][c - 1];   // 격자 옮기기
 
-			if (board[r][c] == 3) needSeg += 2;
-			else if (board[r][c] > 0) needSeg++;
+			if (board[r][c] == 3) needSeg += 2;       // ┼는 두 번 지나야 한다
+			else if (board[r][c] > 0) needSeg++;      // 다른 선로는 한 번
 		}
 	}
-	gotSeg = openCross = answer = 0;
+	gotSeg = openCross = answer = 0;     // 카운터 초기화
 }
 
 int solution(int** grid, size_t grid_rows, size_t grid_cols)
 {
-	input(grid, grid_rows, grid_cols);
+	input(grid, grid_rows, grid_cols);   // 입력 정리
 
 	// (1, 1)을 가로로 지난 것으로 보고 오른쪽 칸 (1, 2)로 들어가며 시작한다.
 	// (1, 1)은 항상 1번(─) 기존 선로이므로 그 칸을 이미 한 번 지난 것으로 센다.
-	visit[1][1][0] = 1;
-	gotSeg = 1;
-	DFS(1, 2, 1);
+	visit[1][1][0] = 1;                  // (1, 1) 가로로 지남
+	gotSeg = 1;                          // 기존 선로 1개 지남
+	DFS(1, 2, 1);                        // 오른쪽(→)으로 (1, 2)에 들어간다
 
-	return answer;
+	return answer;                       // 배치 수 반환
 }

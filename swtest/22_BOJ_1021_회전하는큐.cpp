@@ -36,11 +36,11 @@
 	  회전 총량은 최대 N*M(= 2500) 수준이라 준비한 여유 안에서 끝난다.
 */
 
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf 사용
 
-#define MAX (50 + 5)
-#define MAX_DEQUE (MAX * MAX * 2)
-#define OFFSET (MAX_DEQUE / 2)
+#define MAX (50 + 5)               // N 최대 50 + 여유
+#define MAX_DEQUE (MAX * MAX * 2)  // 회전으로 번져 나갈 여유까지 포함한 덱 크기
+#define OFFSET (MAX_DEQUE / 2)     // 덱이 시작하는 배열 중앙 위치
 
 int N, M;                  // N: 덱의 초기 크기, M: 뽑아야 하는 수의 개수
 
@@ -58,18 +58,18 @@ int front, back;
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // 덱 크기 N과 뽑을 개수 M 입력
 
 	// 뽑아야 하는 순서
 	for (int i = 0; i < M; i++)
-		scanf("%d", &position[i]);
+		scanf("%d", &position[i]);       // i번째로 뽑을 값 입력
 
 	// 배열 한가운데에서 시작해야 양방향 회전에 여유가 생긴다
 	front = back = OFFSET;
 
 	// 초기 덱 : 1, 2, 3, ..., N
 	for (int i = 1; i <= N; i++)
-		deque[back++] = i;
+		deque[back++] = i;               // i를 맨 뒤에 넣는다
 }
 
 // ---------------------------
@@ -81,13 +81,13 @@ void input()
 // ---------------------------
 int getLeftCount(int value)
 {
-	int ret = 0;
+	int ret = 0;                         // 앞에서부터 센 위치
 
-	for (int i = front; i < back; i++)
+	for (int i = front; i < back; i++)   // 맨 앞부터 맨 뒤까지
 	{
-		if (deque[i] == value)
+		if (deque[i] == value)           // 찾는 값이면
 			return ret;   // 앞에서 ret번째에 있다
-		ret++;
+		ret++;                           // 다음 위치로
 	}
 
 	return -1; // error : 덱에 없는 값 (정상 입력이면 오지 않는다)
@@ -103,14 +103,14 @@ int getLeftCount(int value)
 // ---------------------------
 int getRightCount(int value)
 {
-	int ret = 0;
+	int ret = 0;                         // 뒤에서부터 센 회전 횟수
 
-	for (int i = back - 1; i >= front; i--)
+	for (int i = back - 1; i >= front; i--)   // 맨 뒤부터 맨 앞까지
 	{
-		ret++;
+		ret++;                           // 이 원소를 앞으로 보내려면 한 번 더 회전
 
-		if (deque[i] == value)
-			return ret;
+		if (deque[i] == value)           // 찾는 값이면
+			return ret;                  // 필요한 회전 횟수 반환
 	}
 
 	return -1; // error
@@ -121,7 +121,7 @@ int getRightCount(int value)
 // ---------------------------
 int main()
 {
-	input();
+	input();                             // 입력 및 초기 덱 구성
 
 	int answer = 0; // 회전 연산 총 횟수
 
@@ -131,15 +131,15 @@ int main()
 		// 이미 맨 앞에 있으면 회전 없이 바로 뽑는다 (front++ 가 곧 pop_front)
 		if (deque[front] == position[i])
 		{
-			front++;
+			front++;                     // 맨 앞 원소를 뽑는다
 		}
 		else
 		{
 			// 두 방향의 비용을 각각 구해 더 싼 쪽을 고른다 (두 값의 합은 현재 덱 크기)
-			int leftCount = getLeftCount(position[i]);
-			int rightCount = getRightCount(position[i]);
+			int leftCount = getLeftCount(position[i]);     // 왼쪽 회전 횟수
+			int rightCount = getRightCount(position[i]);   // 오른쪽 회전 횟수
 
-			if (leftCount < rightCount)
+			if (leftCount < rightCount)  // 왼쪽 회전이 더 적으면
 			{
 				// 왼쪽 회전 : 맨 앞을 떼어 맨 뒤에 붙이기를 leftCount번
 				for (int k = 0; k < leftCount; k++)
@@ -148,14 +148,14 @@ int main()
 				front++;              // 목표 값이 맨 앞에 왔으므로 뽑는다
 				answer += leftCount;  // 회전 횟수만 정답에 누적
 			}
-			else
+			else                         // 오른쪽 회전이 더 적거나 같으면
 			{
 				// 오른쪽 회전 : 맨 뒤를 떼어 맨 앞에 붙이기를 rightCount번
 				for (int k = 0; k < rightCount; k++)
 					deque[--front] = deque[--back];
 
 				front++;               // 목표 값을 뽑는다
-				answer += rightCount;
+				answer += rightCount;  // 회전 횟수 누적
 			}
 		}
 	}
@@ -163,5 +163,5 @@ int main()
 	// 최소 회전 횟수
 	printf("%d\n", answer);
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

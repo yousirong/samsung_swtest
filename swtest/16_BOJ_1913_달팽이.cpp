@@ -37,27 +37,27 @@
 	     ansR/ansC를 시작할 때 가운데 좌표로 초기화해 둔 것이 그 처리를 겸한다.
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
-#define MAX (1000 + 100)
+#define MAX (1000 + 100)       // N 최대 999 + 여유
 
 int N, K;              // N: 배열 크기(홀수), K: 좌표를 찾아야 하는 숫자
 int MAP[MAX][MAX];     // 달팽이 모양으로 숫자를 채울 배열, 1-based
 
 // 방향 배열: 상(0), 우(1), 하(2), 좌(3) 순으로 순환한다
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = {  0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };    // 방향별 행 변화량
+int dc[] = {  0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 완성된 배열 출력
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행에 대해
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 한 행의 모든 칸을
+			printf("%d ", MAP[r][c]);    // 공백으로 구분해 출력
+		putchar('\n');                   // 한 행이 끝나면 줄바꿈
 	}
 }
 
@@ -88,37 +88,37 @@ void makesnail()
 		// 구간 길이는 두 구간마다 1씩 증가 (1,1,2,2,3,3,...)
 		// i가 짝수일 때만 늘려 주면 정확히 이 패턴이 된다
 		if (i % 2 == 0)
-			size++;
+			size++;                      // 구간 길이 1 증가
 
 		// 현재 방향으로 size칸 직진하며 숫자를 채운다
 		for (int s = 0; s < size; s++)
 		{
-			int nr, nc;
+			int nr, nc;                  // 다음 칸 좌표
 
 			// 다음 칸
-			nr = r + dr[direction];
-			nc = c + dc[direction];
+			nr = r + dr[direction];      // 다음 행
+			nc = c + dc[direction];      // 다음 열
 
 			// 지금 채우려는 숫자가 K라면 그 좌표를 기록해 둔다.
 			// index는 아직 MAP에 쓰기 전의 값이므로 여기서 비교해야 맞다.
 			if (index == K)
 			{
-				ansR = nr;
-				ansC = nc;
+				ansR = nr;               // K가 놓일 행 기록
+				ansC = nc;               // K가 놓일 열 기록
 			}
 
 			// 숫자를 쓰고 다음 숫자로
 			MAP[nr][nc] = index++;
 
 			// 현재 위치 갱신
-			r = nr;
-			c = nc;
+			r = nr;                      // 현재 행을 다음 칸으로
+			c = nc;                      // 현재 열을 다음 칸으로
 		}
 
 		// 다음 구간을 위해 방향 전환 : 상(0) -> 우(1) -> 하(2) -> 좌(3) -> 상(0)
 		direction++;
-		if (direction == 4)
-			direction = 0;
+		if (direction == 4)              // 좌(3) 다음이면
+			direction = 0;               // 다시 상(0)으로
 	}
 
 	// 완성된 배열
@@ -133,9 +133,9 @@ void makesnail()
 // ---------------------------
 int main()
 {
-	scanf("%d %d", &N, &K);
+	scanf("%d %d", &N, &K);              // 배열 크기 N과 찾을 숫자 K 입력
 
-	makesnail();
+	makesnail();                         // 달팽이 배열 생성 + 출력
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

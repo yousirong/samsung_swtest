@@ -38,13 +38,13 @@
 	  그래서 sum은 long long으로 잡고 출력도 %lld를 쓴다.
 */
 
-#include <stdio.h>
+#include <stdio.h>                  // scanf, printf 사용
 
-#define MAX (1000000 + 50000)
+#define MAX (1000000 + 50000)       // 식당 최대 100만 개 + 여유
 
-typedef long long ll;
+typedef long long ll;               // long long을 ll로 줄여 쓰기
 
-int T;
+int T;                  // 테스트 케이스 수
 
 int N;                  // 식당 개수
 int restaurant[MAX];    // 각 식당의 검사 대상 인원 수
@@ -55,11 +55,11 @@ int leader, member;     // 팀장 1명 / 팀원 1명이 검사할 수 있는 인
 // ---------------------------
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 식당 개수 입력
 
 	// 각 식당의 인원 수
 	for (int i = 0; i < N; i++)
-		scanf("%d", &restaurant[i]);
+		scanf("%d", &restaurant[i]);     // i번 식당 인원 입력
 
 	// 팀장, 팀원의 검사 가능 인원
 	scanf("%d %d", &leader, &member);
@@ -71,9 +71,9 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
 		ll sum = 0;   // 필요한 총 검사관 수 (합이 커질 수 있어 long long)
 
@@ -83,7 +83,7 @@ int main()
 		// 팀장이 leader명을 처리하므로 각 식당의 남은 인원에서 먼저 빼 둔다.
 		// (음수가 되어도 상관없다. 아래에서 > 0 인 경우만 보기 때문)
 		for (int i = 0; i < N; i++)
-			restaurant[i] -= leader;
+			restaurant[i] -= leader;     // 팀장이 검사한 만큼 뺀다
 
 		// 식당 수만큼 팀장이 필요하다
 		sum += N;
@@ -102,8 +102,8 @@ int main()
 			}
 		}
 
-		printf("%lld\n", sum);
+		printf("%lld\n", sum);           // 총 검사관 수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

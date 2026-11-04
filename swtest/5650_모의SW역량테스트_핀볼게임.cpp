@@ -43,35 +43,35 @@
 	      "ball r : &d" -> "%d",   ball.r == c -> ball.c == c
 	  - simulate() 끝의 "impossible case!"는 while(1)을 빠져나오는 길이 없어 실행되지 않는다.
 */
-#include <stdio.h>
+#include <stdio.h>               // scanf, printf, putchar 사용
 
-#define MAX (100+20)
+#define MAX (100+20)             // N 최대 100 + 여유
 
-#define BLACKHOLE (-1)
-#define EMPTY (0)
-#define BLOCK_START (1)
-#define BLOCK_END (5)
-#define WORMHOLE_START (6)
-#define WORMHOLE_END (10)
+#define BLACKHOLE (-1)           // 블랙홀
+#define EMPTY (0)                // 빈 칸
+#define BLOCK_START (1)          // 블록 번호 시작
+#define BLOCK_END (5)            // 블록 번호 끝
+#define WORMHOLE_START (6)       // 웜홀 번호 시작
+#define WORMHOLE_END (10)        // 웜홀 번호 끝
 
-#define LEFT (0)
-#define UP (1)
-#define RIGHT (2)
-#define DOWN (3)
+#define LEFT (0)                 // 왼쪽
+#define UP (1)                   // 위
+#define RIGHT (2)                // 오른쪽
+#define DOWN (3)                 // 아래
 
 // 블록 면에 부딪혔을 때 결과
-#define REFLECT (0)
-#define CHANGE_LEFT (1)
-#define CHANGE_UP (2)
-#define CHANGE_RIGHT (3)
-#define CHANGE_DOWN (4)
+#define REFLECT (0)              // 반사 (반대 방향)
+#define CHANGE_LEFT (1)          // 왼쪽으로 꺾임
+#define CHANGE_UP (2)            // 위로 꺾임
+#define CHANGE_RIGHT (3)         // 오른쪽으로 꺾임
+#define CHANGE_DOWN (4)          // 아래로 꺾임
 
-int T;
-int N;
+int T;                           // 테스트 케이스 수
+int N;                           // 판 크기
 
 // 왼쪽, 위, 오른쪽, 아래
-int dr[] = { 0,-1,0,1 };
-int dc[] = { -1,0,1,0 };
+int dr[] = { 0,-1,0,1 };         // 방향별 행 변화량
+int dc[] = { -1,0,1,0 };         // 방향별 열 변화량
 
 int changeDir[4][5];   // changeDir[진행 방향][결과] = 새 방향
 
@@ -81,95 +81,95 @@ struct BLOCK
 	int type;          // 칸 종류 (-1 ~ 10)
 };
 
-BLOCK MAP[MAX][MAX];
+BLOCK MAP[MAX][MAX];   // 판
 
 struct BALL
 {
-	int r;
-	int c;
-	int dir;
+	int r;             // 행
+	int c;             // 열
+	int dir;           // 진행 방향
 };
 
-BALL ball;
+BALL ball;             // 현재 공
 
 struct WORMHOLE
 {
-	int r;
-	int c;
+	int r;             // 행
+	int c;             // 열
 };
 
 WORMHOLE wormhole[10 + 2][2];   // wormhole[번호][0 / 1] : 같은 번호 웜홀 두 칸
-int wcnt[10 + 2];
+int wcnt[10 + 2];               // 번호별로 지금까지 저장한 웜홀 수
 
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                             // 판 크기 입력
 
-	for (int w = 6; w <= 10; w++) wcnt[w] = 0;
+	for (int w = 6; w <= 10; w++) wcnt[w] = 0;   // 웜홀 개수 초기화
 
 	// 테두리 포함 전부 블록 5(사방 반사)로 -> 벽 역할
 	for (int r = 0; r <= N + 1; r++)
 	{
 		for (int c = 0; c <= N + 1; c++)
 		{
-			MAP[r][c].type = 5;
-			MAP[r][c].direction[LEFT] = REFLECT;
-			MAP[r][c].direction[UP] = REFLECT;
-			MAP[r][c].direction[RIGHT] = REFLECT;
-			MAP[r][c].direction[DOWN] = REFLECT;
+			MAP[r][c].type = 5;                  // 사방 반사 블록
+			MAP[r][c].direction[LEFT] = REFLECT;   // 왼쪽 면 반사
+			MAP[r][c].direction[UP] = REFLECT;     // 위쪽 면 반사
+			MAP[r][c].direction[RIGHT] = REFLECT;  // 오른쪽 면 반사
+			MAP[r][c].direction[DOWN] = REFLECT;   // 아래쪽 면 반사
 
 		}
 	}
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)                 // 1행부터 N행까지
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)             // 1열부터 N열까지
 		{
-			int type;
+			int type;                            // 칸 종류
 
-			scanf("%d", &type);
+			scanf("%d", &type);                  // 칸 종류 입력
 
-			MAP[r][c].type = type;
+			MAP[r][c].type = type;               // 판에 기록
 
 			if (type == 1)        // ◣
 			{
-				MAP[r][c].direction[LEFT] = REFLECT;
-				MAP[r][c].direction[UP] = CHANGE_RIGHT;
-				MAP[r][c].direction[RIGHT] = CHANGE_UP;
-				MAP[r][c].direction[DOWN] = REFLECT;
+				MAP[r][c].direction[LEFT] = REFLECT;        // 왼쪽 면 반사
+				MAP[r][c].direction[UP] = CHANGE_RIGHT;     // 위쪽 면 -> 오른쪽
+				MAP[r][c].direction[RIGHT] = CHANGE_UP;     // 오른쪽 면 -> 위
+				MAP[r][c].direction[DOWN] = REFLECT;        // 아래쪽 면 반사
 			}
 			else if (type == 2)   // ◤
 			{
-				MAP[r][c].direction[LEFT] = REFLECT;
-				MAP[r][c].direction[UP] = REFLECT;
-				MAP[r][c].direction[RIGHT] = CHANGE_DOWN;
-				MAP[r][c].direction[DOWN] = CHANGE_RIGHT;
+				MAP[r][c].direction[LEFT] = REFLECT;        // 왼쪽 면 반사
+				MAP[r][c].direction[UP] = REFLECT;          // 위쪽 면 반사
+				MAP[r][c].direction[RIGHT] = CHANGE_DOWN;   // 오른쪽 면 -> 아래
+				MAP[r][c].direction[DOWN] = CHANGE_RIGHT;   // 아래쪽 면 -> 오른쪽
 			}
 			else if (type == 3)   // ◥
 			{
-				MAP[r][c].direction[LEFT] = CHANGE_DOWN;
-				MAP[r][c].direction[UP] = REFLECT;
-				MAP[r][c].direction[RIGHT] = REFLECT;
-				MAP[r][c].direction[DOWN] = CHANGE_LEFT;
+				MAP[r][c].direction[LEFT] = CHANGE_DOWN;    // 왼쪽 면 -> 아래
+				MAP[r][c].direction[UP] = REFLECT;          // 위쪽 면 반사
+				MAP[r][c].direction[RIGHT] = REFLECT;       // 오른쪽 면 반사
+				MAP[r][c].direction[DOWN] = CHANGE_LEFT;    // 아래쪽 면 -> 왼쪽
 			}
 			else if (type == 4)   // ◢
 			{
-				MAP[r][c].direction[LEFT] = CHANGE_UP;
-				MAP[r][c].direction[UP] = CHANGE_LEFT;
-				MAP[r][c].direction[RIGHT] = REFLECT;
-				MAP[r][c].direction[DOWN] = REFLECT;
+				MAP[r][c].direction[LEFT] = CHANGE_UP;      // 왼쪽 면 -> 위
+				MAP[r][c].direction[UP] = CHANGE_LEFT;      // 위쪽 면 -> 왼쪽
+				MAP[r][c].direction[RIGHT] = REFLECT;       // 오른쪽 면 반사
+				MAP[r][c].direction[DOWN] = REFLECT;        // 아래쪽 면 반사
 			}
 			else if (type == 5)   // ■
 			{
-				MAP[r][c].direction[LEFT] = REFLECT;
+				MAP[r][c].direction[LEFT] = REFLECT;        // 모든 면 반사
 				MAP[r][c].direction[UP] = REFLECT;
 				MAP[r][c].direction[RIGHT] = REFLECT;
 				MAP[r][c].direction[DOWN] = REFLECT;
 			}
 			else if (WORMHOLE_START <= type && type <= WORMHOLE_END)   // 웜홀 위치 저장
 			{
-				wormhole[type][wcnt[type]].r = r;
-				wormhole[type][wcnt[type]++].c = c;
+				wormhole[type][wcnt[type]].r = r;           // 웜홀 행
+				wormhole[type][wcnt[type]++].c = c;         // 웜홀 열, 개수 증가
 			}
 		}
 	}
@@ -177,17 +177,17 @@ void input()
 
 void printMap()   // for debug (오타 2개 : "&d" -> "%d", ball.r == c -> ball.c == c)
 {
-	printf("ball r : &d, c : %d, dir %d\n", ball.r, ball.c, ball.dir);
-	for (int r = 1; r <= N; r++)
+	printf("ball r : &d, c : %d, dir %d\n", ball.r, ball.c, ball.dir);   // 공 상태 출력
+	for (int r = 1; r <= N; r++)                 // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)             // 모든 열
 		{
-			if (ball.r == r && ball.r == c) printf("[] ");
-			else printf("%2d ", MAP[r][c].type);
+			if (ball.r == r && ball.r == c) printf("[] ");   // 공 위치
+			else printf("%2d ", MAP[r][c].type);             // 칸 종류
 		}
-		putchar('\n');
+		putchar('\n');                           // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                               // 빈 줄
 }
 
 
@@ -196,30 +196,30 @@ int simulate(int sr, int sc, int dir)
 {
 	int checkDir[4];   // checkDir[진행 방향] = 블록에서 부딪히는 면 (반대 방향)
 
-	checkDir[LEFT] = RIGHT;
-	checkDir[RIGHT] = LEFT;
-	checkDir[UP] = DOWN;
-	checkDir[DOWN] = UP;
+	checkDir[LEFT] = RIGHT;              // 왼쪽으로 가면 오른쪽 면에 부딪힌다
+	checkDir[RIGHT] = LEFT;              // 오른쪽으로 가면 왼쪽 면에 부딪힌다
+	checkDir[UP] = DOWN;                 // 위로 가면 아래쪽 면에 부딪힌다
+	checkDir[DOWN] = UP;                 // 아래로 가면 위쪽 면에 부딪힌다
 
-	ball.r = sr, ball.c = sc;
-	ball.dir = dir;
+	ball.r = sr, ball.c = sc;            // 출발 위치
+	ball.dir = dir;                      // 출발 방향
 
-	int score = 0;
+	int score = 0;                       // 점수
 
-	while (1)
+	while (1)                            // 끝날 때까지
 	{
 		//printMap();
 
-		int nr, nc, mapType;
+		int nr, nc, mapType;             // 다음 칸 좌표와 종류
 
 		// 한 칸 이동
-		nr = ball.r + dr[ball.dir];
-		nc = ball.c + dc[ball.dir];
+		nr = ball.r + dr[ball.dir];      // 다음 행
+		nc = ball.c + dc[ball.dir];      // 다음 열
 
-		ball.r = nr;
-		ball.c = nc;
+		ball.r = nr;                     // 공 위치 갱신 (행)
+		ball.c = nc;                     // 공 위치 갱신 (열)
 
-		mapType = MAP[nr][nc].type;
+		mapType = MAP[nr][nc].type;      // 도착한 칸 종류
 
 		// 블랙홀이거나 출발 위치로 돌아오면 끝
 		if (mapType == BLACKHOLE || (ball.r == sr && ball.c == sc)) return score;
@@ -227,64 +227,64 @@ int simulate(int sr, int sc, int dir)
 		// 블록 / 벽 : 점수 +1, 부딪힌 면에 따라 방향을 바꾼다
 		if (BLOCK_START <= mapType && mapType <= BLOCK_END)
 		{
-			score++;
-			ball.dir = changeDir[ball.dir][MAP[nr][nc].direction[checkDir[ball.dir]]];
+			score++;                     // 부딪힌 횟수 = 점수
+			ball.dir = changeDir[ball.dir][MAP[nr][nc].direction[checkDir[ball.dir]]];   // 새 방향
 
 		}
 		// 웜홀 : 짝이 되는 다른 웜홀로 순간이동 (방향은 그대로)
 		else if (WORMHOLE_START <= mapType && mapType <= WORMHOLE_END)
 		{
-			if (wormhole[mapType][0].r == nr && wormhole[mapType][0].c == nc)
+			if (wormhole[mapType][0].r == nr && wormhole[mapType][0].c == nc)   // 지금 칸이 0번이면
 			{
-				ball.r = wormhole[mapType][1].r;
+				ball.r = wormhole[mapType][1].r;     // 1번 웜홀로 이동
 				ball.c = wormhole[mapType][1].c;
 			}
-			else
+			else                                     // 지금 칸이 1번이면
 			{
-				ball.r = wormhole[mapType][0].r;
+				ball.r = wormhole[mapType][0].r;     // 0번 웜홀로 이동
 				ball.c = wormhole[mapType][0].c;
 			}
 		}
 	}
 
-	printf("impossible case!\n");
+	printf("impossible case!\n");        // 도달하지 않는 코드
 	return -1; // impossible case
 }
 
 int main()
 {
 	// changeDir[진행 방향][결과] = 새 방향. -1은 나올 수 없는 조합
-	changeDir[LEFT][REFLECT] = RIGHT;
-	changeDir[LEFT][CHANGE_LEFT] = -1;
-	changeDir[LEFT][CHANGE_UP] = UP;
-	changeDir[LEFT][CHANGE_RIGHT] = -1;
-	changeDir[LEFT][CHANGE_DOWN] = DOWN;
+	changeDir[LEFT][REFLECT] = RIGHT;        // 왼쪽 진행 + 반사 -> 오른쪽
+	changeDir[LEFT][CHANGE_LEFT] = -1;       // 불가능
+	changeDir[LEFT][CHANGE_UP] = UP;         // 왼쪽 진행 + 위로 꺾임
+	changeDir[LEFT][CHANGE_RIGHT] = -1;      // 불가능
+	changeDir[LEFT][CHANGE_DOWN] = DOWN;     // 왼쪽 진행 + 아래로 꺾임
 
-	changeDir[UP][REFLECT] = DOWN;
-	changeDir[UP][CHANGE_LEFT] = LEFT;
-	changeDir[UP][CHANGE_UP] = -1;
-	changeDir[UP][CHANGE_RIGHT] = RIGHT;
-	changeDir[UP][CHANGE_DOWN] = -1;
+	changeDir[UP][REFLECT] = DOWN;           // 위 진행 + 반사 -> 아래
+	changeDir[UP][CHANGE_LEFT] = LEFT;       // 위 진행 + 왼쪽으로 꺾임
+	changeDir[UP][CHANGE_UP] = -1;           // 불가능
+	changeDir[UP][CHANGE_RIGHT] = RIGHT;     // 위 진행 + 오른쪽으로 꺾임
+	changeDir[UP][CHANGE_DOWN] = -1;         // 불가능
 
-	changeDir[RIGHT][REFLECT] = LEFT;
-	changeDir[RIGHT][CHANGE_LEFT] = -1;
-	changeDir[RIGHT][CHANGE_UP] = UP;
-	changeDir[RIGHT][CHANGE_RIGHT] = -1;
-	changeDir[RIGHT][CHANGE_DOWN] = DOWN;
+	changeDir[RIGHT][REFLECT] = LEFT;        // 오른쪽 진행 + 반사 -> 왼쪽
+	changeDir[RIGHT][CHANGE_LEFT] = -1;      // 불가능
+	changeDir[RIGHT][CHANGE_UP] = UP;        // 오른쪽 진행 + 위로 꺾임
+	changeDir[RIGHT][CHANGE_RIGHT] = -1;     // 불가능
+	changeDir[RIGHT][CHANGE_DOWN] = DOWN;    // 오른쪽 진행 + 아래로 꺾임
 
-	changeDir[DOWN][REFLECT] = UP;
-	changeDir[DOWN][CHANGE_LEFT] = LEFT;
-	changeDir[DOWN][CHANGE_UP] = -1;
-	changeDir[DOWN][CHANGE_RIGHT] = RIGHT;
-	changeDir[DOWN][CHANGE_DOWN] = -1;
+	changeDir[DOWN][REFLECT] = UP;           // 아래 진행 + 반사 -> 위
+	changeDir[DOWN][CHANGE_LEFT] = LEFT;     // 아래 진행 + 왼쪽으로 꺾임
+	changeDir[DOWN][CHANGE_UP] = -1;         // 불가능
+	changeDir[DOWN][CHANGE_RIGHT] = RIGHT;   // 아래 진행 + 오른쪽으로 꺾임
+	changeDir[DOWN][CHANGE_DOWN] = -1;       // 불가능
 
-	scanf("%d", &T);
+	scanf("%d", &T);                     // 테스트 케이스 수 입력
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 판 입력
 
-		int MAXANS = 0;
+		int MAXANS = 0;                  // 최대 점수
 
 		// 모든 빈 칸 x 4방향
 		for (int r = 1; r <= N; r++)
@@ -293,15 +293,15 @@ int main()
 			{
 				if (MAP[r][c].type != 0) continue;   // 빈 칸에서만 출발
 
-				for (int dir = 0; dir < 4; dir++)
+				for (int dir = 0; dir < 4; dir++)    // 4방향 모두
 				{
-					int score = simulate(r, c, dir);
-					if (MAXANS < score) MAXANS = score;
+					int score = simulate(r, c, dir); // 이 출발의 점수
+					if (MAXANS < score) MAXANS = score;   // 최댓값 갱신
 				}
 			}
 		}
-		printf("#%d %d\n", tc, MAXANS);
+		printf("#%d %d\n", tc, MAXANS);  // 결과 출력
 	}
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 
 }

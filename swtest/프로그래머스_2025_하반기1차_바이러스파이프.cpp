@@ -47,11 +47,11 @@
 	  - 감염 상태 백업은 DFS 지역 배열에 한다. 깊이가 최대 10이라 100칸 x 10 이면 충분하다.
 	  - 행동을 k번 "꼭" 해야 하는 게 아니라 "최대" k번이다. 그래서 매 깊이에서 answer를 갱신한다.
 */
-#include <stdio.h>
+#include <stdio.h>                // scanf, printf 사용
 
-#define MAX (100+5)
+#define MAX (100+5)               // n 최대 100 + 여유
 
-int T;
+int T;                        // 테스트 케이스 수
 
 int N, START, K;              // 배양체 수, 처음 감염된 배양체, 최대 행동 수
 
@@ -61,109 +61,109 @@ int adjCnt[MAX];              // v의 이웃 수
 
 int infected[MAX];            // 1이면 감염
 
-int queue[MAX];
-int rp, wp;
+int queue[MAX];               // BFS용 큐
+int rp, wp;                   // rp: 꺼낼 위치, wp: 넣을 위치
 
-int answer;
+int answer;                   // 최대 감염 수
 
 void input()
 {
-	scanf("%d %d", &N, &START);
+	scanf("%d %d", &N, &START);          // 배양체 수, 처음 감염된 배양체 입력
 
-	for (int v = 1; v <= N; v++)
-		adjCnt[v] = 0;
+	for (int v = 1; v <= N; v++)         // 모든 노드
+		adjCnt[v] = 0;                   // 이웃 수 초기화
 
-	for (int i = 0; i < N - 1; i++)
+	for (int i = 0; i < N - 1; i++)      // 파이프 N-1개
 	{
-		int x, y, type;
+		int x, y, type;                  // 양 끝 노드, 파이프 종류
 
-		scanf("%d %d %d", &x, &y, &type);
+		scanf("%d %d %d", &x, &y, &type);   // 파이프 입력
 
 		// 양방향으로 넣는다
-		adj[x][adjCnt[x]] = y;
-		adjType[x][adjCnt[x]++] = type;
+		adj[x][adjCnt[x]] = y;               // x의 이웃에 y
+		adjType[x][adjCnt[x]++] = type;      // 그 파이프 종류, x 이웃 수 증가
 
-		adj[y][adjCnt[y]] = x;
-		adjType[y][adjCnt[y]++] = type;
+		adj[y][adjCnt[y]] = x;               // y의 이웃에 x
+		adjType[y][adjCnt[y]++] = type;      // 그 파이프 종류, y 이웃 수 증가
 	}
 
-	scanf("%d", &K);
+	scanf("%d", &K);                     // 최대 행동 수 입력
 
-	for (int v = 1; v <= N; v++)
-		infected[v] = 0;
+	for (int v = 1; v <= N; v++)         // 모든 노드
+		infected[v] = 0;                 // 감염 안 됨
 
-	infected[START] = 1;
+	infected[START] = 1;                 // 시작 노드만 감염
 
-	answer = 0;
+	answer = 0;                          // 답 초기화
 }
 
 // type 종류 파이프를 열었다 닫는다. 새로 감염된 배양체 수를 돌려준다.
 int spread(int type)
 {
-	int added = 0;
+	int added = 0;                       // 새로 감염된 수
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 빈 큐
 
 	// 감염된 노드 전부가 시작점이다
 	for (int v = 1; v <= N; v++)
 		if (infected[v] == 1) queue[wp++] = v;
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 노드가 남아 있는 동안
 	{
-		int out = queue[rp++];
+		int out = queue[rp++];           // 큐에서 노드 하나를 꺼낸다
 
-		for (int i = 0; i < adjCnt[out]; i++)
+		for (int i = 0; i < adjCnt[out]; i++)    // 이웃마다
 		{
-			int next = adj[out][i];
+			int next = adj[out][i];              // 이웃 노드
 
 			if (adjType[out][i] != type) continue;   // 닫힌 파이프
-			if (infected[next] == 1) continue;
+			if (infected[next] == 1) continue;       // 이미 감염
 
-			infected[next] = 1;
-			added++;
+			infected[next] = 1;                  // 감염
+			added++;                             // 새로 감염된 수 증가
 
-			queue[wp++] = next;
+			queue[wp++] = next;                  // 이 노드에서 또 번진다
 		}
 	}
 
-	return added;
+	return added;                        // 새로 감염된 수 반환
 }
 
 // depth번 행동을 했고, 직전에 연 종류가 lastType, 지금 감염 수가 count
 void DFS(int depth, int lastType, int count)
 {
-	if (count > answer) answer = count;
+	if (count > answer) answer = count;  // 최댓값 갱신
 
-	if (depth == K) return;
+	if (depth == K) return;              // 행동을 다 썼다
 	if (count == N) return;   // 전부 감염됐으면 더 볼 필요가 없다
 
-	for (int t = 1; t <= 3; t++)
+	for (int t = 1; t <= 3; t++)         // 파이프 종류 A, B, C
 	{
 		if (t == lastType) continue;   // 같은 종류를 연달아 여는 건 의미가 없다
 
-		int backup[MAX];
-		for (int v = 1; v <= N; v++) backup[v] = infected[v];
+		int backup[MAX];                 // 감염 상태 백업
+		for (int v = 1; v <= N; v++) backup[v] = infected[v];   // 백업
 
-		int added = spread(t);
+		int added = spread(t);           // t 종류를 열어 퍼뜨린다
 
 		if (added > 0) DFS(depth + 1, t, count + added);   // 0이면 행동만 버린 것
 
-		for (int v = 1; v <= N; v++) infected[v] = backup[v];
+		for (int v = 1; v <= N; v++) infected[v] = backup[v];   // 원상복구
 	}
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		DFS(0, 0, 1);
+		DFS(0, 0, 1);                    // 행동 0번, 직전 종류 없음, 감염 1개
 
-		printf("%d\n", answer);
+		printf("%d\n", answer);          // 최대 감염 수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

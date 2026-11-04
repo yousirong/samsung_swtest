@@ -40,7 +40,7 @@
 	     어느 경로로 계산해도 temp[half][half]가 들어오므로 회전해도 값이 변하지 않는다.
 */
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
 #define MAX (500 + 50)   // N 최대값보다 여유 있게 선언
 
@@ -54,14 +54,14 @@ int temp[MAX][MAX];      // 회전 직전 상태 스냅샷(읽기 전용으로 �
 // ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &D);
+	scanf("%d %d", &N, &D);              // 배열 크기 N과 회전 각도 D 입력
 
 	// N x N 배열 입력
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 1열부터 N열까지
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // (r, c) 칸의 값 입력
 		}
 	}
 }
@@ -71,11 +71,11 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행에 대해
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 한 행의 모든 칸을
+			printf("%d ", MAP[r][c]);    // 공백으로 구분해 출력
+		putchar('\n');                   // 한 행이 끝나면 줄바꿈
 	}
 }
 
@@ -86,11 +86,11 @@ void printMap()
 // ---------------------------
 void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 모든 열
 		{
-			copy[r][c] = original[r][c];
+			copy[r][c] = original[r][c]; // 한 칸씩 그대로 복사
 		}
 	}
 }
@@ -109,20 +109,20 @@ void rotate45Clockwise()
 	int half = (N + 1) / 2;        // 가운데 인덱스 (N이 홀수라 딱 떨어진다)
 
 	// 1) 가운데 가로 행 -> 주대각선   (half, c) -> (c, c), 열 좌표 보존
-	for (int c = 1; c <= N; c++) arr[c] = temp[half][c];
-	for (int i = 1; i <= N; i++) MAP[i][i] = arr[i];
+	for (int c = 1; c <= N; c++) arr[c] = temp[half][c];       // 가운데 행 값을 버퍼에 담고
+	for (int i = 1; i <= N; i++) MAP[i][i] = arr[i];           // 주대각선에 써 넣는다
 
 	// 2) 주대각선 -> 가운데 세로 열   (i, i) -> (i, half), 행 좌표 보존
-	for (int i = 1; i <= N; i++) arr[i] = temp[i][i];
-	for (int r = 1; r <= N; r++) MAP[r][half] = arr[r];
+	for (int i = 1; i <= N; i++) arr[i] = temp[i][i];          // 주대각선 값을 버퍼에 담고
+	for (int r = 1; r <= N; r++) MAP[r][half] = arr[r];        // 가운데 열에 써 넣는다
 
 	// 3) 가운데 세로 열 -> 부대각선   (r, half) -> (r, N-r+1), 행 좌표 보존
-	for (int r = 1; r <= N; r++) arr[r] = temp[r][half];
-	for (int i = 1; i <= N; i++) MAP[i][N - i + 1] = arr[i];
+	for (int r = 1; r <= N; r++) arr[r] = temp[r][half];       // 가운데 열 값을 버퍼에 담고
+	for (int i = 1; i <= N; i++) MAP[i][N - i + 1] = arr[i];   // 부대각선에 써 넣는다
 
 	// 4) 부대각선 -> 가운데 가로 행   (N-i+1, i) -> (half, i), 열 좌표 보존
-	for (int i = 1; i <= N; i++) arr[i] = temp[N - i + 1][i];
-	for (int c = 1; c <= N; c++) MAP[half][c] = arr[c];
+	for (int i = 1; i <= N; i++) arr[i] = temp[N - i + 1][i];  // 부대각선 값을 (열 기준으로) 버퍼에 담고
+	for (int c = 1; c <= N; c++) MAP[half][c] = arr[c];        // 가운데 행에 써 넣는다
 }
 
 // ---------------------------
@@ -140,20 +140,20 @@ void rotate45CounterClockwise()
 	int half = (N + 1) / 2;        // 가운데 인덱스
 
 	// 1) 가운데 행 -> 부대각선       (half, c) -> (N-c+1, c), 열 좌표 보존
-	for (int c = 1; c <= N; c++) arr[c] = temp[half][c];
-	for (int i = 1; i <= N; i++) MAP[N - i + 1][i] = arr[i];
+	for (int c = 1; c <= N; c++) arr[c] = temp[half][c];       // 가운데 행 값을 버퍼에 담고
+	for (int i = 1; i <= N; i++) MAP[N - i + 1][i] = arr[i];   // 부대각선에 써 넣는다
 
 	// 2) 주대각선 -> 가운데 행       (i, i) -> (half, i), 열 좌표 보존
-	for (int i = 1; i <= N; i++) arr[i] = temp[i][i];
-	for (int c = 1; c <= N; c++) MAP[half][c] = arr[c];
+	for (int i = 1; i <= N; i++) arr[i] = temp[i][i];          // 주대각선 값을 버퍼에 담고
+	for (int c = 1; c <= N; c++) MAP[half][c] = arr[c];        // 가운데 행에 써 넣는다
 
 	// 3) 가운데 열 -> 주대각선       (r, half) -> (r, r), 행 좌표 보존
-	for (int r = 1; r <= N; r++) arr[r] = temp[r][half];
-	for (int i = 1; i <= N; i++) MAP[i][i] = arr[i];
+	for (int r = 1; r <= N; r++) arr[r] = temp[r][half];       // 가운데 열 값을 버퍼에 담고
+	for (int i = 1; i <= N; i++) MAP[i][i] = arr[i];           // 주대각선에 써 넣는다
 
 	// 4) 부대각선 -> 가운데 열       (i, N-i+1) -> (i, half), 행 좌표 보존
-	for (int i = 1; i <= N; i++) arr[i] = temp[i][N - i + 1];
-	for (int r = 1; r <= N; r++) MAP[r][half] = arr[r];
+	for (int i = 1; i <= N; i++) arr[i] = temp[i][N - i + 1];  // 부대각선 값을 (행 기준으로) 버퍼에 담고
+	for (int r = 1; r <= N; r++) MAP[r][half] = arr[r];        // 가운데 열에 써 넣는다
 }
 
 // ---------------------------
@@ -163,7 +163,7 @@ int main()
 {
 	scanf("%d", &T);   // 테스트 케이스 수
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
 		input();   // N, D, 배열 입력
 
@@ -176,9 +176,9 @@ int main()
 		// count번 만큼 45도 회전 반복 (D가 0이면 한 번도 돌지 않는다)
 		for (int c = 0; c < count; c++)
 		{
-			if (D >= 0)
+			if (D >= 0)                      // 각도가 0 이상이면
 				rotate45Clockwise();         // 양수 -> 시계 방향
-			else
+			else                             // 각도가 음수면
 				rotate45CounterClockwise();  // 음수 -> 반시계 방향
 		}
 
@@ -186,5 +186,5 @@ int main()
 		printMap();
 	}
 
-	return 0;
+	return 0;          // 프로그램 정상 종료
 }

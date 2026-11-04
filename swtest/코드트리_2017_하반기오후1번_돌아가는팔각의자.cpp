@@ -45,14 +45,14 @@
 	  이미 확정되어 있다. 그래서 한 번의 훑기로 방향을 이어 붙일 수 있다.
 */
 
-#include <stdio.h>
+#include <stdio.h>                 // scanf, printf 사용
 
-#define MAX (100 + 10)
+#define MAX (100 + 10)             // 명령 최대 개수 + 여유
 
-#define CLOCKWISE (1)
-#define COUTNER_CLOCKWISE (-1)
+#define CLOCKWISE (1)              // 시계 방향
+#define COUTNER_CLOCKWISE (-1)     // 반시계 방향
 
-int T;
+int T;                     // 테스트 케이스 수
 
 int K;                     // 회전 명령 개수
 int chair[5][10];          // chair[의자 번호 1~4][톱니 1~8]
@@ -70,15 +70,15 @@ void input()
 	{
 		for (int index = 1; index <= 8; index++)
 		{
-			scanf("%1d", &chair[number][index]);
+			scanf("%1d", &chair[number][index]);   // 톱니 상태 한 자리 입력
 		}
 	}
 
-	scanf("%d", &K);
+	scanf("%d", &K);                     // 명령 개수 입력
 
-	for (int i = 0; i < K; i++)
+	for (int i = 0; i < K; i++)          // 명령마다
 	{
-		scanf("%d %d", &chairNumber[i], &directions[i]);
+		scanf("%d %d", &chairNumber[i], &directions[i]);   // 의자 번호와 방향 입력
 	}
 }
 
@@ -90,27 +90,27 @@ void input()
 // ---------------------------
 void rotate(int number, int direction)
 {
-	int tmp;
+	int tmp;                             // 밀려 나가는 톱니 임시 보관
 
-	if (direction == COUTNER_CLOCKWISE)
+	if (direction == COUTNER_CLOCKWISE)  // 반시계면
 	{
 		// 앞에서부터 한 칸씩 당기고, 맨 앞 값을 뒤로 보낸다
 		tmp = chair[number][1];
 
 		for (int index = 1; index <= 7; index++)
-			chair[number][index] = chair[number][index + 1];
+			chair[number][index] = chair[number][index + 1];   // 한 칸씩 앞으로
 
-		chair[number][8] = tmp;
+		chair[number][8] = tmp;          // 맨 앞 값을 맨 뒤로
 	}
-	else
+	else                                 // 시계면
 	{
 		// 뒤에서부터 한 칸씩 밀고, 맨 뒤 값을 앞으로 보낸다
 		tmp = chair[number][8];
 
 		for (int index = 8; index >= 2; index--)
-			chair[number][index] = chair[number][index - 1];
+			chair[number][index] = chair[number][index - 1];   // 한 칸씩 뒤로
 
-		chair[number][1] = tmp;
+		chair[number][1] = tmp;          // 맨 뒤 값을 맨 앞으로
 	}
 }
 
@@ -119,14 +119,14 @@ void rotate(int number, int direction)
 // ---------------------------
 void simulate()
 {
-	for (int k = 0; k < K; k++)
+	for (int k = 0; k < K; k++)          // 명령을 순서대로
 	{
 		// check[i] : 이번 명령에서 i번 의자가 돌 방향
 		//            0이면 돌지 않음, 1이면 시계, -1이면 반시계
 		int check[5 + 1] = { 0 };
 
-		int target = chairNumber[k];
-		int direction = directions[k];
+		int target = chairNumber[k];     // 직접 돌릴 의자
+		int direction = directions[k];   // 그 방향
 
 		// 직접 지목된 의자는 무조건 그 방향으로 돈다
 		check[target] = direction;
@@ -136,20 +136,20 @@ void simulate()
 		// 다르면 오른쪽 의자는 나와 반대 방향으로 돌고, 같으면 거기서 멈춘다.
 		for (int right = target; right <= 3; right++)
 		{
-			if (chair[right][3] != chair[right + 1][7])
-				check[right + 1] = check[right] * (-1);
-			else
-				break;
+			if (chair[right][3] != chair[right + 1][7])      // 맞닿은 극이 다르면
+				check[right + 1] = check[right] * (-1);      // 오른쪽은 반대 방향
+			else                                             // 같으면
+				break;                                       // 전파 끝
 		}
 
 		// ----- 왼쪽으로 전파 -----
 		// 내 9시 톱니와 왼쪽 의자의 3시 톱니를 비교.
 		for (int left = target; left >= 2; left--)
 		{
-			if (chair[left][7] != chair[left - 1][3])
-				check[left - 1] = check[left] * (-1);
-			else
-				break;
+			if (chair[left][7] != chair[left - 1][3])        // 맞닿은 극이 다르면
+				check[left - 1] = check[left] * (-1);        // 왼쪽은 반대 방향
+			else                                             // 같으면
+				break;                                       // 전파 끝
 		}
 
 		// ----- 판정이 모두 끝난 뒤에 한꺼번에 회전 -----
@@ -158,8 +158,8 @@ void simulate()
 		// 중간에 돌려 버리면 다음 비교가 이미 바뀐 톱니를 보게 되어 결과가 틀어진다.
 		for (int i = 1; i <= 4; i++)
 		{
-			if (check[i] != 0)
-				rotate(i, check[i]);
+			if (check[i] != 0)           // 돌기로 정해졌으면
+				rotate(i, check[i]);     // 그 방향으로 회전
 		}
 	}
 }
@@ -183,10 +183,10 @@ int getScore()
 	//     mul *= 2;
 	// }
 
-	return (chair[1][1] * 1) +
-		(chair[2][1] * 2) +
-		(chair[3][1] * 4) +
-		(chair[4][1] * 8);
+	return (chair[1][1] * 1) +           // 1번 의자 1점
+		(chair[2][1] * 2) +              // 2번 의자 2점
+		(chair[3][1] * 4) +              // 3번 의자 4점
+		(chair[4][1] * 8);               // 4번 의자 8점
 }
 
 int main()
@@ -195,14 +195,14 @@ int main()
 	// scanf("%d", &T);
 	T = 1;
 
-	for (int tc = 1; tc <= T; tc++)
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		simulate();
+		simulate();                      // 명령 수행
 
-		printf("%d\n", getScore());
+		printf("%d\n", getScore());      // 점수 출력
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

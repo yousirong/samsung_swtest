@@ -57,7 +57,7 @@
           for (int k = 1; k <= 5; k++) next[32][k] = 32;   // score[32] == 0 이라 점수도 안 늘어난다
 */
 
-#include <stdio.h>
+#include <stdio.h>             // scanf, printf, putchar 사용
 
 // 이동 횟수는 10번
 #define MAX (10 + 3)
@@ -68,7 +68,7 @@
 // 도착 지점 번호
 #define DESTINATION (32)
 
-int T;
+int T;                         // 테스트 케이스 수
 
 // move[i] : i번째 턴에 움직일 칸 수
 int move[MAX];
@@ -82,7 +82,7 @@ int score[MAX_BOARD];
 // num_of_cases[i] : i번째 턴에 고른 말 번호 (1~4)
 int num_of_cases[MAX];
 
-int maxAnswer;
+int maxAnswer;                 // 최대 점수
 
 /*
     입력 + 보드 표 구성
@@ -92,30 +92,30 @@ int maxAnswer;
 */
 void input()
 {
-    for (int i = 0; i < 10; i++) scanf("%d", &move[i]);
+    for (int i = 0; i < 10; i++) scanf("%d", &move[i]);   // 10턴의 이동 칸 수 입력
 
     // -------------------------
     // 칸별 점수
     // -------------------------
     // 바깥 기본 경로는 2씩 늘어난다 (score[i] = 2 * i)
-    score[1] = 2;   score[2] = 4;   score[3] = 6;   score[4] = 8;   score[5] = 10;
-    score[6] = 12;  score[7] = 14;  score[8] = 16;  score[9] = 18;  score[10] = 20;
-    score[11] = 22; score[12] = 24; score[13] = 26; score[14] = 28; score[15] = 30;
-    score[16] = 32; score[17] = 34; score[18] = 36; score[19] = 38;
+    score[1] = 2;   score[2] = 4;   score[3] = 6;   score[4] = 8;   score[5] = 10;    // 1 ~ 5번 칸
+    score[6] = 12;  score[7] = 14;  score[8] = 16;  score[9] = 18;  score[10] = 20;   // 6 ~ 10번 칸
+    score[11] = 22; score[12] = 24; score[13] = 26; score[14] = 28; score[15] = 30;   // 11 ~ 15번 칸
+    score[16] = 32; score[17] = 34; score[18] = 36; score[19] = 38;                   // 16 ~ 19번 칸
 
     // 지름길과 가운데 공통 구간
-    score[20] = 13;
-    score[21] = 16;
-    score[22] = 19;
-    score[23] = 25;
-    score[24] = 26;
-    score[25] = 27;
-    score[26] = 28;
-    score[27] = 24;
-    score[28] = 22;
-    score[29] = 30;
-    score[30] = 35;
-    score[31] = 40;
+    score[20] = 13;            // 10점 지름길 1칸째
+    score[21] = 16;            // 10점 지름길 2칸째
+    score[22] = 19;            // 10점 지름길 3칸째
+    score[23] = 25;            // 가운데
+    score[24] = 26;            // 30점 지름길 3칸째
+    score[25] = 27;            // 30점 지름길 2칸째
+    score[26] = 28;            // 30점 지름길 1칸째
+    score[27] = 24;            // 20점 지름길 2칸째
+    score[28] = 22;            // 20점 지름길 1칸째
+    score[29] = 30;            // 가운데 다음
+    score[30] = 35;            // 그다음
+    score[31] = 40;            // 40점 칸
     // score[32](도착점)은 0으로 둔다
 
     // -------------------------
@@ -123,60 +123,60 @@ void input()
     // -------------------------
 
     // 시작점
-    next[0][1] = 1; next[0][2] = 2; next[0][3] = 3; next[0][4] = 4; next[0][5] = 5;
+    next[0][1] = 1; next[0][2] = 2; next[0][3] = 3; next[0][4] = 4; next[0][5] = 5;   // 0번에서 1 ~ 5칸
 
     // 바깥 경로 (지름길 입구 직전까지는 그냥 +k)
-    next[1][1] = 2; next[1][2] = 3; next[1][3] = 4; next[1][4] = 5; next[1][5] = 6;
-    next[2][1] = 3; next[2][2] = 4; next[2][3] = 5; next[2][4] = 6; next[2][5] = 7;
-    next[3][1] = 4; next[3][2] = 5; next[3][3] = 6; next[3][4] = 7; next[3][5] = 8;
-    next[4][1] = 5; next[4][2] = 6; next[4][3] = 7; next[4][4] = 8; next[4][5] = 9;
+    next[1][1] = 2; next[1][2] = 3; next[1][3] = 4; next[1][4] = 5; next[1][5] = 6;   // 1번에서 1 ~ 5칸
+    next[2][1] = 3; next[2][2] = 4; next[2][3] = 5; next[2][4] = 6; next[2][5] = 7;   // 2번에서 1 ~ 5칸
+    next[3][1] = 4; next[3][2] = 5; next[3][3] = 6; next[3][4] = 7; next[3][5] = 8;   // 3번에서 1 ~ 5칸
+    next[4][1] = 5; next[4][2] = 6; next[4][3] = 7; next[4][4] = 8; next[4][5] = 9;   // 4번에서 1 ~ 5칸
 
     // 10점 칸(5번)은 지름길 입구다. 여기서 출발하면 무조건 지름길로 들어간다.
-    next[5][1] = 20; next[5][2] = 21; next[5][3] = 22; next[5][4] = 23; next[5][5] = 29;
+    next[5][1] = 20; next[5][2] = 21; next[5][3] = 22; next[5][4] = 23; next[5][5] = 29;   // 5번에서 지름길로
 
-    next[6][1] = 7;  next[6][2] = 8;  next[6][3] = 9;  next[6][4] = 10; next[6][5] = 11;
-    next[7][1] = 8;  next[7][2] = 9;  next[7][3] = 10; next[7][4] = 11; next[7][5] = 12;
-    next[8][1] = 9;  next[8][2] = 10; next[8][3] = 11; next[8][4] = 12; next[8][5] = 13;
-    next[9][1] = 10; next[9][2] = 11; next[9][3] = 12; next[9][4] = 13; next[9][5] = 14;
+    next[6][1] = 7;  next[6][2] = 8;  next[6][3] = 9;  next[6][4] = 10; next[6][5] = 11;   // 6번에서 1 ~ 5칸
+    next[7][1] = 8;  next[7][2] = 9;  next[7][3] = 10; next[7][4] = 11; next[7][5] = 12;   // 7번에서 1 ~ 5칸
+    next[8][1] = 9;  next[8][2] = 10; next[8][3] = 11; next[8][4] = 12; next[8][5] = 13;   // 8번에서 1 ~ 5칸
+    next[9][1] = 10; next[9][2] = 11; next[9][3] = 12; next[9][4] = 13; next[9][5] = 14;   // 9번에서 1 ~ 5칸
 
     // 20점 칸(10번) 지름길 입구
-    next[10][1] = 28; next[10][2] = 27; next[10][3] = 23; next[10][4] = 29; next[10][5] = 30;
+    next[10][1] = 28; next[10][2] = 27; next[10][3] = 23; next[10][4] = 29; next[10][5] = 30;   // 10번에서 지름길로
 
-    next[11][1] = 12; next[11][2] = 13; next[11][3] = 14; next[11][4] = 15; next[11][5] = 16;
-    next[12][1] = 13; next[12][2] = 14; next[12][3] = 15; next[12][4] = 16; next[12][5] = 17;
-    next[13][1] = 14; next[13][2] = 15; next[13][3] = 16; next[13][4] = 17; next[13][5] = 18;
-    next[14][1] = 15; next[14][2] = 16; next[14][3] = 17; next[14][4] = 18; next[14][5] = 19;
+    next[11][1] = 12; next[11][2] = 13; next[11][3] = 14; next[11][4] = 15; next[11][5] = 16;   // 11번에서 1 ~ 5칸
+    next[12][1] = 13; next[12][2] = 14; next[12][3] = 15; next[12][4] = 16; next[12][5] = 17;   // 12번에서 1 ~ 5칸
+    next[13][1] = 14; next[13][2] = 15; next[13][3] = 16; next[13][4] = 17; next[13][5] = 18;   // 13번에서 1 ~ 5칸
+    next[14][1] = 15; next[14][2] = 16; next[14][3] = 17; next[14][4] = 18; next[14][5] = 19;   // 14번에서 1 ~ 5칸
 
     // 30점 칸(15번) 지름길 입구
-    next[15][1] = 26; next[15][2] = 25; next[15][3] = 24; next[15][4] = 23; next[15][5] = 29;
+    next[15][1] = 26; next[15][2] = 25; next[15][3] = 24; next[15][4] = 23; next[15][5] = 29;   // 15번에서 지름길로
 
     // 바깥 경로의 마지막 구간. 넘치면 그대로 도착점(32)에 멈춘다.
-    next[16][1] = 17; next[16][2] = 18; next[16][3] = 19; next[16][4] = 31; next[16][5] = 32;
-    next[17][1] = 18; next[17][2] = 19; next[17][3] = 31; next[17][4] = 32; next[17][5] = 32;
-    next[18][1] = 19; next[18][2] = 31; next[18][3] = 32; next[18][4] = 32; next[18][5] = 32;
-    next[19][1] = 31; next[19][2] = 32; next[19][3] = 32; next[19][4] = 32; next[19][5] = 32;
+    next[16][1] = 17; next[16][2] = 18; next[16][3] = 19; next[16][4] = 31; next[16][5] = 32;   // 16번에서 1 ~ 5칸
+    next[17][1] = 18; next[17][2] = 19; next[17][3] = 31; next[17][4] = 32; next[17][5] = 32;   // 17번에서 1 ~ 5칸
+    next[18][1] = 19; next[18][2] = 31; next[18][3] = 32; next[18][4] = 32; next[18][5] = 32;   // 18번에서 1 ~ 5칸
+    next[19][1] = 31; next[19][2] = 32; next[19][3] = 32; next[19][4] = 32; next[19][5] = 32;   // 19번에서 1 ~ 5칸
 
     // 10점 지름길 내부
-    next[20][1] = 21; next[20][2] = 22; next[20][3] = 23; next[20][4] = 29; next[20][5] = 30;
-    next[21][1] = 22; next[21][2] = 23; next[21][3] = 29; next[21][4] = 30; next[21][5] = 31;
-    next[22][1] = 23; next[22][2] = 29; next[22][3] = 30; next[22][4] = 31; next[22][5] = 32;
+    next[20][1] = 21; next[20][2] = 22; next[20][3] = 23; next[20][4] = 29; next[20][5] = 30;   // 20번에서 1 ~ 5칸
+    next[21][1] = 22; next[21][2] = 23; next[21][3] = 29; next[21][4] = 30; next[21][5] = 31;   // 21번에서 1 ~ 5칸
+    next[22][1] = 23; next[22][2] = 29; next[22][3] = 30; next[22][4] = 31; next[22][5] = 32;   // 22번에서 1 ~ 5칸
 
     // 가운데(25점) 이후 공통 경로
-    next[23][1] = 29; next[23][2] = 30; next[23][3] = 31; next[23][4] = 32; next[23][5] = 32;
+    next[23][1] = 29; next[23][2] = 30; next[23][3] = 31; next[23][4] = 32; next[23][5] = 32;   // 23번(가운데)에서 1 ~ 5칸
 
     // 30점 지름길 내부
-    next[24][1] = 23; next[24][2] = 29; next[24][3] = 30; next[24][4] = 31; next[24][5] = 32;
-    next[25][1] = 24; next[25][2] = 23; next[25][3] = 29; next[25][4] = 30; next[25][5] = 31;
-    next[26][1] = 25; next[26][2] = 24; next[26][3] = 23; next[26][4] = 29; next[26][5] = 30;
+    next[24][1] = 23; next[24][2] = 29; next[24][3] = 30; next[24][4] = 31; next[24][5] = 32;   // 24번에서 1 ~ 5칸
+    next[25][1] = 24; next[25][2] = 23; next[25][3] = 29; next[25][4] = 30; next[25][5] = 31;   // 25번에서 1 ~ 5칸
+    next[26][1] = 25; next[26][2] = 24; next[26][3] = 23; next[26][4] = 29; next[26][5] = 30;   // 26번에서 1 ~ 5칸
 
     // 20점 지름길 내부
-    next[27][1] = 23; next[27][2] = 29; next[27][3] = 30; next[27][4] = 31; next[27][5] = 32;
-    next[28][1] = 27; next[28][2] = 23; next[28][3] = 29; next[28][4] = 30; next[28][5] = 31;
+    next[27][1] = 23; next[27][2] = 29; next[27][3] = 30; next[27][4] = 31; next[27][5] = 32;   // 27번에서 1 ~ 5칸
+    next[28][1] = 27; next[28][2] = 23; next[28][3] = 29; next[28][4] = 30; next[28][5] = 31;   // 28번에서 1 ~ 5칸
 
     // 도착 직전 공통 구간
-    next[29][1] = 30; next[29][2] = 31; next[29][3] = 32; next[29][4] = 32; next[29][5] = 32;
-    next[30][1] = 31; next[30][2] = 32; next[30][3] = 32; next[30][4] = 32; next[30][5] = 32;
-    next[31][1] = 32; next[31][2] = 32; next[31][3] = 32; next[31][4] = 32; next[31][5] = 32;
+    next[29][1] = 30; next[29][2] = 31; next[29][3] = 32; next[29][4] = 32; next[29][5] = 32;   // 29번에서 1 ~ 5칸
+    next[30][1] = 31; next[30][2] = 32; next[30][3] = 32; next[30][4] = 32; next[30][5] = 32;   // 30번에서 1 ~ 5칸
+    next[31][1] = 32; next[31][2] = 32; next[31][3] = 32; next[31][4] = 32; next[31][5] = 32;   // 31번에서 1 ~ 5칸
 }
 
 /*
@@ -194,14 +194,14 @@ int simulate()
     // 각 칸에 말이 있는지
     bool board[MAX_BOARD] = { 0 };
 
-    int sum = 0;
+    int sum = 0;                         // 점수 합
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 10; i++)         // 10턴
     {
         int horseNumber = num_of_cases[i];   // 이번 턴에 고른 말
         int moveCount = move[i];             // 이번 턴의 칸 수
 
-        int currentPos = horsePos[horseNumber];
+        int currentPos = horsePos[horseNumber];   // 그 말의 현재 위치
 
         // 판의 모든 규칙이 이 한 줄에 들어 있다
         int nextPos = next[currentPos][moveCount];
@@ -210,7 +210,7 @@ int simulate()
         if (nextPos != DESTINATION && board[nextPos] == true)
             return 0;
 
-        horsePos[horseNumber] = nextPos;
+        horsePos[horseNumber] = nextPos; // 말 위치 갱신
 
         board[currentPos] = false;   // 있던 칸을 비우고
         board[nextPos] = true;       // 새 칸을 차지한다
@@ -219,7 +219,7 @@ int simulate()
         sum += score[nextPos];
     }
 
-    return sum;
+    return sum;                          // 점수 합 반환
 }
 
 /*
@@ -227,9 +227,9 @@ int simulate()
 */
 void printCases()
 {
-    for (int i = 0; i < 10; i++)
-        printf("%d ", num_of_cases[i]);
-    putchar('\n');
+    for (int i = 0; i < 10; i++)         // 10턴
+        printf("%d ", num_of_cases[i]);  // 고른 말 출력
+    putchar('\n');                       // 줄바꿈
 }
 
 /*
@@ -237,20 +237,20 @@ void printCases()
 */
 void DFS(int depth)
 {
-    if (depth == 10)
+    if (depth == 10)                     // 10턴을 다 정했으면
     {
         //printCases();
 
-        int tmp = simulate();
+        int tmp = simulate();            // 실제로 굴려 본다
 
-        if (maxAnswer < tmp) maxAnswer = tmp;
-        return;
+        if (maxAnswer < tmp) maxAnswer = tmp;   // 최댓값 갱신
+        return;                          // 되돌아간다
     }
 
-    for (int i = 1; i <= 4; i++)
+    for (int i = 1; i <= 4; i++)         // 말 1 ~ 4
     {
-        num_of_cases[depth] = i;
-        DFS(depth + 1);
+        num_of_cases[depth] = i;         // 이번 턴에 i번 말
+        DFS(depth + 1);                  // 다음 턴
     }
 }
 
@@ -260,16 +260,16 @@ int main()
     // scanf("%d", &T);
     T = 1;
 
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
+        input();                         // 입력 + 표 만들기
 
-        maxAnswer = 0;
+        maxAnswer = 0;                   // 답 초기화
 
-        DFS(0);
+        DFS(0);                          // 말 선택 탐색
 
-        printf("%d\n", maxAnswer);
+        printf("%d\n", maxAnswer);       // 결과 출력
     }
 
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

@@ -37,146 +37,146 @@
 	  [확인 필요] 벽면 조각을 다 쓰면(pcnt > M) 0을 채우게 된다.
 	              문제에서 조각이 충분히 주어진다고 보고 검사하지 않는다.
 */
-#include <stdio.h>
+#include <stdio.h>                       // scanf, printf, putchar 사용
 
-#define MAX (5+3)
+#define MAX (5+3)                        // 5 x 5 + 테두리 여유
 //#define DEBUG
-int T;
+int T;                                   // 테스트 케이스 수
 
-int K, M;
-int MAP[MAX][MAX];
-bool visit[MAX][MAX];
-int piece[300 + 50];
-int pcnt;
+int K, M;                                // 탐사 횟수, 벽면 조각 수
+int MAP[MAX][MAX];                       // 유적 격자
+bool visit[MAX][MAX];                    // BFS 방문 표시
+int piece[300 + 50];                     // 벽면 조각 번호들
+int pcnt;                                // 다음에 쓸 벽면 조각 위치
 
-struct RC
+struct RC                                // 좌표
 {
-	int r;
-	int c;
+	int r;                               // 행
+	int c;                               // 열
 };
 
-RC queue[MAX * MAX];
+RC queue[MAX * MAX];                     // BFS 큐
 
 // 상, 우, 하, 좌
-int dr[] = { -1,0,1,0 };
-int dc[] = { 0,1,0,-1 };
+int dr[] = { -1,0,1,0 };                 // 방향별 행 변화량
+int dc[] = { 0,1,0,-1 };                 // 방향별 열 변화량
 
 void input()
 {
-	scanf("%d %d", &K, &M);
+	scanf("%d %d", &K, &M);              // 탐사 횟수, 조각 수 입력
 
-	for (int r = 1; r <= 5; r++)
+	for (int r = 1; r <= 5; r++)         // 5 x 5 격자
 		for (int c = 1; c <= 5; c++)
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 유물 번호 입력
 
-	pcnt = 0;
+	pcnt = 0;                            // 벽면 조각 위치 초기화
 
-	for (int p = 0; p < M; p++) scanf("%d", &piece[p]);
+	for (int p = 0; p < M; p++) scanf("%d", &piece[p]);   // 벽면 조각 입력
 }
 
-void printMap(int map[MAX][MAX])
+void printMap(int map[MAX][MAX])         // for debug
 {
-	for (int r = 1; r <= 5; r++)
+	for (int r = 1; r <= 5; r++)         // 모든 행
 	{
-		for (int c = 1; c <= 5; c++)
-			printf("%d ", map[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= 5; c++)     // 모든 열
+			printf("%d ", map[r][c]);    // 값 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
-void copyMap(int copy[MAX][MAX], int original[MAX][MAX])
+void copyMap(int copy[MAX][MAX], int original[MAX][MAX])   // 격자 복사
 {
 	for (int i = 1; i <= 5; i++)
 		for (int k = 1; k <= 5; k++)
 			copy[i][k] = original[i][k];
 }
 
-void rotate(int map[MAX][MAX], int sr, int sc)
+void rotate(int map[MAX][MAX], int sr, int sc)   // (sr, sc)부터 3 x 3 시계 방향 90도 회전
 {
-	int tmpMAP[MAX][MAX] = { 0 };
+	int tmpMAP[MAX][MAX] = { 0 };        // 회전 전 복사본
 
-	int size = 3;
-	for (int r = 0; r < size; r++)
+	int size = 3;                        // 회전 크기
+	for (int r = 0; r < size; r++)       // 3 x 3 부분 복사
 		for (int c = 0; c < size; c++)
 			tmpMAP[r][c] = map[sr + r][sc + c];
 
-	for (int r = 0; r < size; r++)
+	for (int r = 0; r < size; r++)       // 회전해서 다시 쓰기
 		for (int c = 0; c < size; c++)
 			map[sr + r][sc + c] = tmpMAP[size - 1 - c][r];
 	// (r, c) <- (2-c, r) 가 시계 방향 90도. 180, 270도는 이 함수를 두 번, 세 번 부른다.
 }
 
-int BFS(int map[MAX][MAX], int r, int c)
+int BFS(int map[MAX][MAX], int r, int c) // (r, c)와 같은 번호 덩어리 찾기, 3개 이상이면 지우고 개수 반환
 {
-	int rp, wp, number;
+	int rp, wp, number;                  // 큐 위치, 찾는 번호
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 큐 초기화
 
-	number = map[r][c];
+	number = map[r][c];                  // 기준 번호
 
-	queue[wp].r = r;
+	queue[wp].r = r;                     // 시작 칸 큐에 넣기
 	queue[wp++].c = c;
 
-	visit[r][c] = true;
+	visit[r][c] = true;                  // 방문 표시
 
-	while (rp < wp)
+	while (rp < wp)                      // 큐가 빌 때까지
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 하나 꺼내기
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)      // 4방향
 		{
-			int nr = out.r + dr[i];
-			int nc = out.c + dc[i];
+			int nr = out.r + dr[i];      // 이웃 행
+			int nc = out.c + dc[i];      // 이웃 열
 
-			if (map[nr][nc] != number || visit[nr][nc] == true) continue;
+			if (map[nr][nc] != number || visit[nr][nc] == true) continue;   // 다른 번호거나 방문함
 
-			queue[wp].r = nr;
+			queue[wp].r = nr;            // 큐에 넣기
 			queue[wp++].c = nc;
 
-			visit[nr][nc] = true;
+			visit[nr][nc] = true;        // 방문 표시
 		}
 	}
 
 	if (wp < 3)return 0;
 	// 3개 미만이면 유물이 아니다. 이미 visit은 찍혀 있어 다시 보지 않는다.
-	for (int i = 0; i < wp; i++)
+	for (int i = 0; i < wp; i++)         // 덩어리의 모든 칸
 	{
-		int r, c;
+		int r, c;                        // 칸 좌표
 
 		r = queue[i].r;
 		c = queue[i].c;
 
-		map[r][c] = 0;
+		map[r][c] = 0;                   // 유물 지우기
 	}
 
-	return wp;
+	return wp;                           // 지운 개수 반환
 }
 
 
-int getItem(int map[MAX][MAX])
+int getItem(int map[MAX][MAX])           // 격자 전체에서 유물 획득
 {
-	for (int r = 1; r <= 5; r++)
+	for (int r = 1; r <= 5; r++)         // 방문 초기화
 		for (int c = 1; c <= 5; c++)
 			visit[r][c] = false;
 
-	int sum = 0;
-	for (int r = 1; r <= 5; r++)
+	int sum = 0;                         // 얻은 가치 합
+	for (int r = 1; r <= 5; r++)         // 모든 칸
 	{
 		for (int c = 1; c <= 5; c++)
 		{
-			if (visit[r][c] == true) continue;
+			if (visit[r][c] == true) continue;   // 이미 본 칸 제외
 
-			int count = BFS(map, r, c);
+			int count = BFS(map, r, c);  // 덩어리 확인
 
-			sum += count;
+			sum += count;                // 가치 누적
 		}
 	}
 
-	return sum;
+	return sum;                          // 반환
 }
 
-void setItem(int map[MAX][MAX])
+void setItem(int map[MAX][MAX])          // 빈 칸에 벽면 조각 채우기
 {
 	for (int c = 1; c <= 5; c++)
 		for (int r = 5; r >= 1; r--)
@@ -184,10 +184,10 @@ void setItem(int map[MAX][MAX])
 			if (map[r][c] == 0) map[r][c] = piece[pcnt++];
 }
 
-int simulate()
+int simulate()                           // 탐사 1번, 얻은 가치 반환
 {
-	int maxItemCount = 0;
-	int maxMAP[MAX][MAX] = { 0 };
+	int maxItemCount = 0;                // 최대 1차 획득 가치
+	int maxMAP[MAX][MAX] = { 0 };        // 그때의 격자
 	// 회전 각도가 작고
 	for (int rot = 1; rot <= 3; rot++)
 		// 27가지(각도 3 x 열 3 x 행 3)를 전부 해 보고 가장 좋은 것을 고른다.
@@ -198,18 +198,18 @@ int simulate()
 			// 행이 작은 순서대로
 			for (int r = 1; r <= 3; r++)
 			{
-				int tmpMAP[MAX][MAX] = { 0 };
+				int tmpMAP[MAX][MAX] = { 0 };   // 시험용 격자
 
-				copyMap(tmpMAP, MAP);
+				copyMap(tmpMAP, MAP);           // 원본 복사
 
-				for (int rotCount = 1; rotCount <= rot; rotCount++)
-					rotate(tmpMAP, r, c);
+				for (int rotCount = 1; rotCount <= rot; rotCount++)   // 각도만큼
+					rotate(tmpMAP, r, c);                             // 90도씩 회전
 
-				int itemCount = getItem(tmpMAP);
-				if (maxItemCount < itemCount)
+				int itemCount = getItem(tmpMAP);   // 1차 획득 가치
+				if (maxItemCount < itemCount)      // 더 크면
 				{
-					maxItemCount = itemCount;
-					copyMap(maxMAP, tmpMAP);
+					maxItemCount = itemCount;      // 최대값 갱신
+					copyMap(maxMAP, tmpMAP);       // 격자 저장
 //#ifdef DEBUG
 //					printf("최댓값 갱신: %d (유물 제거 후)\n", itemCount);  // ② 제거 결과 확인
 //					printMap(tmpMAP);
@@ -222,40 +222,40 @@ int simulate()
 	if(maxItemCount == 0) return 0;
 	// 어떤 회전으로도 유물을 못 얻으면 탐사가 끝난다 (격자도 그대로 둔다).
 
-	int sum = maxItemCount;
-	while (1)
+	int sum = maxItemCount;              // 총 가치
+	while (1)                            // 연쇄 획득
 	{
-		setItem(maxMAP);
+		setItem(maxMAP);                 // 빈 칸 채우기
 
-		int itemCount = getItem(maxMAP);
+		int itemCount = getItem(maxMAP); // 다시 획득
 
-		if (itemCount == 0) break;
+		if (itemCount == 0) break;       // 더 없으면 끝
 
-		sum += itemCount;
+		sum += itemCount;                // 누적
 	}
-	copyMap(MAP, maxMAP);
+	copyMap(MAP, maxMAP);                // 결과를 원본에 반영
 
 
-	return sum;
+	return sum;                          // 이번 탐사 가치 반환
 }
 
 int main()
 {
 	//scanf("%d", &T);
-	T = 1;
-	for (int tc = 1; tc <= T; tc++)
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
 	{
-		input();
+		input();                         // 입력
 
-		for (int k = 0; k < K; k++)
+		for (int k = 0; k < K; k++)      // K번 탐사
 		{
-			int result = simulate();
-			
-			if (result == 0)break;
+			int result = simulate();     // 탐사 1번
 
-			printf("%d ", result);
+			if (result == 0)break;       // 유물이 없으면 종료
+
+			printf("%d ", result);       // 결과 출력
 		}
 	}
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

@@ -56,25 +56,25 @@
 	  - #include <string.h>는 C 문자열 함수 헤더이고, 템플릿의 <string>(C++ string)과는 다르다.
 	    이 코드는 둘 다 쓰지 않으므로 어느 쪽이든 상관없다.
 */
-#include <stdio.h>
-#include <string.h>
-#include <vector>
+#include <stdio.h>               // printf 등 (제출 템플릿 그대로)
+#include <string.h>              // C 문자열 함수 (실제로는 사용 안 함)
+#include <vector>                // 프로그래머스 템플릿 헤더
 
-using namespace std;
+using namespace std;             // std:: 생략
 
-int T;
+int T;                   // 테스트 케이스 수 (사용 안 함)
 
 long long DIST, SPLIT;   // 분배 노드 최대 개수, 분배도 최댓값
 
 int A, B;                // 2층 개수, 3층 개수
 long long G3;            // 첫 3층에 1개를 두면 3층 전체에 들어가는 최대 노드 수
 
-long long answer;
+long long answer;        // 최대 리프 수
 
 void input(int dist_limit, int split_limit)
 {
-	DIST = dist_limit;
-	SPLIT = split_limit;
+	DIST = dist_limit;                   // 분배 노드 예산
+	SPLIT = split_limit;                 // 분배도 상한
 
 	answer = 1;   // 분배 노드가 없으면 리프는 루트의 자식 1개
 }
@@ -82,67 +82,67 @@ void input(int dist_limit, int split_limit)
 // 첫 3층에 t개를 놓기 위해 위의 2층들에 필요한 최소 분배 노드 수
 long long getParentCost(long long t)
 {
-	long long sum = 0;
+	long long sum = 0;                   // 필요한 부모 노드 합
 
-	for (int i = 0; i < A; i++)
+	for (int i = 0; i < A; i++)          // 2층을 하나씩 위로 올라가며
 	{
 		t = (t + 1) / 2;   // 부모 하나가 자식 2개를 받친다 -> ceil(t / 2)
-		sum += t;
+		sum += t;          // 이 층에 필요한 노드 수를 더한다
 	}
-	return sum;
+	return sum;                          // 필요한 부모 노드 수 반환
 }
 
 // 첫 3층에 t개를 놓을 때의 리프 수 (불가능하면 -1)
 long long getLeaf(long long t)
 {
-	long long parent = getParentCost(t);
-	if (parent > DIST) return -1;
+	long long parent = getParentCost(t);             // 위 2층에 필요한 노드 수
+	if (parent > DIST) return -1;                    // 예산 초과면 불가능
 
 	long long three = t * G3;                          // 3층에 들어갈 수 있는 자리
 	if (three > DIST - parent) three = DIST - parent;  // 예산만큼만
 
 	long long two = DIST - three;                      // 남는 예산은 2층에
 	long long cap2 = (1LL << A) - 1;                   // 2층 A개를 꽉 채운 노드 수
-	if (two > cap2) two = cap2;
+	if (two > cap2) two = cap2;                        // 2층 자리만큼만
 
-	return 1 + two + 2 * three;
+	return 1 + two + 2 * three;                        // 리프 수 = 1 + 2갈래 + 2 x 3갈래
 }
 
 void solve()
 {
-	for (A = 0; (1LL << A) <= SPLIT; A++)
+	for (A = 0; (1LL << A) <= SPLIT; A++)            // 2층 개수 A (2^A <= split)
 	{
-		long long p2 = 1LL << A;
+		long long p2 = 1LL << A;                     // 2^A
 
 		//3층없이 2층만 쓰는 경우
 		long long only2 = 1 + (DIST < p2 - 1 ? DIST : p2 - 1);
-		if (answer < only2) answer = only2;
+		if (answer < only2) answer = only2;          // 최댓값 갱신
 
-		if (DIST == 0)continue;
+		if (DIST == 0)continue;                      // 분배 노드가 없으면 3층도 못 놓는다
 
-		G3 = 1;
+		G3 = 1;                                      // 3층 1개일 때 G3 = 1
 		long long p = p2 * 3;   // 분배도 = 2^A x 3^B
-		for (B = 1; p <= SPLIT; B++)
+		for (B = 1; p <= SPLIT; B++)                 // 3층 개수 B (2^A x 3^B <= split)
 		{
 			// t x G3 >= DIST - getParentCost(t) 인 가장 작은 t (1 ~ 2^A)
-			long long lo = 1, hi = p2;
-			while (lo < hi)
+			long long lo = 1, hi = p2;               // 이분 탐색 범위
+			while (lo < hi)                          // 범위가 한 점이 될 때까지
 			{
-				long long mid = (lo + hi) / 2;
+				long long mid = (lo + hi) / 2;       // 가운데
 
-				if (mid * G3 >= DIST - getParentCost(mid)) hi = mid;
-				else lo = mid + 1;
+				if (mid * G3 >= DIST - getParentCost(mid)) hi = mid;   // 조건 만족 -> 왼쪽
+				else lo = mid + 1;                                     // 불만족 -> 오른쪽
 			}
 
-			for (long long t = lo - 1; t <= lo; t++)
+			for (long long t = lo - 1; t <= lo; t++) // 경계 t-1, t 두 후보
 			{
-				if (t < 1) continue;
+				if (t < 1) continue;                 // t는 1 이상
 
-				long long leaf = getLeaf(t);
-				if (answer < leaf) answer = leaf;
+				long long leaf = getLeaf(t);         // 그때의 리프 수
+				if (answer < leaf) answer = leaf;    // 최댓값 갱신
 			}
 
-			p *= 3;
+			p *= 3;                                  // 3층 하나 더
 			G3 = G3 * 3 + 1;   // 3층이 하나 늘면 1 + 3 x (이전 G3)
 		}
 	}
@@ -150,9 +150,9 @@ void solve()
 
 int solution(int dist_limit, int split_limit)
 {
-	input(dist_limit, split_limit);
+	input(dist_limit, split_limit);      // 입력 저장
 
-	solve();
+	solve();                             // 모든 (A, B) 탐색
 
-	return (int)answer;
-}
+	return (int)answer;                  // 최대 리프 수 반환
+}

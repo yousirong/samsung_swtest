@@ -40,9 +40,9 @@
 	     방이 하나뿐인 입력에서도 이 값 덕분에 답이 그 방의 넓이로 맞게 나온다.
 */
 
-#include <stdio.h>
+#include <stdio.h>            // scanf, printf, putchar 사용
 
-#define MAX (50 + 5)
+#define MAX (50 + 5)          // N, M 최대 50 + 여유
 
 // 방향 번호 (dr/dc 배열의 인덱스와 일치시켜 둔다)
 #define LEFT  (0)   // 서
@@ -59,17 +59,17 @@ int answers[MAX * MAX];   // answers[방 번호] = 그 방의 넓이
 // 좌표 한 쌍
 struct RC
 {
-	int r;
-	int c;
+	int r;                    // 행
+	int c;                    // 열
 };
 
-typedef struct RC RC;
+typedef struct RC RC;         // struct RC를 RC로 줄여 쓰기
 
 RC queue[MAX * MAX];      // BFS용 큐
 
 // 방향 배열: 서(0), 북(1), 동(2), 남(3)
-int dr[] = { 0, -1, 0, 1 };
-int dc[] = { -1, 0, 1, 0 };
+int dr[] = { 0, -1, 0, 1 };   // 방향별 행 변화량
+int dc[] = { -1, 0, 1, 0 };   // 방향별 열 변화량
 
 // WALL[칸의 값][방향] = 그 방향에 벽이 있으면 1
 //
@@ -102,19 +102,19 @@ int WALL[16 + 3][5] = {
 // 방향은 서로 반대쪽끼리 짝지어 검사한다 (서<->동, 북<->남).
 int isOpen(int room1, int room2, int direction)
 {
-	if (direction == LEFT)
-		return !(WALL[room1][LEFT] || WALL[room2][RIGHT]);
+	if (direction == LEFT)                                   // 서쪽으로 갈 때
+		return !(WALL[room1][LEFT] || WALL[room2][RIGHT]);   // 내 서벽, 이웃 동벽이 모두 없어야 열림
 
-	if (direction == UP)
-		return !(WALL[room1][UP] || WALL[room2][DOWN]);
+	if (direction == UP)                                     // 북쪽으로 갈 때
+		return !(WALL[room1][UP] || WALL[room2][DOWN]);      // 내 북벽, 이웃 남벽이 모두 없어야 열림
 
-	if (direction == RIGHT)
-		return !(WALL[room1][RIGHT] || WALL[room2][LEFT]);
+	if (direction == RIGHT)                                  // 동쪽으로 갈 때
+		return !(WALL[room1][RIGHT] || WALL[room2][LEFT]);   // 내 동벽, 이웃 서벽이 모두 없어야 열림
 
-	if (direction == DOWN)
-		return !(WALL[room1][DOWN] || WALL[room2][UP]);
+	if (direction == DOWN)                                   // 남쪽으로 갈 때
+		return !(WALL[room1][DOWN] || WALL[room2][UP]);      // 내 남벽, 이웃 북벽이 모두 없어야 열림
 
-	return -1;
+	return -1;                                               // 잘못된 방향 (오지 않음)
 }
 
 // ---------------------------
@@ -126,20 +126,20 @@ void input()
 
 	// 격자 바깥을 15(사방이 벽)로 채운다.
 	// 어느 방향에서 접근해도 벽에 막히므로 BFS가 밖으로 새지 않는다.
-	for (int r = 0; r <= N + 1; r++)
+	for (int r = 0; r <= N + 1; r++)     // 바깥 줄 포함 모든 행
 	{
-		for (int c = 0; c <= M + 1; c++)
+		for (int c = 0; c <= M + 1; c++) // 바깥 줄 포함 모든 열
 		{
-			MAP[r][c] = 15;
+			MAP[r][c] = 15;              // 사방이 벽인 칸으로 채운다
 		}
 	}
 
 	// 실제 성곽 정보
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)     // 1열부터 M열까지
 		{
-			scanf("%d", &MAP[r][c]);
+			scanf("%d", &MAP[r][c]);     // 벽 정보(0~15) 입력
 		}
 	}
 }
@@ -149,21 +149,21 @@ void input()
 // ---------------------------
 void printMap()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", MAP[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%d ", MAP[r][c]);    // 벽 정보 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
-			printf("%d ", visit[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= M; c++)     // 모든 열
+			printf("%d ", visit[r][c]);  // 방 번호 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 빈 줄
 }
 
 // ---------------------------
@@ -171,27 +171,27 @@ void printMap()
 // ---------------------------
 int BFS(int r, int c, int mark)
 {
-	int rp, wp;
+	int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;                         // 빈 큐
 
-	queue[wp].r = r;
-	queue[wp++].c = c;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp++].c = c;                   // 시작 열, 삽입 위치 증가
 
 	// visit에 방 번호를 적는 것이 곧 방문 표시다 (0이 아니면 방문한 것)
 	visit[r][c] = mark;
 
-	while (rp < wp)
+	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 한 칸 꺼낸다
 
 		// 서, 북, 동, 남
 		for (int i = 0; i < 4; i++)
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸 좌표
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
 			// 벽에 막혀 있거나 이미 다른(혹은 같은) 방으로 표시된 칸이면 건너뛴다.
 			// 격자 바깥은 값이 15라 isOpen이 반드시 0을 돌려주므로 여기서 걸린다.
@@ -199,10 +199,10 @@ int BFS(int r, int c, int mark)
 				visit[nr][nc] != 0)
 				continue;
 
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 이웃 행 기록
+			queue[wp++].c = nc;          // 이웃 열 기록, 삽입 위치 증가
 
-			visit[nr][nc] = mark;
+			visit[nr][nc] = mark;        // 같은 방 번호를 칠한다 (= 방문 표시)
 		}
 	}
 
@@ -217,13 +217,13 @@ int main()
 	int maxAnswer;     // 가장 넓은 방의 넓이
 	int maxAreaSum;    // 벽 하나를 없앴을 때의 최대 넓이
 
-	input();
+	input();           // 성곽 입력
 
 	// ---------------------------
 	// 1. 방을 모두 찾아 번호를 붙이고 넓이를 기록
 	// ---------------------------
 	answerCount = 1;   // answers[0]은 "방이 아님(격자 바깥)"용으로 비워 둔다
-	mark = 1;
+	mark = 1;          // 첫 방 번호는 1
 
 	for (int r = 1; r <= N; r++)
 	{
@@ -232,7 +232,7 @@ int main()
 			// 아직 어느 방에도 속하지 않은 칸 = 새 방의 시작점
 			if (visit[r][c] == 0)
 			{
-				answers[answerCount++] = BFS(r, c, mark++);
+				answers[answerCount++] = BFS(r, c, mark++);   // 방을 칠하고 넓이 기록
 			}
 		}
 	}
@@ -240,11 +240,11 @@ int main()
 	// ---------------------------
 	// 2. 가장 넓은 방
 	// ---------------------------
-	maxAnswer = 0;
-	for (int i = 1; i <= answerCount; i++)
+	maxAnswer = 0;                           // 최댓값 초기화
+	for (int i = 1; i <= answerCount; i++)   // 모든 방의 넓이 중
 	{
-		if (maxAnswer < answers[i])
-			maxAnswer = answers[i];
+		if (maxAnswer < answers[i])          // 더 넓은 방이면
+			maxAnswer = answers[i];          // 최댓값 갱신
 	}
 
 	// ---------------------------
@@ -254,18 +254,18 @@ int main()
 	// 인접한 두 칸의 방 번호가 다르다는 것은 그 사이에 벽이 있다는 뜻이다.
 	// 그 벽을 없애면 두 방이 하나로 합쳐지므로 넓이는 두 방의 합이 된다.
 	// 실제로 벽을 지우고 BFS를 다시 돌릴 필요가 전혀 없다.
-	maxAreaSum = 0;
+	maxAreaSum = 0;                          // 최댓값 초기화
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)             // 모든 행
 	{
-		for (int c = 1; c <= M; c++)
+		for (int c = 1; c <= M; c++)         // 모든 열
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)      // 4방향 이웃
 			{
-				int nr, nc;
+				int nr, nc;                  // 이웃 칸 좌표
 
-				nr = r + dr[i];
-				nc = c + dc[i];
+				nr = r + dr[i];              // 이웃 행
+				nc = c + dc[i];              // 이웃 열
 
 				// 같은 방이면 그 사이엔 벽이 없다는 뜻이므로 볼 필요가 없다
 				if (visit[r][c] == visit[nr][nc])
@@ -276,8 +276,8 @@ int main()
 				// "자기 방 넓이"만 후보로 들어간다 (외벽은 없앨 수 없으므로 이 값이 상한이 된다)
 				int tmpArea = answers[visit[r][c]] + answers[visit[nr][nc]];
 
-				if (maxAreaSum < tmpArea)
-					maxAreaSum = tmpArea;
+				if (maxAreaSum < tmpArea)    // 더 크면
+					maxAreaSum = tmpArea;    // 최댓값 갱신
 			}
 		}
 	}
@@ -287,5 +287,5 @@ int main()
 
 	// printMap(); // 디버그용
 
-	return 0;
+	return 0;                                // 프로그램 정상 종료
 }

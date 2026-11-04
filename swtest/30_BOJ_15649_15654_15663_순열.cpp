@@ -53,11 +53,11 @@
 //       1 2 / 1 3 / 2 1 / 2 3 / 3 1 / 3 2   (총 3P2 = 6가지)
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
-#define MAX (8 + 3)
+#define MAX (8 + 3)      // N, M 최대 8 + 여유
 
-int N, M;
+int N, M;                // N: 후보 수 범위, M: 수열 길이
 
 int num_of_cases[MAX];   // 만들고 있는 수열
 bool visit[MAX];         // 숫자 i를 지금 경로에서 이미 썼는지
@@ -65,9 +65,9 @@ bool visit[MAX];         // 숫자 i를 지금 경로에서 이미 썼는지
 // 완성된 수열 한 줄 출력
 void printCases()
 {
-	for (int i = 0; i < M; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < M; i++)          // M개 자리를
+		printf("%d ", num_of_cases[i]);  // 차례로 출력
+	putchar('\n');                       // 한 경우 끝 줄바꿈
 }
 
 // 재귀로 순열 생성
@@ -77,8 +77,8 @@ void DFS(int depth)
 	// M자리를 다 채웠으면 한 경우 완성
 	if (depth == M)
 	{
-		printCases();
-		return;
+		printCases();                    // 완성된 수열 출력
+		return;                          // 되돌아간다
 	}
 
 	// 순서를 구분하므로 매번 1 ~ N 전부를 후보로 본다 (작은 수부터 = 사전순)
@@ -88,7 +88,7 @@ void DFS(int depth)
 		if (visit[i] == true)
 			continue;
 
-		num_of_cases[depth] = i;
+		num_of_cases[depth] = i;         // 이 자리에 i를 놓는다
 
 		visit[i] = true;     // 사용 중 표시
 
@@ -100,11 +100,11 @@ void DFS(int depth)
 
 int main()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // N과 M 입력
 
-	DFS(0);
+	DFS(0);                              // 0번째 자리부터 채우기 시작
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }
 
 // ====================================================================
@@ -116,11 +116,11 @@ int main()
 //   visit는 여전히 "값"이 아니라 "인덱스" 기준으로 관리한다.
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
-#define MAX (8 + 3)
+#define MAX (8 + 3)      // N, M 최대 8 + 여유
 
-int N, M;
+int N, M;                // N: 후보 개수, M: 수열 길이
 
 int num_of_cases[MAX];   // 만들고 있는 수열
 bool visit[MAX];         // i번째 후보를 썼는지 (값이 아니라 인덱스 기준)
@@ -129,31 +129,31 @@ int number[MAX];         // 후보로 주어진 수들 (1-based)
 // 완성된 수열 한 줄 출력
 void printCases()
 {
-	for (int i = 0; i < M; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < M; i++)          // M개 자리를
+		printf("%d ", num_of_cases[i]);  // 차례로 출력
+	putchar('\n');                       // 한 경우 끝 줄바꿈
 }
 
 // 재귀로 순열 생성
 void DFS(int depth)
 {
-	if (depth == M)
+	if (depth == M)                      // M자리를 다 채웠으면
 	{
-		printCases();
-		return;
+		printCases();                    // 완성된 수열 출력
+		return;                          // 되돌아간다
 	}
 
-	for (int i = 1; i <= N; i++)
+	for (int i = 1; i <= N; i++)         // 모든 후보 인덱스 확인
 	{
-		if (visit[i] == true)
-			continue;
+		if (visit[i] == true)            // 이미 쓴 후보면
+			continue;                    // 건너뛴다
 
 		// 15649와 유일하게 다른 줄
 		num_of_cases[depth] = number[i];
 
-		visit[i] = true;
+		visit[i] = true;                 // 사용 중 표시
 
-		DFS(depth + 1);
+		DFS(depth + 1);                  // 다음 자리로
 
 		visit[i] = false;    // 반납 (백트래킹)
 	}
@@ -161,29 +161,29 @@ void DFS(int depth)
 
 int main()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // N과 M 입력
 
 	// 후보 수 입력
 	for (int i = 1; i <= N; i++)
-		scanf("%d", &number[i]);
+		scanf("%d", &number[i]);         // i번째 후보 입력
 
 	// 사전순 출력을 위한 오름차순 정렬 (선택 정렬)
-	for (int i = 1; i <= N - 1; i++)
+	for (int i = 1; i <= N - 1; i++)     // 기준 위치
 	{
-		for (int k = i + 1; k <= N; k++)
+		for (int k = i + 1; k <= N; k++) // 기준 뒤의 모든 위치
 		{
-			if (number[i] > number[k])
+			if (number[i] > number[k])   // 뒤쪽 값이 더 작으면
 			{
-				int tmp = number[i];
+				int tmp = number[i];     // 두 값을 맞바꾼다
 				number[i] = number[k];
 				number[k] = tmp;
 			}
 		}
 	}
 
-	DFS(0);
+	DFS(0);                              // 0번째 자리부터 채우기 시작
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }
 
 // ====================================================================
@@ -199,11 +199,11 @@ int main()
 //   여기서 visit[i]는 bool이 아니라 "number[i]를 지금까지 몇 번 썼는지"인 점에 주의.
 // ====================================================================
 
-#include <stdio.h>
+#include <stdio.h>       // scanf, printf, putchar 사용
 
-#define MAX (8 + 3)
+#define MAX (8 + 3)      // N, M 최대 8 + 여유
 
-int N, M;
+int N, M;                // N: (압축 후) 서로 다른 값 개수, M: 수열 길이
 
 int num_of_cases[MAX];      // 만들고 있는 수열
 int visit[MAX];             // number[i]를 현재 경로에서 몇 번 썼는지 (카운터)
@@ -213,18 +213,18 @@ int number[MAX];            // 서로 다른 값들만 모은 목록
 // 완성된 수열 한 줄 출력
 void printCases()
 {
-	for (int i = 0; i < M; i++)
-		printf("%d ", num_of_cases[i]);
-	putchar('\n');
+	for (int i = 0; i < M; i++)          // M개 자리를
+		printf("%d ", num_of_cases[i]);  // 차례로 출력
+	putchar('\n');                       // 한 경우 끝 줄바꿈
 }
 
 // 재귀로 (중복 없는) 순열 생성
 void DFS(int depth)
 {
-	if (depth == M)
+	if (depth == M)                      // M자리를 다 채웠으면
 	{
-		printCases();
-		return;
+		printCases();                    // 완성된 수열 출력
+		return;                          // 되돌아간다
 	}
 
 	// 후보 목록에는 서로 다른 값이 한 번씩만 들어 있으므로
@@ -235,11 +235,11 @@ void DFS(int depth)
 		if (visit[i] == possible[number[i]])
 			continue;
 
-		num_of_cases[depth] = number[i];
+		num_of_cases[depth] = number[i]; // 이 자리에 number[i]를 놓는다
 
 		visit[i]++;       // 이 값을 하나 소비
 
-		DFS(depth + 1);
+		DFS(depth + 1);   // 다음 자리로
 
 		visit[i]--;       // 반납 (백트래킹)
 	}
@@ -247,41 +247,41 @@ void DFS(int depth)
 
 int main()
 {
-	scanf("%d %d", &N, &M);
+	scanf("%d %d", &N, &M);              // N과 M 입력
 
 	int count = 1;   // number[]에 채워 넣을 다음 위치 (1-based)
 
 	// 입력을 받으면서 값별 등장 횟수를 세고, 처음 보는 값만 목록에 추가한다
 	for (int i = 1; i <= N; i++)
 	{
-		int value;
-		scanf("%d", &value);
+		int value;                       // 입력 값
+		scanf("%d", &value);             // 값 하나 입력
 
 		// 아직 한 번도 안 나온 값이면 서로 다른 값 목록에 넣는다
 		if (possible[value] == 0)
 			number[count++] = value;
 
-		possible[value]++;
+		possible[value]++;               // 이 값의 등장 횟수 증가
 	}
 
 	// 여기서부터 N의 의미가 바뀐다 : "입력 개수"가 아니라 "서로 다른 값의 개수"
 	N = count - 1;
 
 	// 사전순 출력을 위해 서로 다른 값 목록을 오름차순 정렬
-	for (int i = 1; i <= N - 1; i++)
+	for (int i = 1; i <= N - 1; i++)     // 기준 위치
 	{
-		for (int k = i + 1; k <= N; k++)
+		for (int k = i + 1; k <= N; k++) // 기준 뒤의 모든 위치
 		{
-			if (number[i] > number[k])
+			if (number[i] > number[k])   // 뒤쪽 값이 더 작으면
 			{
-				int tmp = number[i];
+				int tmp = number[i];     // 두 값을 맞바꾼다
 				number[i] = number[k];
 				number[k] = tmp;
 			}
 		}
 	}
 
-	DFS(0);
+	DFS(0);                              // 0번째 자리부터 채우기 시작
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }

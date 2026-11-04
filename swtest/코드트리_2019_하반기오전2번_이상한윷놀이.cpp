@@ -48,7 +48,7 @@
       그래서 horse[h].dir에 먼저 반영한 뒤 재시도한다.
 */
 
-#include <stdio.h>
+#include <stdio.h>          // scanf, printf, putchar 사용
 
 // 배열 최대 크기 (N 최대 12 + 여유)
 #define MAX (12+5)
@@ -58,7 +58,7 @@
 #define RED   (1)   // 뒤집어서 이동
 #define BLUE  (2)   // 방향 반전 후 재시도 (판 바깥도 이 값으로 채운다)
 
-int T;
+int T;              // 테스트 케이스 수
 int N, K;           // N: 판 크기, K: 말 개수
 int MAP[MAX][MAX];  // 칸의 색
 
@@ -78,64 +78,64 @@ int board[MAX][MAX][10 + 3];  // board[r][c][i] : 아래에서 i번째 말의 �
 int index[MAX][MAX];          // 그 칸에 쌓인 말의 개수
 
 // 방향별 이동량. 방향 번호 1~4를 그대로 인덱스로 쓰려고 0번은 더미다.
-int dr[] = { 0,  0, 0, -1, 1 };
-int dc[] = { 0,  1,-1,  0, 0 };
+int dr[] = { 0,  0, 0, -1, 1 };   // 방향별 행 변화량
+int dc[] = { 0,  1,-1,  0, 0 };   // 방향별 열 변화량
 
 void input()
 {
-    scanf("%d %d", &N, &K);
+    scanf("%d %d", &N, &K);              // 판 크기, 말 개수 입력
 
     // 판 바깥까지 전부 파란색으로 채운다.
     // "판을 벗어남"을 파란 칸과 똑같이 처리할 수 있어 경계 검사가 사라진다.
     for (int r = 0; r <= N + 1; r++)
         for (int c = 0; c <= N + 1; c++)
-            MAP[r][c] = BLUE;
+            MAP[r][c] = BLUE;            // 파란색으로 채운다
 
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 실제 판
         for (int c = 1; c <= N; c++)
-            scanf("%d", &MAP[r][c]);
+            scanf("%d", &MAP[r][c]);     // 칸 색 입력
 
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 모든 칸
         for (int c = 1; c <= N; c++)
-            index[r][c] = 0;
+            index[r][c] = 0;             // 쌓인 말 0개
 
     hcnt = 1; // 말 번호는 1번부터
-    for (int k = 0; k < K; k++)
+    for (int k = 0; k < K; k++)          // 말 K개
     {
-        int r, c, dir;
-        scanf("%d %d %d", &r, &c, &dir);
+        int r, c, dir;                   // 위치, 방향
+        scanf("%d %d %d", &r, &c, &dir); // 말 정보 입력
 
-        horse[hcnt].r = r;
-        horse[hcnt].c = c;
-        horse[hcnt].dir = dir;
+        horse[hcnt].r = r;               // 말의 행
+        horse[hcnt].c = c;               // 말의 열
+        horse[hcnt].dir = dir;           // 말의 방향
 
         // 그 칸의 스택 맨 위에 올린다. 입력 순서대로 쌓인다.
         int& position = index[r][c];
         board[r][c][position] = hcnt;  // 칸은 말 번호를 기억하고
         horse[hcnt].pos = position;    // 말은 자기 층수를 기억한다
-        position++;
+        position++;                    // 스택 크기 증가
 
-        hcnt++;
+        hcnt++;                          // 다음 말 번호
     }
 }
 
 // 디버그용: 칸마다 쌓인 말 출력
 void printBoard()
 {
-    for (int r = 1; r <= N; r++)
+    for (int r = 1; r <= N; r++)         // 모든 행
     {
-        for (int c = 1; c <= N; c++)
+        for (int c = 1; c <= N; c++)     // 모든 열
         {
-            int idx = index[r][c];
-            if (idx == 0) continue;
+            int idx = index[r][c];       // 쌓인 말 수
+            if (idx == 0) continue;      // 없으면 건너뜀
 
-            printf("%d, %d: ", r, c);
+            printf("%d, %d: ", r, c);    // 칸 좌표
             for (int i = 0; i < idx; i++)
-                printf("%d ", board[r][c][i]);
-            putchar('\n');
+                printf("%d ", board[r][c][i]);   // 아래부터 말 번호
+            putchar('\n');               // 줄바꿈
         }
     }
-    putchar('\n');
+    putchar('\n');                       // 빈 줄
 }
 
 // 흰색 칸으로 이동 : 쌓인 순서를 그대로 유지
@@ -143,10 +143,10 @@ void printBoard()
 // number번 말과 그 위에 쌓인 말들을 아래에서 위 순서로 옮긴다.
 void moveWhite(int number)
 {
-    HORSE h = horse[number];
-    int sr = h.r, sc = h.c, dir = h.dir;
-    int nr = sr + dr[dir];
-    int nc = sc + dc[dir];
+    HORSE h = horse[number];             // 움직일 말
+    int sr = h.r, sc = h.c, dir = h.dir; // 현재 위치와 방향
+    int nr = sr + dr[dir];               // 도착 행
+    int nc = sc + dc[dir];               // 도착 열
 
     int front = h.pos;              // 옮길 구간의 시작 층
     int& back = index[sr][sc];      // 출발 칸의 스택 크기
@@ -155,14 +155,14 @@ void moveWhite(int number)
     // 아래 -> 위 순서로 읽어 그대로 쌓으므로 순서가 유지된다
     for (int k = front; k < back; k++)
     {
-        int selectedNumber = board[sr][sc][k];
+        int selectedNumber = board[sr][sc][k];   // 옮길 말 번호
 
         // 옮기는 말의 정보도 함께 갱신해야 다음 턴이 어긋나지 않는다
         horse[selectedNumber].r = nr;
         horse[selectedNumber].c = nc;
         horse[selectedNumber].pos = nextBack;
 
-        board[nr][nc][nextBack++] = selectedNumber;
+        board[nr][nc][nextBack++] = selectedNumber;   // 도착 칸 위에 쌓는다
     }
 
     back = front; // 출발 칸에는 front 아래쪽만 남는다
@@ -173,28 +173,28 @@ void moveWhite(int number)
 // moveWhite와 완전히 같고 읽는 방향만 반대다.
 void moveRed(int number)
 {
-    HORSE h = horse[number];
-    int sr = h.r, sc = h.c, dir = h.dir;
-    int nr = sr + dr[dir];
-    int nc = sc + dc[dir];
+    HORSE h = horse[number];             // 움직일 말
+    int sr = h.r, sc = h.c, dir = h.dir; // 현재 위치와 방향
+    int nr = sr + dr[dir];               // 도착 행
+    int nc = sc + dc[dir];               // 도착 열
 
-    int front = h.pos;
-    int& back = index[sr][sc];
-    int& nextBack = index[nr][nc];
+    int front = h.pos;                   // 옮길 구간의 시작 층
+    int& back = index[sr][sc];           // 출발 칸의 스택 크기
+    int& nextBack = index[nr][nc];       // 도착 칸의 스택 크기
 
     // 위 -> 아래 순서로 읽어 쌓으면 결과적으로 순서가 뒤집힌다
     for (int k = back - 1; k >= front; k--)
     {
-        int selectedNumber = board[sr][sc][k];
+        int selectedNumber = board[sr][sc][k];   // 옮길 말 번호
 
-        horse[selectedNumber].r = nr;
-        horse[selectedNumber].c = nc;
-        horse[selectedNumber].pos = nextBack;
+        horse[selectedNumber].r = nr;            // 새 행
+        horse[selectedNumber].c = nc;            // 새 열
+        horse[selectedNumber].pos = nextBack;    // 새 층
 
-        board[nr][nc][nextBack++] = selectedNumber;
+        board[nr][nc][nextBack++] = selectedNumber;   // 도착 칸 위에 쌓는다
     }
 
-    back = front;
+    back = front;                        // 출발 칸 정리
 }
 
 int simulation()
@@ -202,38 +202,38 @@ int simulation()
     // 방향 반전표 : 1(오른쪽) <-> 2(왼쪽), 3(위) <-> 4(아래)
     int changeDir[5] = { 0, 2, 1, 4, 3 };
 
-    for (int i = 1; i < 1000; i++)
+    for (int i = 1; i < 1000; i++)       // 턴 반복
     {
         // 한 턴은 1번 말부터 K번 말까지 순서대로
         for (int h = 1; h < hcnt; h++)
         {
-            int sr = horse[h].r;
-            int sc = horse[h].c;
-            int dir = horse[h].dir;
+            int sr = horse[h].r;         // 현재 행
+            int sc = horse[h].c;         // 현재 열
+            int dir = horse[h].dir;      // 현재 방향
 
-            int nr = sr + dr[dir];
-            int nc = sc + dc[dir];
+            int nr = sr + dr[dir];       // 다음 행
+            int nc = sc + dc[dir];       // 다음 열
 
-            if (MAP[nr][nc] == WHITE)
+            if (MAP[nr][nc] == WHITE)    // 흰색이면
             {
-                moveWhite(h);
+                moveWhite(h);            // 순서 유지 이동
             }
-            else if (MAP[nr][nc] == RED)
+            else if (MAP[nr][nc] == RED) // 빨간색이면
             {
-                moveRed(h);
+                moveRed(h);              // 순서 뒤집어 이동
             }
-            else if (MAP[nr][nc] == BLUE)
+            else if (MAP[nr][nc] == BLUE)    // 파란색(또는 판 밖)이면
             {
                 // 파란 칸(또는 판 바깥)이면 방향을 반대로 "바꿔 둔 채" 다시 시도한다.
                 // 재시도가 실패해도 바뀐 방향은 그대로 남는다.
                 dir = changeDir[dir];
                 horse[h].dir = dir;
 
-                nr = sr + dr[dir];
-                nc = sc + dc[dir];
+                nr = sr + dr[dir];       // 반대 방향 다음 행
+                nc = sc + dc[dir];       // 반대 방향 다음 열
 
-                if (MAP[nr][nc] == WHITE)      moveWhite(h);
-                else if (MAP[nr][nc] == RED)   moveRed(h);
+                if (MAP[nr][nc] == WHITE)      moveWhite(h);   // 흰색이면 이동
+                else if (MAP[nr][nc] == RED)   moveRed(h);     // 빨간색이면 뒤집어 이동
                 // 반대쪽도 파란색이면 이번 턴에는 움직이지 않는다
             }
 
@@ -249,10 +249,10 @@ int main()
 {
     // 이 문제는 테스트 케이스가 하나다
     T = 1;
-    for (int tc = 1; tc <= T; tc++)
+    for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
     {
-        input();
-        printf("%d\n", simulation());
+        input();                         // 입력
+        printf("%d\n", simulation());    // 끝나는 턴 출력
     }
-    return 0;
+    return 0;                            // 프로그램 정상 종료
 }

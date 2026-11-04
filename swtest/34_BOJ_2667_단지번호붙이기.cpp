@@ -27,7 +27,7 @@
 	  3) 입력이 "0110100"처럼 공백 없이 붙어 있으므로 scanf("%1d", ...)로 한 자리씩 읽는다.
 */
 
-#include <stdio.h>
+#include <stdio.h>     // scanf, printf, putchar 사용
 
 #define MAX (25 + 5)   // 문제의 최대 N은 25, 경계 여유를 위해 +5
 
@@ -46,27 +46,27 @@ struct RC
 	int c;   // col (열)
 };
 
-typedef struct RC RC;
+typedef struct RC RC;  // struct RC를 RC로 줄여 쓰기
 
 // BFS용 큐. 한 칸이 최대 한 번만 들어가므로 N*N이면 충분하다.
 RC queue[MAX * MAX];
 
 // 방향 배열: 상, 우, 하, 좌 (이 문제는 4방향만 연결로 본다)
-int dr[] = { -1, 0, 1, 0 };
-int dc[] = { 0, 1, 0,-1 };
+int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
+int dc[] = { 0, 1, 0,-1 };    // 방향별 열 변화량
 
 // ---------------------------
 // 디버그용: visit 배열 출력
 // ---------------------------
 void printVisit()
 {
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 모든 행
 	{
-		for (int c = 1; c <= N; c++)
-			printf("%d ", visit[r][c]);
-		putchar('\n');
+		for (int c = 1; c <= N; c++)     // 모든 열
+			printf("%d ", visit[r][c]);  // 방문 여부 출력
+		putchar('\n');                   // 행 끝 줄바꿈
 	}
-	putchar('\n');
+	putchar('\n');                       // 출력 끝 빈 줄
 }
 
 // ---------------------------
@@ -74,11 +74,11 @@ void printVisit()
 // ---------------------------
 void input()
 {
-	scanf("%d", &N);
+	scanf("%d", &N);                     // 지도 크기 입력
 
-	for (int r = 1; r <= N; r++)
+	for (int r = 1; r <= N; r++)         // 1행부터 N행까지
 	{
-		for (int c = 1; c <= N; c++)
+		for (int c = 1; c <= N; c++)     // 1열부터 N열까지
 		{
 			// 입력이 "0110100"처럼 공백 없이 붙어 있다.
 			// %1d는 딱 한 자리만 읽어 주므로 이런 형식에 그대로 쓸 수 있다.
@@ -94,26 +94,26 @@ int BFS(int r, int c)
 {
 	int rp, wp;   // rp: 꺼낼 위치, wp: 넣을 위치
 
-	rp = wp = 0;
+	rp = wp = 0;  // 빈 큐
 
 	// 시작 칸을 큐에 넣고 바로 방문 표시
-	queue[wp].r = r;
-	queue[wp++].c = c;
+	queue[wp].r = r;                     // 시작 행
+	queue[wp++].c = c;                   // 시작 열, 삽입 위치 증가
 
-	visit[r][c] = true;
+	visit[r][c] = true;                  // 시작 칸 방문 표시
 
 	// 처리할 칸이 남아 있는 동안
 	while (rp < wp)
 	{
-		RC out = queue[rp++];
+		RC out = queue[rp++];            // 큐에서 한 칸 꺼낸다
 
 		// 상하좌우 네 방향
 		for (int i = 0; i < 4; i++)
 		{
-			int nr, nc;
+			int nr, nc;                  // 이웃 칸 좌표
 
-			nr = out.r + dr[i];
-			nc = out.c + dc[i];
+			nr = out.r + dr[i];          // 이웃 행
+			nc = out.c + dc[i];          // 이웃 열
 
 			// 집이 아니거나 이미 방문했으면 건너뛴다.
 			// 지도 바깥은 MAP이 0이라 이 조건에서 함께 걸러진다(경계 검사 불필요).
@@ -121,8 +121,8 @@ int BFS(int r, int c)
 				continue;
 
 			// 같은 단지에 속한 집이므로 큐에 넣는다
-			queue[wp].r = nr;
-			queue[wp++].c = nc;
+			queue[wp].r = nr;            // 이웃 행 기록
+			queue[wp++].c = nc;          // 이웃 열 기록, 삽입 위치 증가
 
 			// 넣는 즉시 방문 표시 (중복 삽입 방지 = wp가 곧 정확한 개수)
 			visit[nr][nc] = true;
@@ -138,7 +138,7 @@ int BFS(int r, int c)
 // ---------------------------
 int main()
 {
-	input();
+	input();                             // 지도 입력
 
 	int ansCount = 0;   // 단지 수
 
@@ -160,13 +160,13 @@ int main()
 	printf("%d\n", ansCount);
 
 	// 2) 단지 크기를 오름차순 정렬 (선택 정렬)
-	for (int i = 0; i < ansCount - 1; i++)
+	for (int i = 0; i < ansCount - 1; i++)       // 기준 위치
 	{
-		for (int k = i + 1; k < ansCount; k++)
+		for (int k = i + 1; k < ansCount; k++)   // 기준 뒤의 모든 위치
 		{
-			if (answers[i] > answers[k])
+			if (answers[i] > answers[k])         // 뒤쪽 값이 더 작으면
 			{
-				int tmp = answers[i];
+				int tmp = answers[i];            // 두 값을 맞바꾼다
 				answers[i] = answers[k];
 				answers[k] = tmp;
 			}
@@ -175,7 +175,7 @@ int main()
 
 	// 3) 각 단지의 크기
 	for (int i = 0; i < ansCount; i++)
-		printf("%d\n", answers[i]);
+		printf("%d\n", answers[i]);      // 단지 크기 한 줄씩 출력
 
-	return 0;
+	return 0;                            // 프로그램 정상 종료
 }
