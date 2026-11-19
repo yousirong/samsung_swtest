@@ -21,63 +21,69 @@
 	  입출력 예
 	      예제 1 -> #1 0 0 34 0 18
 
-	■ 풀이 방침 : 7단계를 순서대로 그대로 구현한다
-	  - 돌은 목록(stone[])으로 들고 다닌다. 행이 떨어질 행(targetRow)과 같아지면 떨어뜨린다.
-	  - 물결 세기 wave[][]는 턴마다 새로 0에서 시작한다.
-	  - 혼탁도 murk[][]는 턴을 넘어 남는다.
+	■ 풀이 방침 : 돌을 움직이지 않고 "떨어지는 턴"을 미리 계산한다
+	  돌끼리는 서로 막지 않고, 매 턴 정확히 한 칸씩 움직인다.
+	  그래서 돌 하나가 언제 어디에 떨어지는지는 입력만 보고 바로 알 수 있다.
+	  -> 1, 2단계(이동, 발사)는 시뮬레이션하지 않고, 입력 때 landing[턴][]에 떨어질 돌을 넣어 둔다.
+	  매 턴은 makeWave(3) -> getScore(4) -> settleMud(5) -> flowLeft(6) -> makeMud(7) 순서.
 
-	■ 시간 맞추기
-	  1단계(이동)가 2단계(발사)보다 먼저라, 이번 턴에 날린 돌은 이번 턴에 움직이지 않는다.
-	  3단계(낙하)는 발사 뒤라, 거리 1인 돌은 날린 턴에 바로 떨어진다.
-	  -> 시각 L에 날린 거리 h의 돌은 시각 L + h - 1에 떨어진다 (문제 설명과 같다).
+	■ 낙하 턴 계산 : t = s + j x d + h - 1  (j = 0 ~ p-1)
+	  j번째 돌은 시각 s + j x d 에 날린다.
+	  2단계(발사)가 1단계(이동)보다 뒤라, 날린 턴에는 움직이지 않고 n-1행에 있다.
+	  3단계(낙하)는 발사 뒤라, 거리 h = 1이면 날린 턴에 바로 떨어진다.
+	  그 뒤 한 턴에 한 칸씩 올라가므로 n - h 행에는 h - 1턴 뒤에 닿는다.
+	  떨어지는 칸은 (n - h, c).
 
-	■ 5단계와 6단계는 "동시에" 바뀐다 -> 새 배열에 계산한 뒤 복사
-	  가라앉기는 줄어들기 전 상태로 이웃을 봐야 하므로 next[][]에 계산하고 한꺼번에 옮긴다.
-	  물살도 next[r][c] = murk[r][c + 1] 로 만든 뒤 옮긴다.
+	■ 끝나는 턴 = min(50, 마지막 낙하 턴)
+	  마지막 돌이 떨어진 턴이 끝나면 날릴 돌도 날고 있는 돌도 없다.
+	  그래서 lastTurn(모든 돌 중 가장 늦은 낙하 턴)까지만 돌리면 된다. 단 50턴을 넘으면 50에서 끝.
+	  50턴 뒤에 떨어질 돌은 landing[]에 넣지 않는다(배열 크기도 50턴까지만).
+	  한 투석기는 한 턴에 돌을 하나만 날리므로, 한 턴에 떨어지는 돌은 최대 k개다.
+
+	■ 5단계와 6단계는 "동시에" 바뀐다 -> settled[][]를 거쳐 옮긴다
+	  settleMud : 줄어들기 전 mud[][]로 이웃을 보고, 결과는 settled[][]에 쓴다.
+	              네 이웃이 모두 격자 안 = 1 <= r <= n-2 이고 1 <= c <= m-2 (경계 칸은 무조건 -2).
+	              흙탕물이 없는 칸(0)도 -2 후 0으로 잘라 그대로 0이 된다.
+	  flowLeft  : mud[r][c] = settled[r][c + 1], 마지막 열은 0.
+	              settled에서 읽어 mud에 쓰므로 덮어쓰기 순서를 신경 쓸 필요가 없다.
 
 	■ 7단계 덩어리 = BFS (flood fill)
-	  wave > 0 인 칸에서 BFS로 상하좌우 이어진 칸을 모아 합과 칸 수를 구하고, 평균을 다시 그 칸들에 더한다.
-	  대각선만 닿은 칸은 다른 덩어리다.
+	  wave > 0 인 칸에서 BFS로 상하좌우 이어진 칸을 모아 합과 칸 수(wp)를 구하고,
+	  큐에 모인 칸(0 ~ wp-1)에 평균을 더한다. 대각선만 닿은 칸은 다른 덩어리다.
 
 	■ 주의할 점
 	  - 4단계에서 쓰는 혼탁도는 "직전 턴이 끝났을 때" 값이다. 그래서 점수는 5 ~ 7단계 전에 계산한다.
 	  - 7단계는 6단계(물살) 뒤라, 이번 턴 흙탕물은 흘러가지 않은 자리에 바로 더해진다.
-	  - 떨어진 돌이 없으면 wave가 전부 0이라 점수도 0, 7단계도 아무 일이 없다.
-	  - 같은 열에 투석기가 여러 개일 수 있다. 돌끼리는 서로 막지 않는다 (같은 칸에 있어도 된다).
-	  - 대회는 최대 50턴이라 돌이 남아 있어도 50턴에서 끝난다.
+	  - 떨어진 돌이 없으면 wave가 전부 0이라 점수도 0, 7단계도 아무 일이 없다 (따로 처리 안 해도 된다).
+	  - 같은 열에 투석기가 여러 개일 수 있다. 같은 턴 같은 칸에 떨어져도 물결은 그냥 더한다.
+	  - 테스트 케이스마다 landingCount[], mud[][], lastTurn 을 초기화한다.
 */
-#include <stdio.h>                       // scanf, printf, putchar 사용
+#include <stdio.h>                       // scanf, printf, putchar
+#include <stdlib.h>                      // abs
 
-#define MAX (30+5)                       // n, m 최대 30 + 여유
-#define MAX_K (50+5)                     // 투석기 최대 50 + 여유
-#define MAX_STONE (500+20)   // 투석기 50개 x 돌 10개
-#define LAST_TURN (50)                   // 최대 턴
+#define MAX (30 + 5)                     // n, m 최대 30 + 여유
+#define MAX_K (50 + 5)                   // 한 턴에 떨어지는 돌 최대 k(50) + 여유
+#define MAX_T (50 + 5)                   // 최대 50턴 + 여유
 
 int T;                                   // 테스트 케이스 수
-int N, M, K;                             // 행 수, 열 수, 투석기 수
+int N, M, K, lastTurn;                   // 행 수, 열 수, 투석기 수, 가장 늦은 낙하 턴
+int wave[MAX][MAX];                      // 이번 턴 물결 세기 (턴마다 0부터)
+int mud[MAX][MAX];                       // 혼탁도 (턴을 넘어 남는다)
+int settled[MAX][MAX];                   // 가라앉은 뒤 혼탁도 (5단계 결과, 6단계 입력)
+bool visit[MAX][MAX];                    // BFS 방문 표시
 
-struct CATAPULT                          // 투석기 정보
+int dr[] = { -1, 1, 0, 0 };              // 상하좌우 행 변화량
+int dc[] = { 0, 0, -1, 1 };              // 상하좌우 열 변화량
+
+struct STONE                             // 떨어지는 돌
 {
-	int c, s, d, a, h, p;   // 열, 시작 시각, 간격, 무게, 거리, 돌 수
+	int r;                               // 떨어지는 행 (n - h)
+	int c;                               // 떨어지는 열
+	int weight;                          // 무게 a
 };
 
-CATAPULT cat[MAX_K];                     // 투석기 목록
-
-struct STONE                             // 돌 정보
-{
-	int r, c, a;            // 지금 위치, 무게
-	int targetRow;          // 떨어질 행 (n - h)
-	int alive;              // 1 = 날고 있음
-};
-
-STONE stone[MAX_STONE];                  // 돌 목록
-int scnt;                                // 지금까지 날린 돌 수
-
-int wave[MAX][MAX];         // 이번 턴 물결 세기
-int murk[MAX][MAX];         // 혼탁도 (턴을 넘어 남는다)
-
-int score[LAST_TURN + 5];                // 턴별 점수
-int turnCount;                           // 진행한 턴 수
+STONE landing[MAX_T][MAX_K];             // landing[t][] = t턴에 떨어지는 돌들
+int landingCount[MAX_T];                 // t턴에 떨어지는 돌 수
 
 struct RC                                // 좌표
 {
@@ -85,241 +91,167 @@ struct RC                                // 좌표
 	int c;                               // 열
 };
 
-RC queue[MAX * MAX];                     // BFS 큐
-int visit[MAX][MAX];                     // BFS 방문 표시
-
-int dr[] = { -1,1,0,0 };                 // 상하좌우 행 변화량
-int dc[] = { 0,0,-1,1 };                 // 상하좌우 열 변화량
+RC queue[MAX * MAX];                     // BFS 큐 (덩어리 칸 목록으로도 쓴다)
 
 void input()
 {
-	scanf("%d %d %d", &N, &M, &K);       // 호수 크기, 투석기 수 입력
+	scanf("%d %d %d", &N, &M, &K);       // 호수 크기, 투석기 수
 
-	for (int i = 0; i < K; i++)          // 투석기별 정보 입력
-		scanf("%d %d %d %d %d %d", &cat[i].c, &cat[i].s, &cat[i].d, &cat[i].a, &cat[i].h, &cat[i].p);
-
-	for (int r = 0; r < N; r++)          // 혼탁도 초기화
+	lastTurn = 0;                        // 초기화
+	for (int t = 1; t <= 50; t++) landingCount[t] = 0;
+	for (int r = 0; r < N; r++)
 		for (int c = 0; c < M; c++)
-			murk[r][c] = 0;
+			mud[r][c] = 0;
 
-	scnt = 0;                            // 돌 목록 초기화
-	turnCount = 0;                       // 턴 수 초기화
-}
-
-int abs(int x)                           // 절댓값
-{
-	return x > 0 ? x : -x;
-}
-
-// 1단계 : 날고 있는 돌을 한 칸 위로
-void moveStones()
-{
-	for (int i = 0; i < scnt; i++)
-		if (stone[i].alive) stone[i].r--;   // 한 칸 위로
-}
-
-// 2단계 : 이번 시각에 날릴 돌을 이쪽 기슭에 놓는다
-void launchStones(int t)
-{
-	for (int i = 0; i < K; i++)          // 투석기별
+	for (int i = 1; i <= K; i++)         // 투석기별
 	{
-		if (t < cat[i].s) continue;                  // 아직 시작 전
-		if ((t - cat[i].s) % cat[i].d != 0) continue;   // 발사 간격이 아님
-		if ((t - cat[i].s) / cat[i].d >= cat[i].p) continue;   // 이미 p개 다 날렸다
+		int c, s, d, a, h, p;            // 열, 시작 시각, 간격, 무게, 거리, 돌 수
+		scanf("%d %d %d %d %d %d", &c, &s, &d, &a, &h, &p);
 
-		stone[scnt].r = N - 1;           // 이쪽 기슭에서 시작
-		stone[scnt].c = cat[i].c;        // 투석기 열
-		stone[scnt].a = cat[i].a;        // 무게
-		stone[scnt].targetRow = N - cat[i].h;   // 떨어질 행
-		stone[scnt++].alive = 1;         // 날고 있음
+		for (int j = 0; j < p; j++)      // j번째 돌
+		{
+			// 발사한 턴에 이쪽 기슭 칸을 지나므로 거리 h는 h - 1턴 뒤에 낙하한다.
+			int t = s + j * d + h - 1;   // 발사 시각 + 물에 떨어질 때까지 걸리는 턴
+			if (t > lastTurn) lastTurn = t;   // 가장 늦은 낙하 턴 갱신 (50 넘어도 기록)
+			if (t > 50) continue;        // 50턴 뒤는 대회가 끝나서 필요 없다
+
+			STONE &stone = landing[t][landingCount[t]++];   // t턴 목록에 추가
+			stone.r = N - h;             // 떨어지는 행
+			stone.c = c;                 // 떨어지는 열
+			stone.weight = a;            // 무게
+		}
 	}
 }
 
-// 3단계 : 떨어질 행에 이른 돌을 떨어뜨리고 물결 세기를 더한다. 떨어진 돌 수를 돌려준다
-int dropStones()
+// 3단계 : 이 턴에 떨어진 모든 돌의 물결 세기를 칸별로 더한다.
+void makeWave(int turn)
 {
-	int dropCount = 0;                   // 떨어진 돌 수
-
-	for (int r = 0; r < N; r++)          // 물결 세기 초기화
+	for (int r = 0; r < N; r++)          // 물결은 턴마다 새로
 		for (int c = 0; c < M; c++)
 			wave[r][c] = 0;
 
-	for (int i = 0; i < scnt; i++)       // 돌별
+	for (int i = 0; i < landingCount[turn]; i++)   // 이 턴에 떨어진 돌별
 	{
-		if (stone[i].alive == 0 || stone[i].r != stone[i].targetRow) continue;   // 떨어질 돌만
-
-		stone[i].alive = 0;              // 떨어짐
-		dropCount++;                     // 개수 증가
-
-		for (int y = 0; y < N; y++)      // 모든 칸에
-		{
-			for (int x = 0; x < M; x++)
+		STONE stone = landing[turn][i];
+		for (int r = 0; r < N; r++)      // 모든 칸에
+			for (int c = 0; c < M; c++)
 			{
-				int power = 3 * stone[i].a - 5 * (abs(y - stone[i].r) + abs(x - stone[i].c));   // 3a - 5 x 거리
-				if (power > 0) wave[y][x] += power;   // 양수만 더하기
+				int distance = abs(r - stone.r) + abs(c - stone.c);   // 맨해튼 거리
+				int strength = 3 * stone.weight - 5 * distance;       // 3a - 5 x 거리
+				if (strength > 0) wave[r][c] += strength;             // 양수만 더한다
 			}
-		}
 	}
-
-	return dropCount;                    // 반환
 }
 
-// 4단계 : 점수 (혼탁도는 직전 턴이 끝났을 때 값)
+// 4단계 : 점수. 이 시점의 mud는 직전 턴 종료 시 혼탁도이다.
 int getScore()
 {
-	int sum = 0;                         // 점수
+	int score = 0;
+	for (int r = 0; r < N; r++)
+		for (int c = 0; c < M; c++)
+			if (wave[r][c] > mud[r][c])  // 물결 - 혼탁도 가 양수인 칸만
+				score += wave[r][c] - mud[r][c];
 
-	for (int r = 0; r < N; r++)          // 모든 칸
-	{
+	return score;
+}
+
+// 5단계 : 흙탕물 가라앉기. 이웃의 흙탕물 여부는 감소 전 상태(mud)로 동시에 판정한다.
+void settleMud()
+{
+	for (int r = 0; r < N; r++)
 		for (int c = 0; c < M; c++)
 		{
-			int v = wave[r][c] - murk[r][c];   // 물결 - 혼탁도
-			if (v > 0) sum += v;         // 양수만 더하기
+			int decrease = 2;            // 기본 -2
+			if (r > 0 && r + 1 < N && c > 0 && c + 1 < M &&     // 네 이웃이 모두 격자 안
+				mud[r - 1][c] > 0 && mud[r + 1][c] > 0 &&       // 위, 아래 흙탕물
+				mud[r][c - 1] > 0 && mud[r][c + 1] > 0)         // 왼쪽, 오른쪽 흙탕물
+				decrease = 1;            // 둘러싸이면 -1
+
+			settled[r][c] = mud[r][c] - decrease;   // 결과는 settled에 (mud는 그대로 둔다)
+			if (settled[r][c] < 0) settled[r][c] = 0;   // 0 아래로는 안 감
 		}
-	}
-	return sum;                          // 반환
 }
 
-// 5단계 : 흙탕물 가라앉기 (줄어들기 전 상태로 이웃을 보므로 새 배열에 계산)
-void settle()
+// 6단계 : 물살. 가라앉은 흙탕물(settled)을 한 칸 왼쪽으로 옮기고 0열의 것은 버린다.
+void flowLeft()
 {
-	int next[MAX][MAX];                  // 새 혼탁도
-
-	for (int r = 0; r < N; r++)          // 모든 칸
+	for (int r = 0; r < N; r++)
 	{
-		for (int c = 0; c < M; c++)
-		{
-			next[r][c] = murk[r][c];     // 기본은 그대로
-			if (murk[r][c] == 0) continue;   // 흙탕물 없으면 제외
-
-			int surrounded = 1;   // 네 이웃이 모두 격자 안 + 흙탕물
-			for (int i = 0; i < 4; i++)
-			{
-				int nr = r + dr[i];      // 이웃 행
-				int nc = c + dc[i];      // 이웃 열
-
-				if (nr < 0 || nc < 0 || nr >= N || nc >= M || murk[nr][nc] == 0)   // 밖이거나 맑은 물
-				{
-					surrounded = 0;      // 둘러싸이지 않음
-					break;
-				}
-			}
-
-			next[r][c] -= surrounded ? 1 : 2;   // 둘러싸이면 -1, 아니면 -2
-			if (next[r][c] < 0) next[r][c] = 0; // 0 아래로는 안 감
-		}
-	}
-
-	for (int r = 0; r < N; r++)          // 한꺼번에 반영
-		for (int c = 0; c < M; c++)
-			murk[r][c] = next[r][c];
-}
-
-// 6단계 : 물살 (모두 왼쪽으로 한 칸)
-void flow()
-{
-	for (int r = 0; r < N; r++)          // 행별
-	{
-		for (int c = 0; c < M - 1; c++)
-			murk[r][c] = murk[r][c + 1];   // 왼쪽부터 덮어쓰면 아직 안 옮긴 오른쪽 값을 그대로 가져온다
-		murk[r][M - 1] = 0;              // 마지막 열은 0
+		for (int c = 0; c + 1 < M; c++)
+			mud[r][c] = settled[r][c + 1];   // 오른쪽 칸 값을 가져온다
+		mud[r][M - 1] = 0;               // 마지막 열은 맑은 물
 	}
 }
 
-// 7단계 : 물결 덩어리마다 평균을 혼탁도에 더한다
-void stirUp()
+// 7단계 : 흙탕물 일기. 물결이 양수인 칸을 BFS로 묶고, 덩어리별 평균 세기를 더한다.
+// 점수 계산, 가라앉기, 물살이 모두 끝난 뒤에 실행한다.
+void makeMud()
 {
 	for (int r = 0; r < N; r++)          // 방문 초기화
 		for (int c = 0; c < M; c++)
-			visit[r][c] = 0;
+			visit[r][c] = false;
 
-	for (int sr = 0; sr < N; sr++)       // 모든 칸
-	{
-		for (int sc = 0; sc < M; sc++)
+	for (int r = 0; r < N; r++)
+		for (int c = 0; c < M; c++)
 		{
-			if (wave[sr][sc] <= 0 || visit[sr][sc] == 1) continue;   // 물결 없거나 방문함
+			if (wave[r][c] == 0 || visit[r][c] == true) continue;   // 물결 없거나 이미 묶음
 
-			// BFS로 덩어리를 모은다
-			int rp = 0, wp = 0;          // 큐 위치
-			int sum = 0;                 // 세기 합
+			int rp = 0, wp = 0;          // 큐 읽기/쓰기 위치
+			int sum = 0;                 // 덩어리 세기 합
+			queue[wp].r = r;             // 시작 칸
+			queue[wp++].c = c;
+			visit[r][c] = true;
 
-			queue[wp].r = sr;            // 시작 칸 넣기
-			queue[wp++].c = sc;
-			visit[sr][sc] = 1;           // 방문 표시
-
-			while (rp < wp)              // 큐가 빌 때까지
+			while (rp < wp)
 			{
-				RC out = queue[rp++];    // 하나 꺼내기
-				sum += wave[out.r][out.c];   // 세기 누적
+				RC out = queue[rp++];
+				sum += wave[out.r][out.c];   // 꺼낼 때 세기 누적
 
-				for (int i = 0; i < 4; i++)  // 4방향
+				for (int dir = 0; dir < 4; dir++)
 				{
-					int nr = out.r + dr[i];  // 이웃 행
-					int nc = out.c + dc[i];  // 이웃 열
-
+					int nr = out.r + dr[dir];
+					int nc = out.c + dc[dir];
 					if (nr < 0 || nc < 0 || nr >= N || nc >= M) continue;   // 격자 밖
-					if (wave[nr][nc] <= 0 || visit[nr][nc] == 1) continue;  // 물결 없거나 방문함
+					if (wave[nr][nc] == 0 || visit[nr][nc] == true) continue;   // 물결 없거나 방문
 
-					visit[nr][nc] = 1;   // 방문 표시
-					queue[wp].r = nr;    // 큐에 넣기
+					visit[nr][nc] = true;
+					queue[wp].r = nr;
 					queue[wp++].c = nc;
 				}
 			}
 
-			// 큐에 모인 칸(0 ~ wp-1)이 곧 이 덩어리
-			int avg = sum / wp;          // 평균 (내림)
-			for (int i = 0; i < wp; i++)
-				murk[queue[i].r][queue[i].c] += avg;   // 혼탁도에 더하기
+			int average = sum / wp;      // wp = 덩어리 칸 수, 평균 (내림)
+			for (int i = 0; i < wp; i++) // 큐에 모인 칸 = 이 덩어리
+				mud[queue[i].r][queue[i].c] += average;
 		}
-	}
 }
 
-// 날릴 돌이 남았거나 날고 있는 돌이 있으면 1
-int isRemain(int t)
+void simulate(int tc)
 {
-	for (int i = 0; i < scnt; i++)       // 날고 있는 돌
-		if (stone[i].alive) return 1;
+	printf("#%d", tc);                   // 케이스 번호
 
-	for (int i = 0; i < K; i++)          // 날릴 돌
+	// 마지막 낙하 턴과 50번째 턴 중 더 이른 때에 대회가 끝난다.
+	for (int turn = 1; turn <= 50 && turn <= lastTurn; turn++)
 	{
-		int last = cat[i].s + (cat[i].p - 1) * cat[i].d;   // 마지막 발사 시각
-		if (last > t) return 1;          // 아직 남음
+		// 돌의 낙하 시각을 미리 계산했으므로 이동과 발사(1, 2단계)는 따로 시뮬레이션하지 않는다.
+		makeWave(turn);                  // 3
+		printf(" %d", getScore());       // 4 (바로 출력)
+		settleMud();                     // 5
+		flowLeft();                      // 6
+		makeMud();                       // 7
 	}
-	return 0;                            // 모두 끝남
-}
 
-void simulate()
-{
-	for (int t = 1; t <= LAST_TURN; t++) // 최대 50턴
-	{
-		moveStones();                          // 1
-		launchStones(t);                       // 2
-		int dropCount = dropStones();          // 3
-
-		score[turnCount++] = (dropCount > 0) ? getScore() : 0;   // 4
-
-		settle();                              // 5
-		flow();                                // 6
-		stirUp();                              // 7
-
-		if (isRemain(t) == 0) break;     // 더 할 게 없으면 종료
-	}
+	putchar('\n');
 }
 
 int main()
 {
-	scanf("%d", &T);                     // 테스트 케이스 수 입력
-	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
+	scanf("%d", &T);                     // 테스트 케이스 수
+	for (int tc = 1; tc <= T; tc++)
 	{
-		input();                         // 입력
-
-		simulate();                      // 시뮬레이션
-
-		printf("#%d", tc);               // 케이스 번호 출력
-		for (int i = 0; i < turnCount; i++)
-			printf(" %d", score[i]);     // 턴별 점수 출력
-		putchar('\n');                   // 줄바꿈
+		input();                         // 입력 + 낙하 턴 계산
+		simulate(tc);                    // 시뮬레이션 + 출력
 	}
 
-	return 0;                            // 프로그램 정상 종료
+	return 0;
 }
