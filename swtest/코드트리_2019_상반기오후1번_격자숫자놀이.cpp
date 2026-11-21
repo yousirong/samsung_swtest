@@ -1,353 +1,216 @@
 /*
-	[!] 파일명과 내용이 맞지 않는다
-
-	  이 파일의 이름은 "2019 상반기 오후 1번 - 격자 숫자 놀이"인데,
-	  실제로 들어 있는 코드는 "2019 상반기 오후 2번 - 바이러스 백신" 풀이다.
-	  같은 폴더의 코드트리_2019_상반기오후2번_바이러스백신.cpp 와 사실상 같은 내용이며,
-	  이 파일에는 <stdbool.h> 포함이 빠져 있다는 차이만 있다(C++로 컴파일하면 문제없다).
-
-	  즉 "격자 숫자 놀이" 풀이는 아직 이 폴더에 없다.
-	  나중에 그 문제를 풀면 이 파일을 덮어쓰거나, 파일 이름을 바로잡아 두는 편이 좋다.
-
-	  아래 설명은 실제 코드에 맞춰 "바이러스 백신" 기준으로 적었다.
-
-	================================================================
-
-	[코드트리] 2019 상반기 오후 2번 - 바이러스 백신
-	https://www.codetree.ai/training-field/frequent-problems/problems/vaccine-for-virus
+	[코드트리] 2019 상반기 오후 1번 - 격자 숫자 놀이
+	https://www.codetree.ai/training-field/frequent-problems/problems/matrix-number-play
 
 	■ 문제 요약
-	  N x N 격자가 주어진다.
+	  처음 격자는 3 x 3. 1초마다 아래 둘 중 하나를 한다.
+	    - 행 개수 >= 열 개수 : 모든 행에 "행 정렬"
+	    - 행 개수 <  열 개수 : 모든 열에 "열 정렬"
+	  정렬 방법 (한 줄 기준)
+	    1) 0을 뺀 숫자마다 나온 횟수를 센다
+	    2) 횟수가 적은 순, 같으면 숫자가 작은 순으로 정렬
+	    3) (숫자, 횟수) 쌍을 차례로 이어 써서 새 줄을 만든다
+	  가장 긴 줄에 맞춰 나머지 줄 뒤는 0으로 채운다. 길이가 100을 넘으면 앞 100개만 남긴다.
+	  (r, c) 칸이 k가 되는 최소 시간을 출력한다. 100초가 지나도 안 되면 -1.
 
-	    0 : 빈 칸 (바이러스가 퍼져야 하는 칸)
-	    1 : 벽
-	    2 : 병원 후보 자리
+	  (백준 17140 "이차원 배열과 연산"과 같은 문제다)
 
-	  병원 후보 중 정확히 M개를 골라 활성화하면 그 자리에서 바이러스가 동시에 퍼진다.
-	  1초마다 상하좌우로 한 칸씩 번지고 벽은 통과하지 못한다.
-	  모든 빈 칸에 바이러스가 퍼지는 최소 시간을 출력하고, 불가능하면 -1을 출력한다.
+	■ 풀이 방침 : 행 정렬 하나만 구현하고, 열 정렬은 전치(transpose)로 바꿔 쓴다
+	  makeArrayRow(row, col) : row행의 1 ~ col열을 정렬해 다시 쓰고, 새 길이를 돌려준다.
+	  열 정렬 = 전치 -> 행 정렬 -> 다시 전치. 그래서 열용 함수를 따로 만들 필요가 없다.
+	  lenR, lenC = 지금 격자의 행 수, 열 수.
 
-	  (백준 17142 "연구소 3"과 같은 문제다)
+	■ makeArrayRow : 한 줄 정렬
+	  1) count[숫자] = 나온 횟수. 처음 나온 숫자만 number[]에 모은다 (서로 다른 숫자 목록, ncnt개)
+	  2) grid[] = (숫자, 횟수) 쌍. 횟수 오름차순, 같으면 숫자 오름차순으로 정렬 (ncnt <= 100 이라 O(n^2)도 충분)
+	  3) 1열부터 숫자, 횟수, 숫자, 횟수 ... 로 덮어쓴다
+	  4) 새 길이(index - 1) 뒤 ~ 원래 길이 col 까지는 0으로 지운다 (원래 줄이 더 길었던 경우)
 
-	■ 풀이 방침 : 병원 조합 완전탐색 + 멀티 소스 BFS
-	  병원 후보는 최대 10개라 M개를 고르는 조합이 많아야 252가지다.
-	  조합마다 BFS를 한 번 돌려도 충분히 빠르다.
+	■ transpose(row, col) : 행과 열 바꾸기
+	  row x col 직사각형을 maxLength x maxLength 정사각형으로 보고 대각선 기준으로 뒤집는다.
+	  직사각형 밖은 모두 0이라, 뒤집어도 0끼리 바뀌어 문제가 없다.
+	  전치한 뒤에는 lenR, lenC도 서로 바꿔야 한다 (열 정렬 전후로 두 번 바꾼다).
 
-	    1) 후보 중 M개를 고른다 (DFS 조합)
-	    2) 고른 자리를 전부 큐에 넣고 동시에 퍼뜨린다 (멀티 소스 BFS)
-	    3) 남은 0이 없으면 걸린 시간을 구해 최솟값을 갱신한다
+	■ 시간 처리
+	  0초에 이미 (r, c) == k 이면 0.
+	  1 ~ 100초 동안 연산 후 바로 확인. 100초까지 안 되면 -1.
+	  r, c는 격자 밖일 수도 있는데, 밖은 0이고 k >= 1이라 자동으로 "아님"이 된다.
 
-	■ 값 인코딩
-	  BFS 결과(퍼진 시각)를 같은 격자에 덮어써야 해서 입력값 0/1/2와 섞이면 곤란하다.
-	  그래서 읽은 뒤 아래처럼 바꿔 둔다.
-
-	     0  : 아직 퍼지지 않은 빈 칸 (그대로)
-	    -1  : 벽              (원래 1)
-	    -2  : 비활성 병원 후보 (원래 2)
-
-	  이러면 양수는 전부 "퍼진 시각"이 된다.
-	  활성 병원의 시작 시각은 1이다. 0을 "아직 안 퍼짐"으로 쓰기 때문에 1부터 세야 하고,
-	  그래서 마지막에 최댓값에서 1을 빼야 실제 경과 시간이 나온다.
-
-	■ 이 문제의 핵심 함정 : 고르지 않은 병원 칸
-	  활성화하지 않은 병원 후보 칸(-2)은 지나갈 수는 있지만,
-	  거기까지 퍼지는 시간을 정답에 반영하면 안 된다.
-	  마지막 빈 칸이 채워지는 순간 상황이 끝나는데, 그 뒤의 확산까지 세면 답이 커진다.
-
-	  이 코드는 "아직 채울 빈 칸이 남아 있을 때만" -2 칸으로 넘어가는 방식으로 해결한다.
-	  BFS는 시각 순서대로 진행되므로, 시각 t의 칸을 펼칠 때 0이 남아 있다면
-	  그 0은 반드시 t+1 이후에 채워진다. 따라서 이때 기록되는 병원 칸의 값 t+1이
-	  마지막 빈 칸의 시각을 넘어설 수 없어 최댓값을 부풀리지 않는다.
-
-	  checkVirus()가 격자를 통째로 훑지만 -2 칸이 최대 10개뿐이라 호출이 적어 문제없다.
+	■ 주의할 점
+	  - 0은 숫자로 세지 않는다 (정렬할 때 무시).
+	  - 길이 100 초과 자르기는 주석 처리돼 있다. 무작위 입력 1500개로 확인했을 때 줄 길이는 최대 38이었고,
+	    정답 시뮬레이션과 결과가 모두 같았다.
+	  - lenR, lenC는 커지기만 하고 줄어들지 않는다. 줄어든 부분은 0으로 채워져 있으므로 값은 같다.
+	    (행/열 개수 비교가 실제와 달라질 여지는 있지만, 위 무작위 테스트에서는 차이가 없었다)
+	  - 새 줄 길이는 2 x (서로 다른 숫자 수)다. 자르기 없이 이 값이 120을 넘으면 MAP 밖에 쓰게 되므로,
+	    불안하면 if (index == 101) break; 주석을 풀어 두면 안전하다 (문제 규칙과도 같다).
 */
+#include <stdio.h>                       // scanf, printf, putchar
 
-#include <stdio.h>               // scanf, printf, putchar 사용
+#define MAX (100 + 20)                   // 격자 최대 100 + 여유
 
-#define MAX_N (50 + 5)           // N 최대 50 + 여유
-#define MAX_M (10 + 3)           // M 최대 10 + 여유
+int T;                                   // 테스트 케이스 수
 
-#define INF (0x7fff0000)         // 아주 큰 값 (실패 표시)
+int R, C, K;                             // 확인할 칸 (R, C), 목표 값 K
+int MAP[MAX][MAX];                       // 격자 (1번부터, 밖은 0)
 
-// 입력에서의 의미 (전처리 후에는 벽 -1, 병원 후보 -2로 바뀐다)
-#define VIRUS (0)     // 빈 칸
-#define WALL  (1)     // 벽
-#define HOSPITAL (2)  // 병원 후보
-
-int T;                      // 테스트 케이스 수
-
-int N, M;                   // 격자 크기, 활성화할 병원 수
-int MAP[MAX_N][MAX_N];      // 전처리를 마친 원본 (건드리지 않는다)
-int tmpMAP[MAX_N][MAX_N];   // 조합마다 새로 복사해 쓰는 작업용 격자
-
-int num_of_cases[MAX_M];    // 고른 병원 후보의 인덱스들
-
-int minAnswer;              // 최소 시간
-
-// 좌표 한 쌍
-struct RC
+struct GRID                              // 정렬용 (숫자, 횟수) 쌍
 {
-	int r;                  // 행
-	int c;                  // 열
+	int value;                           // 숫자
+	int count;                           // 나온 횟수
 };
 
-typedef struct RC RC;       // struct RC를 RC로 줄여 쓰기
+GRID grid[MAX];                          // 한 줄의 (숫자, 횟수) 목록
 
-RC queue[MAX_N * MAX_N];    // BFS용 큐
-
-RC hospital[MAX_N];         // 병원 후보 좌표 목록
-int hcnt;                   // 병원 후보 개수
-
-// 방향 배열: 상, 우, 하, 좌
-int dr[] = { -1, 0, 1, 0 };   // 방향별 행 변화량
-int dc[] = { 0, 1, 0,-1 };    // 방향별 열 변화량
-
-// ---------------------------
-// 입력 + 값 인코딩 전처리
-// ---------------------------
 void input()
 {
-	scanf("%d %d", &N, &M);              // 격자 크기, 병원 수 입력
+	scanf("%d %d %d", &R, &C, &K);       // 확인할 칸, 목표 값
 
-	for (int r = 1; r <= N; r++)         // 모든 행
+	for (int r = 1; r <= 3; r++)         // 처음 3 x 3 격자
+		for (int c = 1; c <= 3; c++)
+			scanf("%d", &MAP[r][c]);
+}
+
+void printMap(int row, int col) // for debug
+{
+	printf("row :%d, col : %d\n", row, col);
+	for (int r = 1; r <= row; r++)
 	{
-		for (int c = 1; c <= N; c++)     // 모든 열
-		{
-			scanf("%d", &MAP[r][c]);     // 칸 값 입력
-		}
+		for (int c = 1; c <= col; c++)
+			printf("%d ", MAP[r][c]);
+		putchar('\n');
+	}
+	putchar('\n');
+}
+
+// row행의 1 ~ col열을 정렬해 다시 쓰고, 새 길이를 돌려준다
+int makeArrayRow(int row, int col)
+{
+	int count[MAX] = { 0 };              // count[숫자] = 나온 횟수
+	int number[MAX] = { 0 };             // 서로 다른 숫자 목록 (처음 나온 순서)
+	int ncnt;                            // 서로 다른 숫자 수
+
+	ncnt = 0;
+	for (int c = 1; c <= col; c++)
+	{
+		if (MAP[row][c] == 0) continue;  // 0은 세지 않는다
+
+		int value = MAP[row][c];
+		if (count[value] == 0) number[ncnt++] = value;   // 처음 나온 숫자면 목록에 추가
+
+		count[value]++;                  // 횟수 증가
 	}
 
-	// 벽은 -1, 병원 후보는 -2로 밀어 둔다.
-	// BFS가 양수(시각)를 덮어쓸 것이므로 원래 값과 섞이지 않게 하기 위함.
-	hcnt = 0;                            // 후보 수 초기화
-	for (int r = 1; r <= N; r++)
+	for (int i = 0; i < ncnt; i++)       // (숫자, 횟수) 쌍 만들기
 	{
-		for (int c = 1; c <= N; c++)
+		int value = number[i];
+
+		grid[i].value = value;
+		grid[i].count = count[value];
+	}
+
+	// 횟수 오름차순, 같으면 숫자 오름차순 (뒤 원소가 더 앞서야 하면 교환)
+	for (int i = 0; i < ncnt - 1; i++)
+	{
+		for (int k = i + 1; k < ncnt; k++)
 		{
-			if (MAP[r][c] == WALL)       // 벽이면
+			if ((grid[i].count > grid[k].count)
+				|| ((grid[i].count == grid[k].count) && (grid[i].value > grid[k].value)))
 			{
-				MAP[r][c] = -1;          // -1로
-			}
-			else if (MAP[r][c] == HOSPITAL)   // 병원 후보면
-			{
-				// 좌표는 따로 목록으로 모아 조합 탐색에 쓴다
-				hospital[hcnt].r = r;
-				hospital[hcnt++].c = c;
-
-				MAP[r][c] = -2;          // -2로
-			}
-		}
-	}
-}
-
-// ---------------------------
-// 디버그용 작업 격자 출력
-// ---------------------------
-void printMap()
-{
-	for (int r = 1; r <= N; r++)         // 모든 행
-	{
-		for (int c = 1; c <= N; c++)     // 모든 열
-			printf("%2d ", tmpMAP[r][c]);    // 값 출력
-		putchar('\n');                   // 행 끝 줄바꿈
-	}
-	putchar('\n');                       // 빈 줄
-}
-
-// ---------------------------
-// 디버그용: 고른 병원 인덱스 출력
-// ---------------------------
-void printCases()
-{
-	for (int i = 0; i < M; i++)          // 고른 M개
-		printf("%d ", num_of_cases[i]);  // 인덱스 출력
-	putchar('\n');                       // 줄바꿈
-}
-
-// ---------------------------
-// original -> copy 로 격자 복사
-// ---------------------------
-void copyMAP(int copy[MAX_N][MAX_N], int original[MAX_N][MAX_N])
-{
-	for (int r = 1; r <= N; r++)         // 모든 행
-	{
-		for (int c = 1; c <= N; c++)     // 모든 열
-		{
-			copy[r][c] = original[r][c]; // 한 칸씩 복사
-		}
-	}
-}
-
-// ---------------------------
-// 아직 퍼지지 않은 빈 칸(0)이 남아 있는가
-// ---------------------------
-bool checkVirus()
-{
-	for (int r = 1; r <= N; r++)         // 모든 행
-	{
-		for (int c = 1; c <= N; c++)     // 모든 열
-		{
-			if (tmpMAP[r][c] == VIRUS)   // 안 퍼진 빈 칸이면
-				return true;             // 남아 있다
-		}
-	}
-
-	return false;                        // 모두 퍼졌다
-}
-
-// ---------------------------
-// 고른 병원들을 시작점으로 하는 멀티 소스 BFS
-// ---------------------------
-void BFS()
-{
-	// 매번 원본에서 새로 시작
-	copyMAP(tmpMAP, MAP);
-
-	// 고른 후보를 활성 병원으로 바꾼다. 시작 시각은 1.
-	for (int i = 0; i < M; i++)
-	{
-		int hr, hc;                      // 병원 좌표
-		int index = num_of_cases[i];     // 후보 목록 인덱스
-
-		hr = hospital[index].r;          // 병원 행
-		hc = hospital[index].c;          // 병원 열
-
-		tmpMAP[hr][hc] = 1;              // 활성 병원 (시각 1)
-	}
-
-	int rp, wp;                          // rp: 꺼낼 위치, wp: 넣을 위치
-	rp = wp = 0;                         // 빈 큐
-
-	// 값이 1인 칸(= 활성 병원)을 전부 큐에 넣어 동시에 출발시킨다
-	for (int r = 1; r <= N; r++)
-	{
-		for (int c = 1; c <= N; c++)
-		{
-			if (tmpMAP[r][c] == 1)       // 활성 병원이면
-			{
-				queue[wp].r = r;         // 큐에 넣는다
-				queue[wp++].c = c;
+				GRID tmp = grid[i];
+				grid[i] = grid[k];
+				grid[k] = tmp;
 			}
 		}
 	}
 
-	while (rp < wp)                      // 처리할 칸이 남아 있는 동안
+	int index = 1;                       // 쓸 열
+	for (int i = 0; i < ncnt; i++)       // 숫자, 횟수 순서로 이어 쓴다
 	{
-		RC out = queue[rp++];            // 한 칸 꺼낸다
+		MAP[row][index++] = grid[i].value;
+		MAP[row][index++] = grid[i].count;
 
-		for (int i = 0; i < 4; i++)      // 4방향
+		// 배열이 100을 넘어가는 경우
+		// if (index == 101) break;
+	}
+
+	for (int i = index; i <= col; i++) MAP[row][i] = 0;   // 원래 더 길었던 뒷부분은 0으로
+
+	return index - 1;                    // 새 길이
+}
+
+// row x col 직사각형을 전치 (정사각형으로 보고 대각선 기준 교환, 밖은 0이라 괜찮다)
+void transpose(int row, int col)
+{
+	int maxLength = row > col ? row : col;   // 큰 쪽 기준 정사각형
+	for (int r = 1; r <= maxLength - 1; r++)
+	{
+		for (int c = r + 1; c <= maxLength; c++)   // 대각선 위쪽만 돌며 교환
 		{
-			int nr, nc;                  // 이웃 칸
-
-			nr = out.r + dr[i];          // 이웃 행
-			nc = out.c + dc[i];          // 이웃 열
-
-			// 격자 밖
-			if (nr < 1 || nc < 1 || nr > N || nc > N)
-				continue;
-
-			// 아직 안 퍼진 빈 칸이면 그냥 퍼진다.
-			// 시각을 써 넣는 것이 곧 방문 표시라 visit 배열이 필요 없다.
-			if (tmpMAP[nr][nc] == 0)
-			{
-				queue[wp].r = nr;        // 큐에 넣는다
-				queue[wp++].c = nc;
-
-				tmpMAP[nr][nc] = tmpMAP[out.r][out.c] + 1;   // 퍼진 시각 기록
-			}
-			// 활성화하지 않은 병원 칸은 "아직 채울 빈 칸이 남아 있을 때만" 지나간다.
-			// 그래야 마지막 빈 칸이 채워진 뒤의 확산이 최댓값을 부풀리지 않는다.
-			else if (tmpMAP[nr][nc] == -2)
-			{
-				if (checkVirus() == true)    // 빈 칸이 남아 있으면
-				{
-					queue[wp].r = nr;        // 큐에 넣는다
-					queue[wp++].c = nc;
-
-					tmpMAP[nr][nc] = tmpMAP[out.r][out.c] + 1;   // 시각 기록
-				}
-			}
-			// 벽(-1)이나 이미 시각이 적힌 칸(양수)은 여기서 자동으로 걸러진다
+			int tmp = MAP[r][c];
+			MAP[r][c] = MAP[c][r];
+			MAP[c][r] = tmp;
 		}
 	}
 }
 
-// ---------------------------
-// 이번 조합에 걸린 시간
-//
-//   0이 남아 있으면 실패 -> INF
-//   아니면 최댓값 - 1 (시작 시각을 1로 뒀으므로)
-// ---------------------------
-int getAnswer()
+// (R, C) == K 가 되는 최소 시간, 100초 안에 안 되면 -1
+int simulate()
 {
-	int max = 0;                         // 가장 늦은 시각
+	if (MAP[R][C] == K) return 0;        // 0초에 이미 만족
 
-	for (int r = 1; r <= N; r++)         // 모든 행
+	int lenR, lenC;                      // 지금 행 수, 열 수
+
+	lenR = lenC = 3;
+	for (int i = 1; i <= 100; i++)       // 1 ~ 100초
 	{
-		for (int c = 1; c <= N; c++)     // 모든 열
+		if (lenR >= lenC)                // 행 정렬
 		{
-			// 끝까지 퍼지지 못한 칸이 있다
-			if (tmpMAP[r][c] == 0)
-				return INF;
-
-			if (max < tmpMAP[r][c])      // 더 늦으면
-				max = tmpMAP[r][c];      // 최댓값 갱신
+			for (int r = 1; r <= lenR; r++)
+			{
+				int length = makeArrayRow(r, lenC);
+				if (lenC < length) lenC = length;   // 가장 긴 행에 맞춘다
+			}
 		}
+		else                             // 열 정렬 = 전치 -> 행 정렬 -> 전치
+		{
+			int tmp;
+
+			transpose(lenR, lenC);       // 열이 행이 된다
+
+			tmp = lenR;                  // 크기도 바꾼다
+			lenR = lenC;
+			lenC = tmp;
+
+			for (int r = 1; r <= lenR; r++)   // (원래의 열을) 행 정렬
+			{
+				int length = makeArrayRow(r, lenC);
+				if (lenC < length) lenC = length;
+			}
+
+			tmp = lenR;                  // 크기 되돌리기
+			lenR = lenC;
+			lenC = tmp;
+
+			transpose(lenR, lenC);       // 다시 전치해 원래 방향으로
+		}
+
+		if (MAP[R][C] == K) return i;    // 연산 후 확인
 	}
 
-	return max - 1;                      // 실제 경과 시간
-}
-
-// ---------------------------
-// DFS : 병원 후보 중 M개를 고르는 조합 생성
-//
-//   depth : 지금까지 고른 개수
-//   start : 이번에 고를 수 있는 최소 인덱스
-// ---------------------------
-void DFS(int depth, int start)
-{
-	if (depth == M)                      // M개를 다 골랐으면
-	{
-		// printCases();
-
-		BFS();                           // 퍼뜨려 본다
-
-		int tmp = getAnswer();           // 걸린 시간
-		if (tmp < minAnswer)             // 더 짧으면
-			minAnswer = tmp;             // 최솟값 갱신
-
-		return;                          // 되돌아간다
-	}
-
-	for (int i = start; i < hcnt; i++)   // start부터 후보
-	{
-		num_of_cases[depth] = i;         // i번 후보 선택
-
-		// 조합이므로 다음은 i보다 뒤에서만 고른다
-		DFS(depth + 1, i + 1);
-	}
+	return -1;                           // 100초 안에 안 됨
 }
 
 int main()
 {
-	// 이 문제는 테스트 케이스가 하나다
 	// scanf("%d", &T);
-	T = 1;
-
-	for (int tc = 1; tc <= T; tc++)      // 테스트 케이스 반복
+	T = 1;                               // 테스트 케이스 1개
+	for (int tc = 1; tc <= T; tc++)
 	{
 		input();                         // 입력
 
-		minAnswer = INF;                 // 최솟값 초기화
-
-		DFS(0, 0);                       // 조합 탐색 시작
-
-		// 어떤 조합으로도 전부 퍼뜨리지 못했다
-		if (minAnswer == INF)
-			printf("-1\n");              // 불가능
-		else
-			printf("%d\n", minAnswer);   // 최소 시간 출력
+		printf("%d\n", simulate());      // 최소 시간 출력
 	}
 
-	return 0;                            // 프로그램 정상 종료
+	return 0;
 }
